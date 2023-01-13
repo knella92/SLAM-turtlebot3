@@ -9,11 +9,7 @@ from launch_ros.substitutions import FindPackageShare, ExecutableInPackage
 def generate_launch_description():
         
     return LaunchDescription([
-        Node(
-            package='joint_state_publisher',
-            executable='joint_state_publisher',
-            name='joint_state_publisher'
-            ),
+        
     
         Node(
             package='robot_state_publisher',
@@ -22,9 +18,15 @@ def generate_launch_description():
                 {'robot_description':
                 Command([ExecutableInPackage('xacro','xacro'), ' ',
                         PathJoinSubstitution(
-                        [FindPackageShare('nuturtle_description'), 'turtlebot3_burger.urdf.xacro'])
+                        [FindPackageShare('nuturtle_description'), 'urdf/turtlebot3_burger.urdf.xacro'])
                         ])}
                         ]
+            ),
+
+        Node(
+            package='joint_state_publisher',
+            executable='joint_state_publisher',
+            name='joint_state_publisher'
             ),
 
         Node(
