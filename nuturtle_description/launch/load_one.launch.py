@@ -1,4 +1,3 @@
-import os
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.conditions import IfCondition, UnlessCondition
@@ -10,6 +9,13 @@ def generate_launch_description():
         
     return LaunchDescription([
         
+        DeclareLaunchArgument(
+            name='use_rviz',
+            default_value='true',
+            choices=['true', 'false'],
+            description='Controls whether rviz is launched'
+        )
+        ,
     
         Node(
             package='robot_state_publisher',
@@ -30,6 +36,7 @@ def generate_launch_description():
             ),
 
         Node(
+            condition=IfCondition(LaunchConfiguration('use_rviz')),
             package='rviz2',
             executable='rviz2',
             name='rviz2',
