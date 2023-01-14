@@ -4,22 +4,30 @@ from launch.conditions import IfCondition
 from launch.substitutions import Command, LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare, ExecutableInPackage
+from launch_ros.parameter_descriptions import ParameterFile
 
 def generate_launch_description():
         
     return LaunchDescription([
         
-        DeclareLaunchArgument(
+        DeclareLaunchArgument(              #Creates a launch argument regarding use of rviz upon launch
             name='use_rviz',
             default_value='true',
             choices=['true', 'false'],
             description='Controls whether rviz is launched'
         ),
     
-        DeclareLaunchArgument(
+        DeclareLaunchArgument(              #Creates a launch argument regarding use of joint_state_publisher upon launch
             name='use_jsp',
             default_value='true',
             choices=['true', 'false'],
+            description='Controls whether joint_state_publisher is used to publish default joint states'
+        ),
+
+        DeclareLaunchArgument(              #Creates a launch argument for color
+            name='color',
+            default_value='purple',
+            choices=['red', 'green', 'blue', 'purple'],
             description='Controls whether joint_state_publisher is used to publish default joint states'
         ),
 
@@ -30,7 +38,8 @@ def generate_launch_description():
                 {'robot_description':
                 Command([ExecutableInPackage('xacro','xacro'), ' ',
                         PathJoinSubstitution(
-                        [FindPackageShare('nuturtle_description'), 'urdf/turtlebot3_burger.urdf.xacro'])
+                        [FindPackageShare('nuturtle_description'), 'urdf/turtlebot3_burger.urdf.xacro']),
+                        ' ', 'color:=', LaunchConfiguration('color')            #passes color argument into xacro file
                         ])}
                         ]
             ),
@@ -49,6 +58,6 @@ def generate_launch_description():
             name='rviz2',
             output='screen',
             arguments=['-d', PathJoinSubstitution([FindPackageShare('nuturtle_description'),'config/basic_purple.rviz'])],
-            on_exit=Shutdown()
+            on_exit=Shutdown()  #launchfile action to terminate launchfile upon exiting rviz2 node
             )
     ])
