@@ -2,9 +2,9 @@
 
 URDF files for NUturtle franklin
 * 'ros2 launch nuturtle_description load_one.launch.py' to see the robot in rviz.
-![] (images/rviz.png)
+![](images/rviz.png)
 * The rqt_graph when all four robots are visualized (Nodes Only, Hide Debug) is:
-![] (images/rqt_graph.svg)
+![](images/rqt_graph.svg)
 
 # Launch File Details
 * 'ros2 launch nuturtle_description load_one.launch.py -s'
