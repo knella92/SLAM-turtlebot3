@@ -1,8 +1,18 @@
 #include "rigid2d.hpp"
 #include <iostream>
 
-int main(){
-    bool x = turtlelib::almost_equal(3,3);
-    std::cout << (x==true?"true\n":"false\n");
+
+std::ostream & turtlelib::operator<<(std::ostream & os, const Vector2D & v)
+{
+    os << '[' << v.x << ' ' << v.y << ']' << '\n';
+    return os;
+}
+
+
+
+int main()
+{
+    const turtlelib::Vector2D v{1,2};
+    std::cout << v;
     return 0;
 }
