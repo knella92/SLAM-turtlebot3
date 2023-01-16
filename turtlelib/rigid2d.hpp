@@ -99,6 +99,10 @@ namespace turtlelib
     /// \brief a rigid body transformation in 2 dimensions
     class Transform2D
     {
+    private:
+
+        double transf[3][3];
+
     public:
         /// \brief Create an identity transformation
         Transform2D();
