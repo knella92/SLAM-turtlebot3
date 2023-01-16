@@ -126,7 +126,12 @@ std::ostream & turtlelib::operator<<(std::ostream & os, const turtlelib::Transfo
 
 std::istream & turtlelib::operator>>(std::istream & is, turtlelib::Transform2D & tf)
 {
-    is >> tf;
+    turtlelib::Vector2D vec{};
+    double deg{};
+    is >> deg >> vec.x >> vec.y;
+    double radians = deg2rad(deg);
+    turtlelib::Transform2D newtf{vec, radians};
+    tf = newtf;
     return is;
 }
 
@@ -139,12 +144,11 @@ turtlelib::Transform2D turtlelib::operator*(Transform2D lhs, const Transform2D &
 int main()
 {
     turtlelib::Vector2D v{1,1}; double rad{3.14};
-    turtlelib::Transform2D tf1{v,rad};
+    turtlelib::Transform2D tf1{};
+    std::cout << "Enter deg, x, y: \n";
     std::cin >> tf1;
-    turtlelib::Transform2D tf2{};
-    std::cin >> tf2;
-    turtlelib::Transform2D tf3 = tf1*tf2;
-    std::cout << tf3;
+    std::cout << tf1.translation() << tf1.rotation();
+
     
     return 0;
 }
