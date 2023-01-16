@@ -48,14 +48,14 @@ turtlelib::Transform2D::Transform2D(Vector2D trans)
 turtlelib::Transform2D::Transform2D(double radians)
     :  transf{{cos(radians),sin(radians)*-1.0, 0.0}
              ,{sin(radians),cos(radians), 0.0}
-             ,{0.0, 0.0, 1.0}}
+             ,{0.0, 0.0, 1.0}}, rad{radians}
 {
 }
 
 turtlelib::Transform2D::Transform2D(Vector2D trans, double radians)
     : transf{{cos(radians),sin(radians)*-1.0, trans.x}
             ,{sin(radians),cos(radians), trans.y}
-            ,{0.0, 0.0, 1.0}}
+            ,{0.0, 0.0, 1.0}}, rad{radians}
 {
 }
 
@@ -113,14 +113,12 @@ turtlelib::Vector2D turtlelib::Transform2D::translation() const
 
 double turtlelib::Transform2D::rotation() const
 {
-    double out_rad{};
-    out_rad = acos(transf[0][0]);
-    return out_rad;
+    return rad;
 }
 
 std::ostream & turtlelib::operator<<(std::ostream & os, const turtlelib::Transform2D & tf)
 {
-    os << "deg: " << turtlelib::rad2deg(tf.rotation()) << " x: " << tf.translation().x << " y: " << tf.translation().y << '\n';
+    os << "deg: " << rad2deg(tf.rotation()) << " x: " << tf.translation().x << " y: " << tf.translation().y << '\n';
     return os;
 }
 
@@ -128,7 +126,39 @@ std::istream & turtlelib::operator>>(std::istream & is, turtlelib::Transform2D &
 {
     turtlelib::Vector2D vec{};
     double deg{};
-    is >> deg >> vec.x >> vec.y;
+    int space_pos{0}; // tells you which white space # peek() is at
+    char x{};
+    int num{0}; // set to 1 if a number is entered first, which triggers commands accordingly
+    while (std::cin.peek()!='\n')
+    {
+        x = std::cin.peek();
+        if (x == ' ')
+        {
+            space_pos = space_pos + 1;
+            std::cin.get(x);
+        }
+        else if (std::isdigit(x)||x == '-')
+        {   
+            if(space_pos==0)
+            {
+                num = 1;
+                is >> deg;
+                space_pos = 2;
+            }
+            else if(space_pos==1){is>>deg;}
+            else if(space_pos==3)
+            {
+                is>>vec.x;
+                if(num==1){space_pos = 4;}
+            }
+            else if(space_pos==5){is>>vec.y;}
+        }
+        else
+        {
+            std::cin.get(x);
+        }
+    }
+
     double radians = deg2rad(deg);
     turtlelib::Transform2D newtf{vec, radians};
     tf = newtf;
@@ -147,7 +177,7 @@ int main()
     turtlelib::Transform2D tf1{};
     std::cout << "Enter deg, x, y: \n";
     std::cin >> tf1;
-    std::cout << tf1.translation() << tf1.rotation();
+    std::cout << tf1;
 
     
     return 0;

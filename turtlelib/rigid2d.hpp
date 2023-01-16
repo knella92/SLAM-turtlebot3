@@ -102,6 +102,7 @@ namespace turtlelib
     private:
 
         double transf[3][3];
+        double rad;
 
     public:
         /// \brief Create an identity transformation
