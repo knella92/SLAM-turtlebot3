@@ -120,18 +120,31 @@ double turtlelib::Transform2D::rotation() const
 
 std::ostream & turtlelib::operator<<(std::ostream & os, const turtlelib::Transform2D & tf)
 {
-    os << '[' << tf.transf[0][0] << ' ' << tf.transf[0][1] << ' ' << tf.transf[0][2] << "]\n"
-       << '[' << tf.transf[1][0] << ' ' << tf.transf[1][1] << ' ' << tf.transf[1][2] << "]\n"
-       << '[' << tf.transf[2][0] << ' ' << tf.transf[2][1] << ' ' << tf.transf[2][2] << "]\n";
+    os << "deg: " << turtlelib::rad2deg(tf.rotation()) << " x: " << tf.translation().x << " y: " << tf.translation().y << '\n';
     return os;
+}
+
+std::istream & turtlelib::operator>>(std::istream & is, turtlelib::Transform2D & tf)
+{
+    is >> tf;
+    return is;
+}
+
+turtlelib::Transform2D turtlelib::operator*(Transform2D lhs, const Transform2D & rhs)
+{
+    lhs*=rhs;
+    return lhs;
 }
 
 int main()
 {
-    turtlelib::Vector2D v{1,2};
-    turtlelib::Vector2D trans{1,1};
-    double radians = 3.14;
-    turtlelib::Transform2D transfor{trans, radians};
-    std::cout<<transfor.inv();
+    turtlelib::Vector2D v{1,1}; double rad{3.14};
+    turtlelib::Transform2D tf1{v,rad};
+    std::cin >> tf1;
+    turtlelib::Transform2D tf2{};
+    std::cin >> tf2;
+    turtlelib::Transform2D tf3 = tf1*tf2;
+    std::cout << tf3;
+    
     return 0;
 }
