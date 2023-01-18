@@ -133,6 +133,19 @@ double turtlelib::Transform2D::rotation() const
     return radians;
 }
 
+turtlelib::Twist2D turtlelib::Transform2D::operator()(turtlelib::Twist2D V) const
+{
+    turtlelib::Twist2D V_new{};
+    double adj[3][3]{{1.0, 0.0, 0.0}
+              ,{transf[1][2], transf[0][0], transf[0][1]}
+              ,{-transf[0][2], transf[1][0], transf[1][1]}};
+    V_new.w = V.w;
+    V_new.v.x = adj[1][0]*V.w + adj[1][1]*V.v.x + adj[1][2]*V.v.y;
+    V_new.v.y = adj[2][0]*V.w + adj[2][1]*V.v.x + adj[2][2]*V.v.y;
+
+    return V_new;
+}
+
 std::ostream & turtlelib::operator<<(std::ostream & os, const turtlelib::Transform2D & tf)
 {
     os << "deg: " << turtlelib::rad2deg(tf.rotation()) << " x: " << tf.translation().x << " y: " << tf.translation().y;
@@ -190,6 +203,7 @@ turtlelib::Transform2D turtlelib::operator*(Transform2D lhs, const Transform2D &
     return lhs;
 }
 
+
 turtlelib::Vector2D turtlelib::normalize(Vector2D v)
 {
     double mag{};
@@ -199,6 +213,9 @@ turtlelib::Vector2D turtlelib::normalize(Vector2D v)
     return v;
 }
 
+
+// Twist2D implementations
+
 turtlelib::Twist2D::Twist2D()
     : w{0}, v{0}
 {
@@ -207,7 +224,6 @@ turtlelib::Twist2D::Twist2D()
 turtlelib::Twist2D::Twist2D(double ang_v, Vector2D xy)
     : w{ang_v}, v{xy}
 {
-
 }
 
 

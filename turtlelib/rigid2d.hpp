@@ -97,6 +97,28 @@ namespace turtlelib
     /// HINT: this function can be written in under 20 lines and uses only std::peek(), std::get(), istream::operator>>() and a little logic
     std::istream & operator>>(std::istream & is, Vector2D & v);
 
+    // \brief A twist in two dimensions 
+    struct Twist2D
+    {
+        double w;
+        Vector2D v;
+
+        /// \brief Create an empty twist
+        Twist2D();
+
+        /// \brief Create a twist with a rotational and translational
+        /// component
+        /// \param w - the rotational velocity
+        /// \param xdot - the x velocity
+        /// \param ydot - the y velocity
+        Twist2D(double w, Vector2D v);
+
+        /// \brief \see operator<<(...) (declared outside this class)
+        /// for a description
+        friend std::ostream & operator<<(std::ostream & os, const Twist2D & tw);
+
+    };
+
     /// \brief a rigid body transformation in 2 dimensions
     class Transform2D
     {
@@ -150,6 +172,11 @@ namespace turtlelib
         /// for a description
         friend std::ostream & operator<<(std::ostream & os, const Transform2D & tf);
 
+        /// \brief convert a twist V to a different reference frame
+        /// \param V - the twist to transform
+        /// \return a twist in the new reference frame
+        Twist2D operator()(Twist2D V) const;
+
     };
 
 
@@ -175,35 +202,6 @@ namespace turtlelib
     Transform2D operator*(Transform2D lhs, const Transform2D & rhs);
 
 
-
-
-    /// \brief A twist in two dimensions 
-    class Twist2D
-    {
-        private:
-
-            double w;
-            Vector2D v;
-
-        public:
-
-        /// \brief Create an empty twist
-        Twist2D();
-
-        /// \brief Create a twist with a translational and rotational
-        /// component
-        /// \param w - the rotational velocity
-        /// \param xdot - the x velocity
-        /// \param ydot - the y velocity
-        Twist2D(double w, Vector2D v);
-
-        /// \brief \see operator<<(...) (declared outside this class)
-        /// for a description
-        friend std::ostream & operator<<(std::ostream & os, const Twist2D & tw);
-
-
-
-    };
 
     /// \brief should print a human readable version of the Twist:
     /// An example output:

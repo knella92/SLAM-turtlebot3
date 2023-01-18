@@ -3,7 +3,7 @@
 
 int main()
 {
-    turtlelib::Transform2D T_ab, T_bc, T_cb;
+    turtlelib::Transform2D T_ab, T_bc;
     turtlelib::Vector2D v{};
     turtlelib::Twist2D V_b{};
     
@@ -16,8 +16,7 @@ int main()
     std::cout << "T_{b,a}: " << T_ab.inv() << std::endl;
     std::cout << "T_{b,c}: " << T_bc << std::endl;
 
-    T_cb = T_bc.inv();
-    std::cout << "T_{c,b}: " << T_cb << std::endl;
+    std::cout << "T_{c,b}: " << T_bc.inv() << std::endl;
     std::cout << "T_{a,c}: " << (T_ab*T_bc) << std::endl;
     std::cout << "T_{c,a}: " << (T_ab*T_bc).inv() << std::endl;
 
@@ -31,7 +30,9 @@ int main()
 
     std::cout << "Enter twist V_b:" << std::endl;
     std::cin >> V_b;
-    std::cout << V_b << std::endl;
+    std::cout << "V_a " << T_ab(V_b) << std::endl;
+    std::cout << "V_b " << V_b << std::endl;
+    std::cout << "V_c " << T_bc.inv()(V_b) << std::endl;
     
 
 
