@@ -68,6 +68,7 @@ namespace turtlelib
         double y = 0.0;
     };
 
+    Vector2D normalize(Vector2D v);
 
 
     /// \brief output a 2 dimensional vector as [xcomponent ycomponent]
@@ -174,6 +175,49 @@ namespace turtlelib
     Transform2D operator*(Transform2D lhs, const Transform2D & rhs);
 
 
+
+
+    /// \brief A twist in two dimensions 
+    class Twist2D
+    {
+        private:
+
+            double w;
+            Vector2D v;
+
+        public:
+
+        /// \brief Create an empty twist
+        Twist2D();
+
+        /// \brief Create a twist with a translational and rotational
+        /// component
+        /// \param w - the rotational velocity
+        /// \param xdot - the x velocity
+        /// \param ydot - the y velocity
+        Twist2D(double w, Vector2D v);
+
+        /// \brief \see operator<<(...) (declared outside this class)
+        /// for a description
+        friend std::ostream & operator<<(std::ostream & os, const Twist2D & tw);
+
+
+
+    };
+
+    /// \brief should print a human readable version of the Twist:
+    /// An example output:
+    /// [1 3 5]
+    /// \param os - an output stream
+    /// \param tw - the twist to print
+    std::ostream & operator<<(std::ostream & os, const Twist2D & tw);
+
+    /// \brief Read a twist from stdin
+    /// Should be able to read input either as output by operator<< or
+    /// as 3 numbers (w x y) separated by spaces
+    /// For example:
+    /// 1 2 3
+    std::istream & operator>>(std::istream & is, Twist2D & tw);
 
 }
 

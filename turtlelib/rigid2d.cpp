@@ -100,9 +100,9 @@ turtlelib::Transform2D & turtlelib::Transform2D::operator*=(const Transform2D & 
     tmp.transf[1][1] = transf[1][0]*rhs.transf[0][1] + transf[1][1]*rhs.transf[1][1] + transf[1][2]*rhs.transf[2][1];
     tmp.transf[1][2] = transf[1][0]*rhs.transf[0][2] + transf[1][1]*rhs.transf[1][2] + transf[1][2]*rhs.transf[2][2];
 
-    tmp.transf[2][0] = transf[2][0]*rhs.transf[0][0] + transf[2][1]*rhs.transf[1][0] + transf[2][2]*rhs.transf[2][0];
-    tmp.transf[2][1] = transf[2][0]*rhs.transf[0][1] + transf[2][1]*rhs.transf[1][1] + transf[2][2]*rhs.transf[2][1];
-    tmp.transf[2][2] = transf[2][0]*rhs.transf[0][2] + transf[2][1]*rhs.transf[1][2] + transf[2][2]*rhs.transf[2][2];
+    tmp.transf[2][0] = 0.0;
+    tmp.transf[2][1] = 0.0;
+    tmp.transf[2][2] = 1.0;
 
     *this = tmp;
     return *this;
@@ -188,4 +188,76 @@ turtlelib::Transform2D turtlelib::operator*(Transform2D lhs, const Transform2D &
 {
     lhs*=rhs;
     return lhs;
+}
+
+turtlelib::Vector2D turtlelib::normalize(Vector2D v)
+{
+    double mag{};
+    mag = sqrt(v.x*v.x + v.y*v.y);
+    v.x /= mag;
+    v.y /= mag;
+    return v;
+}
+
+turtlelib::Twist2D::Twist2D()
+    : w{0}, v{0}
+{
+}
+
+turtlelib::Twist2D::Twist2D(double ang_v, Vector2D xy)
+    : w{ang_v}, v{xy}
+{
+
+}
+
+
+std::ostream & turtlelib::operator<<(std::ostream & os, const Twist2D & tw)
+{
+    os << "[" << tw.w << " " << tw.v.x << " " << tw.v.y << "]";
+    return os;
+}
+
+
+std::istream & turtlelib::operator>>(std::istream & is, Twist2D & tw)
+{
+    turtlelib::Vector2D v{};
+    double w;
+    int space_pos{0};
+    char x{};
+    x = std::cin.peek();
+    std::cin.get(x);
+    while (std::cin.peek()!='\n')
+    {
+        x = std::cin.peek();
+        if (x == ' ')
+        {
+            space_pos += 1;
+            std::cin.get(x);
+        }
+        else if (std::isdigit(x)||x == '-')
+        {   
+            if (space_pos == 0)
+            {
+                is>>w;
+            }
+            else if (space_pos == 1)
+            {
+                is>>v.x;
+            }
+            else if (space_pos == 2)
+            {
+                is>>v.y;
+            }
+        }
+        else
+        {
+            std::cin.get(x);
+        }
+    }
+    
+    x = std::cin.peek();
+    std::cin.get(x);
+    turtlelib::Twist2D tmp{w, v};
+    tw = tmp;
+    return is;
 }

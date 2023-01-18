@@ -9,9 +9,78 @@ A library for handling transformations in SE(2) and other turtlebot-related math
 1. We need to be able to ~normalize~ Vector2D objects (i.e., find the unit vector in the direction of a given Vector2D):
    - Propose three different designs for implementing the ~normalize~ functionality
 
+      Design 1)
+
+      Vector2D normalize(const Vector2D* vec)
+      {
+         double mag{};
+         Vector2D n_vec;
+         mag = sqrt(vec.x*vec.x + vec.y*vec.y);
+         n_vec.x = vec.x/mag;   
+         n_vec.y = vec.y/mag;
+         return n_vec;
+      }
+
+
+      Design 2)
+
+      Vector2D normalize(const Vector2D vec)
+      {
+         double mag{};
+         Vector2D n_vec;
+         mag = pow(pow(tw.x, 2) + pow(tw.y, 2), 0.5);
+         n_vec.x = vec.x/mag;
+         n_vec.y = vec.y/mag;
+         return n_vec;
+      }
+
+
+      Design 3)
+
+      Vector2D normalize(Vector2D vec)
+      {
+         double mag{};
+         mag = pow((pow(vec.x,2) + pow(vec.y,2)), 0.5);
+         vec.x /= mag;
+         vec.y /= mag;
+         return vec;
+      }
+
+
    - Discuss the pros and cons of each proposed method, in light of the C++ Core Guidelines.
 
+      Design 1)
+      Pros:
+         -Uses pointer so doesn't need to make a copy of the value to run the function.
+         -Uses const keyword with pointer to guarantee no change of the value in memory.
+
+      Cons: 
+         Have to create new object, increasing overhead and memory usage.
+         Have to create pointer variable, increasing chance of value change.
+         
+
+      Design 2)
+      Pros:
+         -Uses the input parameter uses const keyword to indicate that it will not be changed (immutable)
+
+      Cons:
+         -Can't do anything to vec so you have to create and initialize a new struct, increasing computation time and memory usage
+
+
+      Design 3)
+      Pros:
+         -Don't have to create and initialize a new Vector2D struct, can just return the parameter after it's been acted on.
+        
+      Cons:
+         -This may cause confusion since the function itself looks like it's changing the object's vec data, however it's just using the local variable.
+
+
+
+
+
    - Which of the methods would you implement and why?
+
+      I would implement Design 3 - don't have to worry about creating pointers
 
 2. What is the difference between a class and a struct in C++?
 
