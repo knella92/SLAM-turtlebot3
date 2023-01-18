@@ -75,22 +75,27 @@ A library for handling transformations in SE(2) and other turtlebot-related math
          -This may cause confusion since the function itself looks like it's changing the object's vec data, however it's just using the local variable.
 
 
-
-
-
    - Which of the methods would you implement and why?
 
-      I would implement Design 3 - don't have to worry about creating pointers
+      I would implement Design 3 - don't have to worry about creating pointers or new objects.
+
 
 2. What is the difference between a class and a struct in C++?
 
-   The difference is the default accessibility of its members methods. They are public in a struct while private in a class.
+   The difference is the default accessibility of its members methods. They are public in a struct while private in a class. Other than that there are no differences.
+
 
 3. Why is Vector2D a struct and Transform2D a Class (refer to at least 2 specific C++ core guidelines in your answer)?
+
+   Vector2D's variables are public and therefore can be a struct by default, while Transform2D has private variables.
 
 
 4. Why are some of the constructors in Transform2D explicit (refer to a specific C++ core guideline in your answer)?
 
+   They are single argument constructors, which should be made explicit according to C++ core guidelines to avoid unintended conversions.
+
 
 5. Why is Transform2D::inv() declared const while Transform2D::operator*=() is not?
    - Refer to [[https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#con-constants-and-immutability][C++ Core Guidelines (Constants and Immutability)]] in your answer
+
+   inv() is declared constant to guarantee that we do not change the object's member variables within the function. operator*= is not because we are directly altering the internals of the left hand side of the operation, using const would prevent that and throw an error.
