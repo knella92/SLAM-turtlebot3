@@ -23,7 +23,7 @@ target_compile_options(turtlelib PUBLIC -Wall -Wextra -Wpedantic)
 # into a single executable (as long as exactly one of these files includes a main() function).
 # However, by creating a library (as we are doing here) the library files
 # can be compiled once and used
-add_executable(frame_main frame_main)
+add_executable(frame_main src/frame_main.cpp src/rigid2d.cpp)
 target_link_libraries(frame_main turtlelib)
 
 

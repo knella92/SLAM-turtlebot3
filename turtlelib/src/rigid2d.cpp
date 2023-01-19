@@ -33,7 +33,7 @@ std::istream & turtlelib::operator>>(std::istream & is, Vector2D & v)
 }
 
 
-turtlelib::Transform2D::Transform2D()
+turtlelib::Transform2D::Transform2D() // creates an identity matrix
     : transf{{1,0,0},{0,1,0},{0,0,1}}
 {
 }
@@ -217,7 +217,7 @@ turtlelib::Vector2D turtlelib::normalize(Vector2D v)
 // Twist2D implementations
 
 turtlelib::Twist2D::Twist2D()
-    : w{0}, v{0}
+    : w{0}, v{0,0}
 {
 }
 
