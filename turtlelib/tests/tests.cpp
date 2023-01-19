@@ -110,7 +110,7 @@ TEST_CASE("Operator >>", "[operator]"){
 
     turtlelib::Transform2D Tf{};
     std::stringstream is{};
-    is.str("deg: 0.0 x: 1.0 y: 1.0");
+    is.str("deg: 0.0 x: 1.0 y: 3.0\n");
     is >> Tf;
     
     

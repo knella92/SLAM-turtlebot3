@@ -12,13 +12,13 @@ std::istream & turtlelib::operator>>(std::istream & is, Vector2D & v)
 {
     int first{0};
     char x{};
-    while (std::cin.peek()!='\n')
+    while (is.peek()!='\n')
     {
-        x = std::cin.peek();
+        x = is.peek();
         if (x == ' ')
         {
             first = 1;
-            std::cin.get(x);
+            is.get(x);
         }
         else if (std::isdigit(x)||x == '-')
         {   
@@ -26,7 +26,7 @@ std::istream & turtlelib::operator>>(std::istream & is, Vector2D & v)
         }
         else
         {
-            std::cin.get(x);
+            is.get(x);
         }
     }
     return is;
@@ -159,13 +159,13 @@ std::istream & turtlelib::operator>>(std::istream & is, turtlelib::Transform2D &
     int space_pos{0}; // tells you which white space # peek() is at
     char x{};
     int num{0}; // set to 1 if a number is entered first, which triggers commands accordingly
-    while (std::cin.peek()!='\n')
+    while (is.peek()!='\n')
     {
-        x = std::cin.peek();
+        x = is.peek();
         if (x == ' ')
         {
             space_pos = space_pos + 1;
-            std::cin.get(x);
+            is.get(x);
         }
         else if (std::isdigit(x)||x == '-')
         {   
@@ -185,12 +185,12 @@ std::istream & turtlelib::operator>>(std::istream & is, turtlelib::Transform2D &
         }
         else
         {
-            std::cin.get(x);
+            is.get(x);
         }
     }
     // Next two lines are to flush out the \n from the istream
-    x = std::cin.peek();
-    std::cin.get(x);
+    x = is.peek();
+    is.get(x);
     double radians = turtlelib::deg2rad(deg);
     turtlelib::Transform2D newtf{vec, radians};
     tf = newtf;
@@ -240,39 +240,39 @@ std::istream & turtlelib::operator>>(std::istream & is, Twist2D & tw)
     double w;
     int space_pos{0};
     char x{};
-    x = std::cin.peek();
-    std::cin.get(x);
-    while (std::cin.peek()!='\n')
+    x = is.peek();
+    is.get(x);
+    while (is.peek()!='\n')
     {
-        x = std::cin.peek();
+        x = is.peek();
         if (x == ' ')
         {
             space_pos += 1;
-            std::cin.get(x);
+            is.get(x);
         }
         else if (std::isdigit(x)||x == '-')
         {   
             if (space_pos == 0)
             {
-                is>>w;
+                is >> w;
             }
             else if (space_pos == 1)
             {
-                is>>v.x;
+                is >> v.x;
             }
             else if (space_pos == 2)
             {
-                is>>v.y;
+                is >> v.y;
             }
         }
         else
         {
-            std::cin.get(x);
+            is.get(x);
         }
     }
     
-    x = std::cin.peek();
-    std::cin.get(x);
+    x = is.peek();
+    is.get(x);
     turtlelib::Twist2D tmp{w, v};
     tw = tmp;
     return is;
