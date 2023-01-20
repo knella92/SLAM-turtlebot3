@@ -11,14 +11,19 @@ find_package(ament_cmake REQUIRED)
 # further dependencies manually.
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
-find_package(rosidl_generate_interfaces({PROJECT_NAME}))
+find_package(rosidl_default_generators REQUIRED)
+
+
+set(srv_files
+  "srv/Reset.srv")
+
+rosidl_generate_interfaces(${PROJECT_NAME}_srv
+  ${srv_files} LIBRARY_NAME ${PROJECT_NAME})
+
+rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME}_srv "rosidl_typesupport_cpp")
 
 add_executable(nusim src/nusim.cpp)
 ament_target_dependencies(nusim rclcpp std_msgs)
-
-rosidl_generate_interfaces(${PROJECT_NAME})(
-  srv/empty.srv
-)
 
 install(
   DIRECTORY launch config
@@ -26,8 +31,11 @@ install(
 
 install(
   TARGETS nusim
-  DESTINATION lib/${PROJECT_NAME}
-)
+  DESTINATION lib/${PROJECT_NAME})
+
+target_link_libraries(nusim "${cpp_typesupport_target}")
+
+ament_export_dependencies(rosidl_default_runtime)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
