@@ -52,9 +52,9 @@ turtlelib::Transform2D::Transform2D(double radians)
 {
 }
 
-turtlelib::Transform2D::Transform2D(Vector2D trans, double radians)
-    : transf{{cos(radians),-sin(radians), trans.x}
-            ,{sin(radians),cos(radians), trans.y}
+turtlelib::Transform2D::Transform2D(Vector2D trans, double rot)
+    : transf{{cos(rot),-sin(rot), trans.x}
+            ,{sin(rot),cos(rot), trans.y}
             ,{0.0, 0.0, 1.0}}
 {
 }

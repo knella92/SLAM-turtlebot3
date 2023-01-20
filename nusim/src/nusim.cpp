@@ -1,10 +1,8 @@
 #include <chrono>
 #include <functional>
 #include <memory>
-#include <string>
 
 #include "rclcpp/rclcpp.hpp"
-#include "std_msgs/msg/string.hpp"
 #include "std_msgs/msg/u_int64.hpp"
 
 
@@ -17,27 +15,25 @@ class MinimalPublisher : public rclcpp::Node
     : Node("nusim"), count_(0)
     {
     
-    //declare parameters
+    //declare/get rate parameter
     this->declare_parameter("rate", 200);
     auto rate = this->get_parameter("rate").as_int();
     int64_t t = 1000/rate;
     
 
-
-
-
-      publisher_ = this->create_publisher<std_msgs::msg::UInt64>("~/timestep", 10);
-      timer_ = this->create_wall_timer(
-      std::chrono::duration<int64_t,std::milli>(t), std::bind(&MinimalPublisher::timer_callback, this));
+    publisher_ = this->create_publisher<std_msgs::msg::UInt64>("~/timestep", 10);
+    timer_ = this->create_wall_timer(
+    std::chrono::duration<int64_t,std::milli>(t), std::bind(&MinimalPublisher::timer_callback, this));
     }
 
   private:
     void timer_callback()
     {
-      //auto message = std_msgs::msg::String();
-      //message.data = "Hello, world! " + std::to_string(count_++);
-      //RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
-      //publisher_->publish(message);
+      auto message = std_msgs::msg::UInt64();
+      count_++;
+      message.data = count_;
+      RCLCPP_INFO(this->get_logger(), "Publishing: %lu", message.data);
+      publisher_->publish(message);
     }
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Publisher<std_msgs::msg::UInt64>::SharedPtr publisher_;
