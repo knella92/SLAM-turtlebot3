@@ -16,9 +16,19 @@ class MinimalPublisher : public rclcpp::Node
     MinimalPublisher()
     : Node("nusim"), count_(0)
     {
+    
+    //declare parameters
+    this->declare_parameter("rate", 200);
+    auto rate = this->get_parameter("rate").as_int();
+    int64_t t = 1000/rate;
+    
+
+
+
+
       publisher_ = this->create_publisher<std_msgs::msg::UInt64>("~/timestep", 10);
-      //timer_ = this->create_wall_timer(
-      //500ms, std::bind(&MinimalPublisher::timer_callback, this));
+      timer_ = this->create_wall_timer(
+      std::chrono::duration<int64_t,std::milli>(t), std::bind(&MinimalPublisher::timer_callback, this));
     }
 
   private:
