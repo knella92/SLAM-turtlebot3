@@ -18,7 +18,8 @@ find_package(tf2_ros REQUIRED)
 
 
 set(srv_files
-  "srv/Reset.srv")
+  "srv/Reset.srv"
+  "srv/Teleport.srv")
 
 rosidl_generate_interfaces(${PROJECT_NAME}_srv
   ${srv_files} LIBRARY_NAME ${PROJECT_NAME})

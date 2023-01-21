@@ -5,6 +5,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/u_int64.hpp"
 #include "nusim/srv/reset.hpp"
+#include "nusim/srv/teleport.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_ros/transform_broadcaster.h"
@@ -22,9 +23,13 @@ class SimNode : public rclcpp::Node
       
       //declare/get parameters
       this->declare_parameter("rate", 200);
-      this->declare_parameter("x", -0.6);
-      this->declare_parameter("y", 0.8);
-      this->declare_parameter("z", 1.57);
+      this->declare_parameter("x0", 0.0);
+      this->declare_parameter("y0", 0.0);
+      this->declare_parameter("z0", 0.0);
+
+      this->declare_parameter("x", 0.0);
+      this->declare_parameter("y", 0.0);
+      this->declare_parameter("z", 0.0);
 
       auto rate = this->get_parameter("rate").as_int();
 
@@ -36,6 +41,7 @@ class SimNode : public rclcpp::Node
       std::chrono::duration<int64_t,std::milli>(t), std::bind(&SimNode::timer_callback, this));
 
       service_ = this->create_service<nusim::srv::Reset>("~/reset", std::bind(&SimNode::reset, this, std::placeholders::_1, std::placeholders::_2));
+      tele_service_ = this->create_service<nusim::srv::Teleport>("~/teleport", std::bind(&SimNode::teleport, this, std::placeholders::_1, std::placeholders::_2));
 
       tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
@@ -71,16 +77,35 @@ class SimNode : public rclcpp::Node
                std::shared_ptr<nusim::srv::Reset::Response> response)
     {
         count_ = 0;
+        
+        auto x = this->get_parameter("x0").as_double();
+        auto y = this->get_parameter("y0").as_double();
+        auto z = this->get_parameter("z0").as_double();
+
+        this->set_parameter(rclcpp::Parameter("x", x));
+        this->set_parameter(rclcpp::Parameter("y", y));
+        this->set_parameter(rclcpp::Parameter("z", z));
+
         (void)request;
         (void)response;
         RCLCPP_INFO(this->get_logger(), "Incoming request to reset");
         RCLCPP_INFO(this->get_logger(), "Resetting");
+    }
+
+    void teleport(const std::shared_ptr<nusim::srv::Teleport::Request> request,
+               std::shared_ptr<nusim::srv::Teleport::Response> response)
+    {
+      this->set_parameter(rclcpp::Parameter("x", request->x));
+      this->set_parameter(rclcpp::Parameter("y", request->y));
+      this->set_parameter(rclcpp::Parameter("z", request->z));
+      (void)response;
     }
     
     
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Publisher<std_msgs::msg::UInt64>::SharedPtr publisher_;
     rclcpp::Service<nusim::srv::Reset>::SharedPtr service_;
+    rclcpp::Service<nusim::srv::Teleport>::SharedPtr tele_service_;
     std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
     size_t count_;
 };
