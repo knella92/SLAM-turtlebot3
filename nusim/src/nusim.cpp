@@ -25,11 +25,11 @@ class SimNode : public rclcpp::Node
       this->declare_parameter("rate", 200);
       this->declare_parameter("x0", 0.0);
       this->declare_parameter("y0", 0.0);
-      this->declare_parameter("z0", 0.0);
+      this->declare_parameter("theta0", 0.0);
 
       this->declare_parameter("x", 0.0);
       this->declare_parameter("y", 0.0);
-      this->declare_parameter("z", 0.0);
+      this->declare_parameter("theta", 0.0);
 
       auto rate = this->get_parameter("rate").as_int();
 
@@ -59,7 +59,7 @@ class SimNode : public rclcpp::Node
 
       auto x = this->get_parameter("x").as_double();
       auto y = this->get_parameter("y").as_double();
-      auto z = this->get_parameter("z").as_double();
+      auto theta = this->get_parameter("theta").as_double();
 
       geometry_msgs::msg::TransformStamped t;
       t.header.stamp = this->get_clock()->now();
@@ -68,7 +68,12 @@ class SimNode : public rclcpp::Node
 
       t.transform.translation.x = x;
       t.transform.translation.y = y;
-      t.transform.translation.z = z;
+
+      tf2::Quaternion q;
+      t.transform.rotation.x = 0;
+      t.transform.rotation.y = 0;
+      t.transform.rotation.z = theta;
+      
 
       tf_broadcaster_->sendTransform(t);
     }
@@ -80,11 +85,11 @@ class SimNode : public rclcpp::Node
         
         auto x = this->get_parameter("x0").as_double();
         auto y = this->get_parameter("y0").as_double();
-        auto z = this->get_parameter("z0").as_double();
+        auto theta = this->get_parameter("theta0").as_double();
 
         this->set_parameter(rclcpp::Parameter("x", x));
         this->set_parameter(rclcpp::Parameter("y", y));
-        this->set_parameter(rclcpp::Parameter("z", z));
+        this->set_parameter(rclcpp::Parameter("theta", theta));
 
         (void)request;
         (void)response;
@@ -97,7 +102,7 @@ class SimNode : public rclcpp::Node
     {
       this->set_parameter(rclcpp::Parameter("x", request->x));
       this->set_parameter(rclcpp::Parameter("y", request->y));
-      this->set_parameter(rclcpp::Parameter("z", request->z));
+      this->set_parameter(rclcpp::Parameter("theta", request->theta));
       (void)response;
     }
     
