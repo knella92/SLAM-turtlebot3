@@ -54,7 +54,7 @@ class SimNode : public rclcpp::Node
       auto message = std_msgs::msg::UInt64();
       count_++;
       message.data = count_;
-      RCLCPP_INFO(this->get_logger(), "Publishing: %lu", message.data);
+      //RCLCPP_INFO(this->get_logger(), "Publishing: %lu", message.data);
       publisher_->publish(message);
 
       auto x = this->get_parameter("x").as_double();
