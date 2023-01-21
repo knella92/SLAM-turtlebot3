@@ -1,0 +1,5 @@
+[0.000000] (-) TimerEvent: {}
+[0.000695] (nuturtle_description) JobQueued: {'identifier': 'nuturtle_description', 'dependencies': OrderedDict([('nuturtle_description', '/home/kevin/workspaces/SLAM/hw1/src/nuturtle-knella92/nuturtle_description/install/nuturtle_description')])}
+[0.000828] (nuturtle_description) JobStarted: {'identifier': 'nuturtle_description'}
+[0.036761] (nuturtle_description) JobEnded: {'identifier': 'nuturtle_description', 'rc': 0}
+[0.037921] (-) EventReactorShutdown: {}

@@ -12,6 +12,9 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
 
 
 set(srv_files
@@ -19,16 +22,20 @@ set(srv_files
 
 rosidl_generate_interfaces(${PROJECT_NAME}_srv
   ${srv_files} LIBRARY_NAME ${PROJECT_NAME})
-
 rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME}_srv "rosidl_typesupport_cpp")
 
 add_executable(nusim src/nusim.cpp)
-ament_target_dependencies(nusim rclcpp std_msgs)
+ament_target_dependencies(
+  nusim
+  rclcpp
+  std_msgs
+  geometry_msgs
+  tf2
+  tf2_ros)
 
 install(
   DIRECTORY launch config
   DESTINATION share/${PROJECT_NAME})
-
 install(
   TARGETS nusim
   DESTINATION lib/${PROJECT_NAME})

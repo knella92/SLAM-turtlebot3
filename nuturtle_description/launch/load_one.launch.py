@@ -23,11 +23,11 @@ def generate_launch_description():
             name='use_jsp',
             default_value='true',
             choices=['true', 'false'],
-            description=['Controls whether joint_state_publisher is used to',
-                         'publish default joint states']
+            description="""Controls whether joint_state_publisher is used to
+                         publish default joint states"""
         ),
 
-        DeclareLaunchArgument(              # Creates a launch argument for color
+        DeclareLaunchArgument(  # Creates a launch argument for color
             name='color',
             default_value='purple',
             choices=['red', 'green', 'blue', 'purple', ''],

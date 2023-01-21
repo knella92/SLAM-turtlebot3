@@ -61,10 +61,10 @@ A library for handling transformations in SE(2) and other turtlebot-related math
 
       Design 2)
       Pros:
-         -Uses the input parameter uses const keyword to indicate that it will not be changed (immutable)
+         -Uses the input parameter uses const keyword to indicate that it will not be changed (immutable).
 
       Cons:
-         -Can't do anything to vec so you have to create and initialize a new struct, increasing computation time and memory usage
+         -Can't do anything to vec so you have to create and initialize a new struct, increasing computation time and memory usage.
 
 
       Design 3)
@@ -77,7 +77,7 @@ A library for handling transformations in SE(2) and other turtlebot-related math
 
    - Which of the methods would you implement and why?
 
-      I would implement Design 3 - don't have to worry about creating pointers or new objects.
+      I would implement Design 3 - don't have to worry about creating pointers or new objects
 
 
 2. What is the difference between a class and a struct in C++?
