@@ -23,6 +23,7 @@ set(srv_files
 
 rosidl_generate_interfaces(${PROJECT_NAME}_srv
   ${srv_files} LIBRARY_NAME ${PROJECT_NAME})
+
 rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME}_srv "rosidl_typesupport_cpp")
 
 add_executable(nusim src/nusim.cpp)

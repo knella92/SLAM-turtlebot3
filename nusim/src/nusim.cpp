@@ -38,7 +38,7 @@ class SimNode : public rclcpp::Node
 
       publisher_ = this->create_publisher<std_msgs::msg::UInt64>("~/timestep", 10);
       timer_ = this->create_wall_timer(
-      std::chrono::duration<int64_t,std::milli>(t), std::bind(&SimNode::timer_callback, this));
+        std::chrono::duration<int64_t,std::milli>(t), std::bind(&SimNode::timer_callback, this));
 
       service_ = this->create_service<nusim::srv::Reset>("~/reset", std::bind(&SimNode::reset, this, std::placeholders::_1, std::placeholders::_2));
       tele_service_ = this->create_service<nusim::srv::Teleport>("~/teleport", std::bind(&SimNode::teleport, this, std::placeholders::_1, std::placeholders::_2));
@@ -69,7 +69,6 @@ class SimNode : public rclcpp::Node
       t.transform.translation.x = x;
       t.transform.translation.y = y;
 
-      tf2::Quaternion q;
       t.transform.rotation.x = 0;
       t.transform.rotation.y = 0;
       t.transform.rotation.z = theta;

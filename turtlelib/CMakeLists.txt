@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.9)
 project(turtlelib)
+include(CTest)
 
 # create the turtlelib library
 add_library(turtlelib src/rigid2d.cpp)
 # The add_library function just added turtlelib as a "target"
 # A "target" is a name that CMake uses to refer to some type of output
 # In this case it is a library but it could also be an executable or some other items
-
 # Public include directories can be used by other targets that link against turtlelib
 # By adding include/ to the include path, this means that files in e.g., include/turtlelib
 # can be included with #include"turtlelib/file.hpp"
@@ -25,6 +25,10 @@ target_compile_options(turtlelib PUBLIC -Wall -Wextra -Wpedantic)
 # can be compiled once and used
 add_executable(frame_main src/frame_main.cpp src/rigid2d.cpp)
 target_link_libraries(frame_main turtlelib)
+
+install(
+  TARGETS turtlelib
+  DESTINATION lib/${PROJECT_NAME})
 
 
 # CMake also has the ability to generate doxygen documentation
