@@ -5,3 +5,4 @@
 *.#file
 *.vscode
 __pycache__/
+turtlelib/build

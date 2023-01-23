@@ -1,0 +1,21 @@
+ Enter transform T_{a,b}:
+>deg: 45 x: 1 y: 5
+ Enter transform T_{b,c}:
+>deg: 63 x: 5 y: 1
+ T_{a,b}: deg: 45 x: 1 y: 5
+ T_{b,a}: deg: -45 x: -4.24264 y: -2.82843
+ T_{b,c}: deg: 63 x: 5 y: 1
+ T_{c,b}: deg: -63 x: -3.16096 y: 4.00104
+ T_{a,c}: deg: 180 x: 3.82843 y: 9.24264
+ T_{c,a}: deg: -180 x: -7.60722 y: 6.49718
+ Enter vector v_b:
+>2 1
+ v_bhat: [0.894427 0.447214]
+ v_a: [1.70711 7.12132]
+ v_b: [2 1]
+ v_c: [-1.36197 2.67302]
+ Enter twist V_b:
+>2 2 4
+ V_a [2 8.58579 2.24264]
+ V_b [2 2 4]
+ V_c [2 12.4741 6.35587]
