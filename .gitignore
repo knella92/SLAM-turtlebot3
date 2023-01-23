@@ -1,0 +1,7 @@
+*.urdf
+*.[oa]
+*~
+*.zip
+*.#file
+*.vscode
+__pycache__/

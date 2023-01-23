@@ -11,7 +11,7 @@ find_package(ament_cmake REQUIRED)
 # further dependencies manually.
 
 install(
-  DIRECTORY launch meshes config
+  DIRECTORY launch meshes config urdf
   DESTINATION share/${PROJECT_NAME}
 )
 
