@@ -9,6 +9,8 @@
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_ros/transform_broadcaster.h"
+#include "visualization_msgs/msg/marker_array.hpp"
+
 
 
 using namespace std::chrono_literals;
@@ -22,27 +24,34 @@ class SimNode : public rclcpp::Node
     {
       
       //declare/get parameters
-      this->declare_parameter("rate", 200);
-      this->declare_parameter("x0", 0.0);
-      this->declare_parameter("y0", 0.0);
-      this->declare_parameter("theta0", 0.0);
+      declare_parameter("rate", 200);
+      declare_parameter("x0", 0.0);
+      declare_parameter("y0", 0.0);
+      declare_parameter("theta0", 0.0);
+      
+      auto x0 = get_parameter("x0").as_double();
+      auto y0 = get_parameter("y0").as_double();
+      auto theta0 = get_parameter("theta0").as_double();
 
-      this->declare_parameter("x", 0.0);
-      this->declare_parameter("y", 0.0);
-      this->declare_parameter("theta", 0.0);
+      declare_parameter("x", x0);
+      declare_parameter("y", y0);
+      declare_parameter("theta", theta0);
 
-      auto rate = this->get_parameter("rate").as_int();
+      declare_parameter("obstacles/x", std::vector<double>({0.0}));
+      declare_parameter("obstacles/y", std::vector<double>({0.0}));
+      declare_parameter("obstacles/r",0.0);
+
+      auto rate = get_parameter("rate").as_int();
 
       int64_t t = 1000/rate; // implicit conversion of 1000/rate to int64_t to use as time in ms
-      
 
-      publisher_ = this->create_publisher<std_msgs::msg::UInt64>("~/timestep", 10);
-      timer_ = this->create_wall_timer(
+      publisher_ = create_publisher<std_msgs::msg::UInt64>("~/timestep", 10);
+      obst_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/obstacles", 10);
+      timer_ = create_wall_timer(
         std::chrono::duration<int64_t,std::milli>(t), std::bind(&SimNode::timer_callback, this));
 
-      service_ = this->create_service<nusim::srv::Reset>("~/reset", std::bind(&SimNode::reset, this, std::placeholders::_1, std::placeholders::_2));
-      tele_service_ = this->create_service<nusim::srv::Teleport>("~/teleport", std::bind(&SimNode::teleport, this, std::placeholders::_1, std::placeholders::_2));
-
+      service_ = create_service<nusim::srv::Reset>("~/reset", std::bind(&SimNode::reset, this, std::placeholders::_1, std::placeholders::_2));
+      tele_service_ = create_service<nusim::srv::Teleport>("~/teleport", std::bind(&SimNode::teleport, this, std::placeholders::_1, std::placeholders::_2));
       tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
     }
@@ -54,15 +63,16 @@ class SimNode : public rclcpp::Node
       auto message = std_msgs::msg::UInt64();
       count_++;
       message.data = count_;
-      //RCLCPP_INFO(this->get_logger(), "Publishing: %lu", message.data);
+  
       publisher_->publish(message);
 
-      auto x = this->get_parameter("x").as_double();
-      auto y = this->get_parameter("y").as_double();
-      auto theta = this->get_parameter("theta").as_double();
+      auto x = get_parameter("x").as_double();
+      auto y = get_parameter("y").as_double();
+      auto theta = get_parameter("theta").as_double();
+      // RCLCPP_INFO(get_logger(), "Publishing: %f %f", obstacles_x[0], obstacles_x[1]);
 
       geometry_msgs::msg::TransformStamped t;
-      t.header.stamp = this->get_clock()->now();
+      t.header.stamp = get_clock()->now();
       t.header.frame_id = "nusim/world";
       t.child_frame_id = "red/base_footprint";
 
@@ -73,36 +83,71 @@ class SimNode : public rclcpp::Node
       t.transform.rotation.y = 0;
       t.transform.rotation.z = theta;
       
-
       tf_broadcaster_->sendTransform(t);
+
+
+      visualization_msgs::msg::MarkerArray obstacles = add_obstacles();
+      obst_publisher_->publish(obstacles);
+
+
     }
 
     void reset(const std::shared_ptr<nusim::srv::Reset::Request> request,
                std::shared_ptr<nusim::srv::Reset::Response> response)
     {
-        count_ = 0;
+      count_ = 0;
         
-        auto x = this->get_parameter("x0").as_double();
-        auto y = this->get_parameter("y0").as_double();
-        auto theta = this->get_parameter("theta0").as_double();
+      auto x = get_parameter("x0").as_double();
+      auto y = get_parameter("y0").as_double();
+      auto theta = get_parameter("theta0").as_double();
 
-        this->set_parameter(rclcpp::Parameter("x", x));
-        this->set_parameter(rclcpp::Parameter("y", y));
-        this->set_parameter(rclcpp::Parameter("theta", theta));
+      set_parameter(rclcpp::Parameter("x", x));
+      set_parameter(rclcpp::Parameter("y", y));
+      set_parameter(rclcpp::Parameter("theta", theta));
 
-        (void)request;
-        (void)response;
-        RCLCPP_INFO(this->get_logger(), "Incoming request to reset");
-        RCLCPP_INFO(this->get_logger(), "Resetting");
+      (void)request;
+      (void)response;
+      RCLCPP_INFO(get_logger(), "Incoming request to reset");
+      RCLCPP_INFO(get_logger(), "Resetting");
     }
 
     void teleport(const std::shared_ptr<nusim::srv::Teleport::Request> request,
                std::shared_ptr<nusim::srv::Teleport::Response> response)
     {
-      this->set_parameter(rclcpp::Parameter("x", request->x));
-      this->set_parameter(rclcpp::Parameter("y", request->y));
-      this->set_parameter(rclcpp::Parameter("theta", request->theta));
+      set_parameter(rclcpp::Parameter("x", request->x));
+      set_parameter(rclcpp::Parameter("y", request->y));
+      set_parameter(rclcpp::Parameter("theta", request->theta));
       (void)response;
+    }
+    
+    visualization_msgs::msg::MarkerArray add_obstacles()
+    {
+      visualization_msgs::msg::MarkerArray all_obst;
+
+      const std::vector<double> obstacles_x = get_parameter("obstacles/x").as_double_array();
+      const std::vector<double> obstacles_y = get_parameter("obstacles/y").as_double_array();
+      const double obstacles_r = get_parameter("obstacles/r").as_double();
+      const int size_x = obstacles_x.size();
+
+      for (int i = 0; i <size_x; ++i)
+      {
+        visualization_msgs::msg::Marker obst;
+        obst.header.frame_id = "nusim/world";
+        obst.header.stamp = get_clock()->now();
+        obst.type = visualization_msgs::msg::Marker::CYLINDER;
+        obst.scale.x  = obstacles_r;
+        obst.scale.y = obstacles_r;
+        obst.scale.z = 0.25;
+        obst.color.r = 1.0;
+        obst.color.a = 1.0;
+        obst.id = i;
+        obst.action = visualization_msgs::msg::Marker::ADD;
+        obst.pose.position.x = obstacles_x[i];
+        obst.pose.position.y = obstacles_y[i];
+        all_obst.markers.push_back(obst);
+      }
+
+      return all_obst;
     }
     
     
@@ -111,6 +156,7 @@ class SimNode : public rclcpp::Node
     rclcpp::Service<nusim::srv::Reset>::SharedPtr service_;
     rclcpp::Service<nusim::srv::Teleport>::SharedPtr tele_service_;
     std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+    rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr obst_publisher_;
     size_t count_;
 };
 
