@@ -67,6 +67,14 @@ public:
     declare_parameter("obstacles/y", std::vector<double>({0.0}));
     declare_parameter("obstacles/r", 0.0);
 
+    // test for determining whether obstacles/x and obstacles/y are equal in length
+    const std::vector<double> obstacles_x = get_parameter("obstacles/x").as_double_array();
+    const std::vector<double> obstacles_y = get_parameter("obstacles/y").as_double_array();
+    if (obstacles_x.size() != obstacles_y.size())
+    {
+      rclcpp::shutdown();
+    }
+
     // saves rate parameter as an int
     const auto rate = get_parameter("rate").as_int();
 
@@ -114,6 +122,7 @@ private:
 
     auto x = get_parameter("x").as_double();
     auto y = get_parameter("y").as_double();
+
     auto theta = get_parameter("theta").as_double();
 
 
