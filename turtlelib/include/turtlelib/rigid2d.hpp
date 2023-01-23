@@ -124,7 +124,7 @@ namespace turtlelib
     {
     private:
 
-        double transf[3][3];
+        std::vector<std::vector<double>> transf;
 
     public:
         /// \brief Create an identity transformation
