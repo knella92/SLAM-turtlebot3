@@ -1,6 +1,4 @@
 #include "turtlelib/rigid2d.hpp"
-#include <iostream>
-#include <cmath>
 
 std::ostream & turtlelib::operator<<(std::ostream & os, const Vector2D & v)
 {
@@ -34,7 +32,7 @@ std::istream & turtlelib::operator>>(std::istream & is, Vector2D & v)
 
 
 turtlelib::Transform2D::Transform2D() // creates an identity matrix
-    : transf{{1,0,0},{0,1,0},{0,0,1}}
+    : transf{{1.0,0.0,0.0},{0.0,1.0,0.0},{0.0,0.0,1.0}}
 {
 }
 
@@ -52,9 +50,9 @@ turtlelib::Transform2D::Transform2D(double radians)
 {
 }
 
-turtlelib::Transform2D::Transform2D(Vector2D trans, double radians)
-    : transf{{cos(radians),-sin(radians), trans.x}
-            ,{sin(radians),cos(radians), trans.y}
+turtlelib::Transform2D::Transform2D(Vector2D trans, double rot)
+    : transf{{cos(rot),-sin(rot), trans.x}
+            ,{sin(rot),cos(rot), trans.y}
             ,{0.0, 0.0, 1.0}}
 {
 }
@@ -191,7 +189,7 @@ std::istream & turtlelib::operator>>(std::istream & is, turtlelib::Transform2D &
     // Next two lines are to flush out the \n from the istream
     x = is.peek();
     is.get(x);
-    double radians = turtlelib::deg2rad(deg);
+    auto radians = turtlelib::deg2rad(deg);
     turtlelib::Transform2D newtf{vec, radians};
     tf = newtf;
     return is;
@@ -254,15 +252,15 @@ std::istream & turtlelib::operator>>(std::istream & is, Twist2D & tw)
         {   
             if (space_pos == 0)
             {
-                is >> w;
+                is>>w;
             }
             else if (space_pos == 1)
             {
-                is >> v.x;
+                is>>v.x;
             }
             else if (space_pos == 2)
             {
-                is >> v.y;
+                is>>v.y;
             }
         }
         else

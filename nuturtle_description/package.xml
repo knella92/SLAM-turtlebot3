@@ -3,7 +3,7 @@
 <package format="3">
   <name>nuturtle_description</name>
   <version>0.0.4</version>
-  <description>TODO: Package description</description>
+  <description>Launches a robot into rviz depending on input color</description>
   <maintainer email="kevin.nella@northwestern.edu">kevin</maintainer>
   <license>Apache License 2.0</license>
 
