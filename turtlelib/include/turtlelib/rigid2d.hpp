@@ -6,6 +6,8 @@
 
 #include<iosfwd> // contains forward definitions for iostream objects
 #include<iostream>
+#include <cmath>
+#include <vector>
 
 namespace turtlelib
 {
@@ -68,6 +70,9 @@ namespace turtlelib
         double y = 0.0;
     };
 
+    /// \brief output the normalized 2D vector of the input parameter
+    /// \param v - 2D vector input
+    /// \return normalized vector
     Vector2D normalize(Vector2D v);
 
 
@@ -97,10 +102,12 @@ namespace turtlelib
     /// HINT: this function can be written in under 20 lines and uses only std::peek(), std::get(), istream::operator>>() and a little logic
     std::istream & operator>>(std::istream & is, Vector2D & v);
 
-    // \brief A twist in two dimensions 
+    /// \brief A twist in two dimensions 
     struct Twist2D
     {
+        /// \brief the angular velocity
         double w;
+        /// \brief the 2D vector of the translational velocity
         Vector2D v;
 
         /// \brief Create an empty twist
@@ -108,9 +115,8 @@ namespace turtlelib
 
         /// \brief Create a twist with a rotational and translational
         /// component
-        /// \param w - the rotational velocity
-        /// \param xdot - the x velocity
-        /// \param ydot - the y velocity
+        /// \param w - the angular velocity input
+        /// \param v - the 2D vector of the translational velocity input
         Twist2D(double w, Vector2D v);
 
         /// \brief \see operator<<(...) (declared outside this class)
@@ -124,6 +130,7 @@ namespace turtlelib
     {
     private:
 
+        /// \brief a private vector to store the transformation
         std::vector<std::vector<double>> transf;
 
     public:
@@ -142,7 +149,7 @@ namespace turtlelib
         /// component
         /// \param trans - the translation
         /// \param rot - the rotation, in radians
-        Transform2D(Vector2D trans, double radians);
+        Transform2D(Vector2D trans, double rot);
 
         /// \brief apply a transformation to a Vector2D
         /// \param v - the vector to transform
@@ -215,6 +222,8 @@ namespace turtlelib
     /// as 3 numbers (w x y) separated by spaces
     /// For example:
     /// 1 2 3
+    /// \param is - input stream
+    /// \param tw - input twist
     std::istream & operator>>(std::istream & is, Twist2D & tw);
 
 }
