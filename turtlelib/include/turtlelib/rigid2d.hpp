@@ -6,6 +6,8 @@
 
 #include<iosfwd> // contains forward definitions for iostream objects
 #include<iostream>
+#include <cmath>
+#include <vector>
 
 namespace turtlelib
 {
@@ -128,8 +130,8 @@ namespace turtlelib
     {
     private:
 
-        /// \brief a private array to store the transformation
-        double transf[3][3];
+        /// \brief a private vector to store the transformation
+        std::vector<std::vector<double>> transf;
 
     public:
         /// \brief Create an identity transformation

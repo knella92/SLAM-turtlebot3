@@ -1,6 +1,4 @@
 #include "turtlelib/rigid2d.hpp"
-#include <iostream>
-#include <cmath>
 
 std::ostream & turtlelib::operator<<(std::ostream & os, const Vector2D & v)
 {
@@ -34,7 +32,7 @@ std::istream & turtlelib::operator>>(std::istream & is, Vector2D & v)
 
 
 turtlelib::Transform2D::Transform2D() // creates an identity matrix
-    : transf{{1,0,0},{0,1,0},{0,0,1}}
+    : transf{{1.0,0.0,0.0},{0.0,1.0,0.0},{0.0,0.0,1.0}}
 {
 }
 
@@ -191,7 +189,7 @@ std::istream & turtlelib::operator>>(std::istream & is, turtlelib::Transform2D &
     // Next two lines are to flush out the \n from the istream
     x = is.peek();
     is.get(x);
-    double radians = turtlelib::deg2rad(deg);
+    auto radians = turtlelib::deg2rad(deg);
     turtlelib::Transform2D newtf{vec, radians};
     tf = newtf;
     return is;
