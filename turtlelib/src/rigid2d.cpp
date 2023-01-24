@@ -1,6 +1,5 @@
 #include "turtlelib/rigid2d.hpp"
-#include <iostream>
-#include <cmath>
+
 
 std::ostream & turtlelib::operator<<(std::ostream & os, const Vector2D & v)
 {
@@ -211,6 +210,52 @@ turtlelib::Vector2D turtlelib::normalize(Vector2D v)
     v.x /= mag;
     v.y /= mag;
     return v;
+}
+
+
+double turtlelib::normalize_angle(double rad)
+{
+    const double rem = std::remainder(rad,(2*turtlelib::PI));
+    double x{};
+    if (rem > 0)
+    {
+        if (rem > 0.5)
+        {
+            x = rem - 0.5;
+            rad = -1*turtlelib::PI + x*2*turtlelib::PI;
+        }
+        else if (rem < 0.5)
+        {
+            rad = -1*turtlelib::PI + rem*2*turtlelib::PI;
+        }
+        else
+        {
+            rad = turtlelib::PI;
+        }
+        return rad;
+    }
+    else if (rem < 0)
+    {
+        if (rem > -0.5)
+        {
+            rad = -1*turtlelib::PI + rem*2*turtlelib::PI;
+        }
+        else if (x < -0.5)
+        {
+            x = rem + 1;
+            rad = x*2*turtlelib::PI;
+        }
+        else
+        {
+            rad = turtlelib::PI;
+        }
+        return rad;
+    }
+    else
+    {
+        rad = 0;
+        return rad;
+    }
 }
 
 

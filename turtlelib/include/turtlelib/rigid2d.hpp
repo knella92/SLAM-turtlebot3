@@ -75,6 +75,9 @@ namespace turtlelib
     /// \return normalized vector
     Vector2D normalize(Vector2D v);
 
+    
+    double normalize_angle(double rad);
+
 
     /// \brief output a 2 dimensional vector as [xcomponent ycomponent]
     /// os - stream to output to
@@ -208,8 +211,6 @@ namespace turtlelib
     /// HINT: This function should be implemented in terms of *=
     Transform2D operator*(Transform2D lhs, const Transform2D & rhs);
 
-
-
     /// \brief should print a human readable version of the Twist:
     /// An example output:
     /// [1 3 5]
@@ -225,6 +226,7 @@ namespace turtlelib
     /// \param is - input stream
     /// \param tw - input twist
     std::istream & operator>>(std::istream & is, Twist2D & tw);
+
 
 }
 
