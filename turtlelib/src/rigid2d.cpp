@@ -215,7 +215,8 @@ turtlelib::Vector2D turtlelib::normalize(Vector2D v)
 
 double turtlelib::normalize_angle(double rad)
 {
-    const double rem = std::remainder(rad,(2*turtlelib::PI));
+    const double quot = rad/(2*turtlelib::PI);
+    const double rem = quot - floor(quot);
     double x{};
     if (rem > 0)
     {

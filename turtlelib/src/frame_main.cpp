@@ -3,9 +3,9 @@
 
 int main()
 {
-    double rad = 2*turtlelib::PI;
+    double rad = 17;
     double rad2 = turtlelib::normalize_angle(rad);
-    std::cout << rad2;
+    std::cout << rad2 << std::endl;;
     
     // turtlelib::Transform2D T_ab, T_bc;
     // turtlelib::Vector2D v{};
