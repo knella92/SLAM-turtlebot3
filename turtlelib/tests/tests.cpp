@@ -1,8 +1,53 @@
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_template_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include "turtlelib/rigid2d.hpp"
 #include <sstream>
 #include <string>
+
+
+
+TEMPLATE_TEST_CASE("Normalize rotation angle", "[normalize]", double){
+    double rad1{};
+    double rad2{};
+
+    SECTION("rad = PI"){
+        rad1 = turtlelib::PI;
+        rad2 = turtlelib::normalize_angle(rad1);
+        REQUIRE(rad2 == turtlelib::PI);
+    }
+
+    SECTION("rad = -PI"){
+        rad1 = -1.0*turtlelib::PI;
+        rad2 = turtlelib::normalize_angle(rad1);
+        REQUIRE(rad2 == turtlelib::PI);
+    }
+    
+    SECTION("rad = 0"){
+        rad1 = 0.0;
+        rad2 = turtlelib::normalize_angle(rad1);
+        REQUIRE(rad2 == 0.0);
+    }
+
+    SECTION("rad = -PI/4"){
+        rad1 = -1.0/4.0 * turtlelib::PI;
+        rad2 = turtlelib::normalize_angle(rad1);
+        REQUIRE(rad2 == -1.0/4.0 * turtlelib::PI);
+    }
+
+    SECTION("rad = 3*PI/2"){
+        rad1 = 3.0/2.0 * turtlelib::PI;
+        rad2 = turtlelib::normalize_angle(rad1);
+        REQUIRE(rad2 == -1.0/2.0 * turtlelib::PI);
+    }
+
+    SECTION("rad = -5*PI/2"){
+        rad1 = -5.0/2.0 * turtlelib::PI;
+        rad2 = turtlelib::normalize_angle(rad1);
+        REQUIRE(rad2 == -1.0/2.0 * turtlelib::PI);
+    }
+}
+
 
 
 
