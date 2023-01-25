@@ -31,6 +31,19 @@ std::istream & turtlelib::operator>>(std::istream & is, Vector2D & v)
     return is;
 }
 
+turtlelib::Vector2D& turtlelib::Vector2D::operator+=(const turtlelib::Vector2D& rhs)
+{
+    this->x = this->x + rhs.x;
+    this->y = this->y + rhs.y;
+
+    return *this;
+}
+
+turtlelib::Vector2D turtlelib::operator+(turtlelib::Vector2D lhs, const turtlelib::Vector2D rhs)
+{
+    lhs+=rhs;
+    return lhs;
+}
 
 turtlelib::Transform2D::Transform2D() // creates an identity matrix
     : transf{{1,0,0},{0,1,0},{0,0,1}}

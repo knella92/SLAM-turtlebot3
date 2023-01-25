@@ -68,6 +68,11 @@ namespace turtlelib
 
         /// \brief the y coordinate
         double y = 0.0;
+
+        /// \brief compute addition of two vectors and store result in this object
+        /// \param rhs - vector to add to original
+        /// \return sum of the two vectors
+        Vector2D& operator+=(const Vector2D& rhs);
     };
 
     /// \brief output the normalized 2D vector of the input parameter
@@ -75,9 +80,16 @@ namespace turtlelib
     /// \return normalized vector
     Vector2D normalize(Vector2D v);
 
-    
-    double normalize_angle(double rad);
+    /// \brief adds two vectors together, returning their csum
+    /// \param lhs - left hand side of operator
+    /// \param rhs - right hand side of operator
+    /// \return - the vector sum
+    Vector2D operator+(Vector2D lhs, const Vector2D rhs);
 
+    /// \brief output the normalized angle of the input paramater
+    /// \param rad - angular rotation input
+    /// \return normalized angular rotation
+    double normalize_angle(double rad);
 
     /// \brief output a 2 dimensional vector as [xcomponent ycomponent]
     /// os - stream to output to
