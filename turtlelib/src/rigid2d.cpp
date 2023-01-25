@@ -215,19 +215,20 @@ turtlelib::Vector2D turtlelib::normalize(Vector2D v)
 
 double turtlelib::normalize_angle(double rad)
 {
-    const double quot = rad/(2*turtlelib::PI);
-    const double rem = quot - floor(quot);
-    double x{};
+    const double quot = rad/(2.0*turtlelib::PI);
+    double rem{}, x{};
+    (quot > 0) ? (rem = quot - floor(quot)) : (rem = quot - ceil(quot));
     if (rem > 0)
     {
+        std::cout<<"over 0\n";
         if (rem > 0.5)
         {
             x = rem - 0.5;
-            rad = -1*turtlelib::PI + x*2*turtlelib::PI;
+            rad = -1.0*turtlelib::PI + x*2.0*turtlelib::PI;
         }
         else if (rem < 0.5)
         {
-            rad = -1*turtlelib::PI + rem*2*turtlelib::PI;
+            rad = rem*2.0*turtlelib::PI;
         }
         else
         {
@@ -237,14 +238,15 @@ double turtlelib::normalize_angle(double rad)
     }
     else if (rem < 0)
     {
+        std::cout<<"under 0\n";
         if (rem > -0.5)
         {
-            rad = -1*turtlelib::PI + rem*2*turtlelib::PI;
+            rad = rem*2.0*turtlelib::PI;
         }
         else if (x < -0.5)
         {
-            x = rem + 1;
-            rad = x*2*turtlelib::PI;
+            x = rem + 1.0;
+            rad = x*2.0*turtlelib::PI;
         }
         else
         {
