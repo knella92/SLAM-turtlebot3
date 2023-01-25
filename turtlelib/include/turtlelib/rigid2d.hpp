@@ -69,25 +69,41 @@ namespace turtlelib
         /// \brief the y coordinate
         double y = 0.0;
 
-        /// \brief compute addition of two vectors and store result in this object
+        /// \brief compute addition of two 2D vectors and store result in this object
         /// \param rhs - vector to add to original
         /// \return sum of the two vectors
         Vector2D& operator+=(const Vector2D& rhs);
 
-        /// \brief compute subtraction of two vectors and store result in this object
+        /// \brief compute subtraction of two 2D vectors and store result in this object
         /// \param rhs - vector to subtract from the original
         /// \return difference of the two vectors
         Vector2D& operator-=(const Vector2D& rhs);
 
-
     };
+
+    /// \brief compute the dot product of two 2D vectors
+    /// \param vec1 - first vector
+    /// \param vec2 - second vector
+    /// \return - dot product with double point precision
+    double dot(Vector2D& vec1, Vector2D& vec2);
+
+    /// \brief compute the magnitude of a 2D vector
+    /// \param vec1 - vector
+    /// \return - magnitude of the vector
+    double magnitude(Vector2D& vec);
+
+    /// \brief compute the angle between two 2D vectors
+    /// \param vec1 - first vector
+    /// \param vec2 - second vector
+    /// \return - angle between the vectors
+    double angle(Vector2D& vec1, Vector2D& vec2);
 
     /// \brief output the normalized 2D vector of the input parameter
     /// \param v - 2D vector input
     /// \return normalized vector
     Vector2D normalize(Vector2D v);
 
-    /// \brief adds two vectors together, returning their csum
+    /// \brief adds two vectors together, returning their sum
     /// \param lhs - left hand side of operator
     /// \param rhs - right hand side of operator
     /// \return - the vector sum
@@ -99,16 +115,16 @@ namespace turtlelib
     /// \return - the vector difference
     Vector2D operator-(Vector2D lhs, const Vector2D rhs);
 
-    /// \brief gives product of scalar multiplication of 2D vector
+    /// \brief gives product of left scalar multiplication of 2D vector
     /// \param lhs - scalar value (left side)
-    /// \param rhs - vector to be multiplied (right side)
-    /// \return - the vector difference
+    /// \param rhs - 2D vector to be multiplied (right side)
+    /// \return - the final 2D vector
     Vector2D operator*(double lhs, const Vector2D rhs);
 
-    /// \brief gives product of scalar multiplication of 2D vector
+    /// \brief gives product of right scalar multiplication of 2D vector
     /// \param lhs - 2D vector (left side)
     /// \param rhs - scalar value to multiply by (right side)
-    /// \return - the vector difference
+    /// \return - the final 2D vector
     Vector2D operator*(Vector2D lhs, const double rhs);
 
 

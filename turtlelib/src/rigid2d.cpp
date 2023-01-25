@@ -73,6 +73,28 @@ turtlelib::Vector2D turtlelib::operator*(turtlelib::Vector2D lhs, double rhs)
     return lhs;
 }
 
+double turtlelib::dot(turtlelib::Vector2D& vec1, turtlelib::Vector2D& vec2)
+{
+    double dp{};
+    dp = vec1.x * vec2.x + vec1.y * vec2.y;
+    return dp;
+}
+
+double turtlelib::magnitude(turtlelib::Vector2D& vec)
+{
+    double mag{};
+    mag = sqrt(vec.x*vec.x + vec.y*vec.y);
+    return mag;
+}
+
+double turtlelib::angle(turtlelib::Vector2D& vec1, turtlelib::Vector2D& vec2){
+    double rad{};
+    const double num{turtlelib::dot(vec1,vec2)};
+    const double den{turtlelib::magnitude(vec1) * turtlelib::magnitude(vec2)};
+    rad = acos(num/den);
+    return rad;
+}
+
 turtlelib::Transform2D::Transform2D() // creates an identity matrix
     : transf{{1,0,0},{0,1,0},{0,0,1}}
 {

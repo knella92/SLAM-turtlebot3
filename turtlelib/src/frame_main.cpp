@@ -3,9 +3,9 @@
 
 int main()
 {
-    turtlelib::Vector2D vec1{1,1};
-    double s{2};
-    std::cout<<vec1*s<<std::endl;
+    turtlelib::Vector2D vec1{0,7};
+    turtlelib::Vector2D vec2{-1,0};
+    std::cout<<turtlelib::angle(vec1,vec2)<<std::endl;
     
     // turtlelib::Transform2D T_ab, T_bc;
     // turtlelib::Vector2D v{};
