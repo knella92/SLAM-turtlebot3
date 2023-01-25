@@ -45,6 +45,34 @@ turtlelib::Vector2D turtlelib::operator+(turtlelib::Vector2D lhs, const turtleli
     return lhs;
 }
 
+turtlelib::Vector2D& turtlelib::Vector2D::operator-=(const turtlelib::Vector2D& rhs)
+{
+    this->x = this->x - rhs.x;
+    this->y = this->y - rhs.y;
+
+    return *this;
+}
+
+turtlelib::Vector2D turtlelib::operator-(turtlelib::Vector2D lhs, const turtlelib::Vector2D rhs)
+{
+    lhs-=rhs;
+    return lhs;
+}
+
+turtlelib::Vector2D turtlelib::operator*(const double lhs, turtlelib::Vector2D rhs)
+{
+    rhs.x*=lhs;
+    rhs.y*=lhs;
+    return rhs;
+}
+
+turtlelib::Vector2D turtlelib::operator*(turtlelib::Vector2D lhs, double rhs)
+{
+    lhs.x*=rhs;
+    lhs.y*=rhs;
+    return lhs;
+}
+
 turtlelib::Transform2D::Transform2D() // creates an identity matrix
     : transf{{1,0,0},{0,1,0},{0,0,1}}
 {

@@ -73,6 +73,13 @@ namespace turtlelib
         /// \param rhs - vector to add to original
         /// \return sum of the two vectors
         Vector2D& operator+=(const Vector2D& rhs);
+
+        /// \brief compute subtraction of two vectors and store result in this object
+        /// \param rhs - vector to subtract from the original
+        /// \return difference of the two vectors
+        Vector2D& operator-=(const Vector2D& rhs);
+
+
     };
 
     /// \brief output the normalized 2D vector of the input parameter
@@ -85,6 +92,26 @@ namespace turtlelib
     /// \param rhs - right hand side of operator
     /// \return - the vector sum
     Vector2D operator+(Vector2D lhs, const Vector2D rhs);
+
+    /// \brief gives difference between two vectors together
+    /// \param lhs - left hand side of operator
+    /// \param rhs - right hand side of operator
+    /// \return - the vector difference
+    Vector2D operator-(Vector2D lhs, const Vector2D rhs);
+
+    /// \brief gives product of scalar multiplication of 2D vector
+    /// \param lhs - scalar value (left side)
+    /// \param rhs - vector to be multiplied (right side)
+    /// \return - the vector difference
+    Vector2D operator*(double lhs, const Vector2D rhs);
+
+    /// \brief gives product of scalar multiplication of 2D vector
+    /// \param lhs - 2D vector (left side)
+    /// \param rhs - scalar value to multiply by (right side)
+    /// \return - the vector difference
+    Vector2D operator*(Vector2D lhs, const double rhs);
+
+
 
     /// \brief output the normalized angle of the input paramater
     /// \param rad - angular rotation input

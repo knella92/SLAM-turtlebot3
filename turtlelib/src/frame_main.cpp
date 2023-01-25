@@ -4,8 +4,8 @@
 int main()
 {
     turtlelib::Vector2D vec1{1,1};
-    turtlelib::Vector2D vec2{2,2};
-    std::cout<<(vec1+vec2)<<std::endl;
+    double s{2};
+    std::cout<<vec1*s<<std::endl;
     
     // turtlelib::Transform2D T_ab, T_bc;
     // turtlelib::Vector2D v{};
