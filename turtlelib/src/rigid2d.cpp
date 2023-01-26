@@ -388,3 +388,20 @@ std::istream & turtlelib::operator>>(std::istream & is, Twist2D & tw)
     tw = tmp;
     return is;
 }
+
+turtlelib::Transform2D turtlelib::integrate_twist(Twist2D& Vb)
+{
+    if (Vb.w == 0)
+    {
+        // No t in the expression because we're dealing with one unit time-step
+        const turtlelib::Transform2D Tb_bp{{Vb.v.x, Vb.v.y}, 0.0};
+        return Tb_bp;
+    }
+    else{
+        const turtlelib::Transform2D Ts_b{{Vb.v.y/Vb.w, -1*Vb.v.x/Vb.w}, Vb.w}; // Also equal to Tsp_bp
+        const turtlelib::Transform2D Ts_sp{Vb.w};
+        const turtlelib::Transform2D Tb_bp = Ts_b.inv() * Ts_sp * Ts_b;
+        return Tb_bp;
+    }
+
+}

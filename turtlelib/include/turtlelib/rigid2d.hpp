@@ -88,7 +88,7 @@ namespace turtlelib
     double dot(Vector2D& vec1, Vector2D& vec2);
 
     /// \brief compute the magnitude of a 2D vector
-    /// \param vec1 - vector
+    /// \param vec - vector
     /// \return - magnitude of the vector
     double magnitude(Vector2D& vec);
 
@@ -281,6 +281,13 @@ namespace turtlelib
     /// \param is - input stream
     /// \param tw - input twist
     std::istream & operator>>(std::istream & is, Twist2D & tw);
+
+    /// \brief Computes the transformation corresponding to a rigid body
+    /// following a constant twist (in its original body frame) for one
+    /// time unit
+    /// \param Vb - constant twist within original body frame of rigid body
+    /// \return transformation corresponding new body frame from original body frame
+    Transform2D integrate_twist(Twist2D& Vb);
 
 
 }
