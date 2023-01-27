@@ -245,6 +245,16 @@ namespace turtlelib
     };
 
 
+    /// \brief Models differential drive robots
+    class DiffDrive
+    {
+
+        
+
+
+    }
+
+
     /// \brief should print a human readable version of the transform:
     /// An example output:
     /// deg: 90 x: 3 y: 5
