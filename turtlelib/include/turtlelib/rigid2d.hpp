@@ -165,6 +165,7 @@ namespace turtlelib
     {
         /// \brief the angular velocity
         double w;
+        
         /// \brief the 2D vector of the translational velocity
         Vector2D v;
 
@@ -243,16 +244,6 @@ namespace turtlelib
         Twist2D operator()(Twist2D V) const;
 
     };
-
-
-    /// \brief Models differential drive robots
-    class DiffDrive
-    {
-
-        
-
-
-    }
 
 
     /// \brief should print a human readable version of the transform:
