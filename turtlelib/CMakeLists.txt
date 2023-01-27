@@ -10,7 +10,11 @@ add_library(turtlelib src/rigid2d.cpp)
 # Public include directories can be used by other targets that link against turtlelib
 # By adding include/ to the include path, this means that files in e.g., include/turtlelib
 # can be included with #include"turtlelib/file.hpp"
-target_include_directories(turtlelib PUBLIC include/)
+target_include_directories(turtlelib
+    PUBLIC 
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+    )
 
 # enable C++ 17
 target_compile_features(turtlelib PUBLIC cxx_std_17) 
@@ -25,6 +29,23 @@ target_compile_options(turtlelib PUBLIC -Wall -Wextra -Wpedantic)
 # can be compiled once and used
 add_executable(frame_main src/frame_main.cpp src/rigid2d.cpp)
 target_link_libraries(frame_main turtlelib)
+
+install(
+    DIRECTORY include/
+    DESTINATION include
+)
+
+install(
+    TARGETS frame_main turtlelib
+    EXPORT turtlelib-targets
+)
+
+install(
+    EXPORT turtlelib-targets
+    FILE turtlelib-config.cmake
+    NAMESPACE turtlelib::
+    DESTINATION lib/cmake/${PROJECT_NAME}
+)
 
 
 # CMake also has the ability to generate doxygen documentation
