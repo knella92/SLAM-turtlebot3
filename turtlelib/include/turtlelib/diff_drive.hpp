@@ -22,15 +22,24 @@ namespace turtlelib
         double theta;
     };
 
-    /// \brief right and left wheel velocities (rad/s)
+    /// \brief wheel velocity (m/s)
     struct Wheel_Vel
     {
-        /// \brief left wheel velocity
-        double phi_ldot{};
+        /// \brief left wheel velocity (x and y components)
+        Vector2D l;
 
-        /// \brief right wheel velocity
-        double phi_rdot{};
+        /// \brief right wheel velocity (x and y components)
+        Vector2D r;
     };
+
+    struct Ang_Vel
+    {
+        /// \brief left wheel rotational velocity
+        double phi_ldot;
+
+        /// \brief right wheel rotational velocity
+        double phi_rdot;
+    }
 
 
     /// \brief forward and inverse kinematics function
@@ -38,8 +47,6 @@ namespace turtlelib
     {
 
         private:
-
-            double depth{};
 
             Transform2D Tb1;
 
@@ -60,16 +67,21 @@ namespace turtlelib
             /// @param depth 
             DiffDrive(double depth);
 
+
+            Ang_Vel bodytwist_to_wheelmotion(Twist2D & Vb) const;
+
+            /// \brief computes wheel velocities required to make robot move at a given body twist
+            /// \param Vb - given body twist
+            /// \return - wheel velocities
+            Wheel_Vel inverse_kin(Twist2D & Vb) const;
+
             /// \brief updates robot's configuration given new wheel positions
             /// \param phi_lp - new left wheel position (phi_l')
             /// \param phi_rp - new right wheel position (phi_r')
             /// \return updated configuration
             Config forward_kin(double phi_lp, double phi_rp);
 
-            /// \brief computes wheel velocities required to make robot move at a given body twist
-            /// \param V - given body twist
-            /// \return - wheel velocities
-            Wheel_vel inverse_kin(Twist2D & V) const;
+
             
 
     };
