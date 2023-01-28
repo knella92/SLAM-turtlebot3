@@ -22,13 +22,14 @@ namespace turtlelib
         double theta;
     };
 
+    /// \brief struct containing left and right wheel rotational velocity
     struct Wheel_Vel
     {
         /// \brief left wheel rotational velocity
-        double phi_ldot;
+        double l;
 
         /// \brief right wheel rotational velocity
-        double phi_rdot;
+        double r;
     }
 
 
@@ -37,9 +38,10 @@ namespace turtlelib
     {
 
         private:
-
+            /// \brief transform from body frame to wheel 1 (left)
             Transform2D Tb1;
 
+            /// \brief transform from body frame to wheel 2 (right)
             Transform2D Tb2;
 
         public:
