@@ -22,17 +22,7 @@ namespace turtlelib
         double theta;
     };
 
-    /// \brief wheel velocity (m/s)
     struct Wheel_Vel
-    {
-        /// \brief left wheel velocity (x and y components)
-        Vector2D l;
-
-        /// \brief right wheel velocity (x and y components)
-        Vector2D r;
-    };
-
-    struct Ang_Vel
     {
         /// \brief left wheel rotational velocity
         double phi_ldot;
@@ -66,9 +56,6 @@ namespace turtlelib
             /// \brief initialize transforms
             /// @param depth 
             DiffDrive(double depth);
-
-
-            Ang_Vel bodytwist_to_wheelmotion(Twist2D & Vb) const;
 
             /// \brief computes wheel velocities required to make robot move at a given body twist
             /// \param Vb - given body twist

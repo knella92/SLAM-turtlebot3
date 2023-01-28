@@ -7,17 +7,17 @@ turtlelib::DiffDrive::DiffDrive(double depth)
 {
 }
 
+turtlelib::Wheel_Vel turtlelib::DiffDrive::inverse_kin(Twist2D & Vb){
+
+    turtlelib::Twist2D V1 = Tb1.inv()(Vb);
+    turtlelib::Twist2D V2 = Tb2.inv()(Vb);
+    turtlelib::Wheel_Vel{V1[1], V2[1]};
+    return Wheel_Vel
+
+}
 
 turtlelib::Config turtlelib::DiffDrive::forward_kin(double phi_lp, double phi_rp){
 
 }
 
 
-turtlelib::Wheel_Vel turtlelib::DiffDrive::inverse_kin(Twist2D & Vb){
-
-    for (int i{1}; i<=2; i++)
-    {
-        
-    }
-
-}
