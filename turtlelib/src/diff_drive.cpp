@@ -11,7 +11,7 @@ turtlelib::Wheel_Vel turtlelib::DiffDrive::inverse_kin(Twist2D & Vb){
 
     turtlelib::Twist2D V1 = Tb1.inv()(Vb);
     turtlelib::Twist2D V2 = Tb2.inv()(Vb);
-    turtlelib::Wheel_Vel phidot{V1[1], V2[1]};
+    turtlelib::Wheel_Vel v{V1[1], V2[1]};
     return phidot;
 
 }

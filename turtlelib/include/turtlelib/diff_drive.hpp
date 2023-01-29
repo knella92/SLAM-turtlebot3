@@ -22,7 +22,7 @@ namespace turtlelib
         double theta;
     };
 
-    /// \brief struct containing left and right wheel rotational velocity
+    /// \brief struct containing left and right wheel x velocities
     struct Wheel_Vel
     {
         /// \brief left wheel rotational velocity

@@ -190,7 +190,7 @@ double turtlelib::Transform2D::rotation() const
     }
     else
     {
-        (transf[1][0] == 0) ? radians=acos(transf[1][1]) : radians=asin(transf[1][0]); // if cos(theta) = 0, use acos(cos(theta)), if not, use asin(sin(theta))
+        almost_equal(transf[1][0],0) ? radians=acos(transf[1][1]) : radians=asin(transf[1][0]); // if cos(theta) = 0, use acos(cos(theta)), if not, use asin(sin(theta))
     }
     return radians;
 }
@@ -391,7 +391,7 @@ std::istream & turtlelib::operator>>(std::istream & is, Twist2D & tw)
 
 turtlelib::Transform2D turtlelib::integrate_twist(Twist2D& Vb)
 {
-    if (Vb.w == 0)
+    if (almost_equal(Vb.w,0))
     {
         // No t in the expression because we're dealing with one unit time-step
         const turtlelib::Transform2D Tb_bp{{Vb.v.x, Vb.v.y}, 0.0};
