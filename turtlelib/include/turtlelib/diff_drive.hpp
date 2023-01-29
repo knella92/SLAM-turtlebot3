@@ -25,10 +25,10 @@ namespace turtlelib
     /// \brief struct containing left and right wheel x velocities
     struct Wheel_Vel
     {
-        /// \brief left wheel rotational velocity
+        /// \brief left wheel x velocity
         double l;
 
-        /// \brief right wheel rotational velocity
+        /// \brief right wheel x velocity
         double r;
     }
 
@@ -44,6 +44,12 @@ namespace turtlelib
             /// \brief transform from body frame to wheel 2 (right)
             Transform2D Tb2;
 
+            /// \brief depth of the wheels (distance between wheel frame and body frame in y dimension) 
+            double D;
+
+            /// \brief 2D H pseudo-inverse matrix
+            std::vector<std::vector<double>> H_pi;
+
         public:
 
             /// \brief robot's current right wheel position
@@ -55,9 +61,15 @@ namespace turtlelib
             /// \brief robot's current configuration q (x, y, theta)
             Config q{};
 
-            /// \brief initialize transforms
-            /// @param depth 
-            DiffDrive(double depth);
+            /// \brief initialize transforms, D, H pseudo-inverse matrix, set's current wheel positions to zero
+            /// \param depth - depth between center of one wheel and center of chassis
+            /// \param radius - radius of wheels
+            DiffDrive(double depth, double radius);
+
+            /// \brief initialize transforms, D, H pseudo-inverse matrix, set's current wheel positions to given values
+            /// \param depth - depth between center of one wheel and center of chassis
+            /// \param radius - radius of wheels
+            DiffDrive(double depth, double radius, double left_pos, double right_pos);
 
             /// \brief computes wheel velocities required to make robot move at a given body twist
             /// \param Vb - given body twist
@@ -68,7 +80,7 @@ namespace turtlelib
             /// \param phi_lp - new left wheel position (phi_l')
             /// \param phi_rp - new right wheel position (phi_r')
             /// \return updated configuration
-            Config forward_kin(double phi_lp, double phi_rp);
+            void forward_kin(double phi_lp, double phi_rp);
 
 
             
