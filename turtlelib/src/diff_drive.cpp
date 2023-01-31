@@ -6,7 +6,8 @@ turtlelib::DiffDrive::DiffDrive(double depth, double radius)
      Tb2{{0.0, -1*depth}, 0.0},
      D{depth}, r{radius},
      H_pi{{(-1.0*radius)/(2.0*depth), (1.0*radius)/(2.0*depth)}, {radius/2.0, radius/2.0}},
-     phi_l{0.0}, phi_r{0.0}
+     phi_l{0.0}, phi_r{0.0},
+     q{0.0,0.0,0.0}
 {
 }
 
@@ -15,7 +16,8 @@ turtlelib::DiffDrive::DiffDrive(double depth, double radius, double left_pos, do
      Tb2{{0.0, -1*depth}, 0.0},
      D{depth}, r{radius},
      H_pi{{(-1.0*radius)/(2.0*depth), radius/(2.0*depth)}, {radius/2.0, radius/2.0}},
-     phi_l{left_pos}, phi_r{right_pos}
+     phi_l{left_pos}, phi_r{right_pos},
+     q{0.0,0.0,0.0}
 {
 }
 
@@ -38,7 +40,12 @@ void turtlelib::DiffDrive::forward_kin(double phi_lp, double phi_rp){
     Vb.v.x = H_pi[1][0] * u1 + H_pi[1][1] * u2;
     Vb.v.y = 0;
     
-
+    turtlelib::Transform2D Twb{{q[0],q[1]},q[3]};
+    turtlelib::Transform2D Tb_bp = turtlelib::integrate_twist(Vb);
+    Twb*=Tb_bp;
+    q.x = Twb.translation().x;
+    q.y = Twb.translation().y;
+    q.w = Twb.rotation();
 }
 
 
