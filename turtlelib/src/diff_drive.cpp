@@ -40,7 +40,7 @@ void turtlelib::DiffDrive::forward_kin(double phi_lp, double phi_rp){
     Vb.v.x = H_pi[1][0] * u1 + H_pi[1][1] * u2;
     Vb.v.y = 0;
     
-    turtlelib::Transform2D Twb{{q[0],q[1]},q[3]};
+    turtlelib::Transform2D Twb{{q[0],q[1]},q[2]};
     turtlelib::Transform2D Tb_bp = turtlelib::integrate_twist(Vb);
     Twb*=Tb_bp;
     q.x = Twb.translation().x;
