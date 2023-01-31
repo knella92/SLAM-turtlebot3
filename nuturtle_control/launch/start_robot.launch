@@ -1,0 +1,7 @@
+<launch>
+
+ <node pkg='nuturtle_control' exec='turtle_control' name='turtle_control' output='screen'>
+        <param from="$(find-pkg-share nuturtle_description)/config/diff_params.yaml"/>
+    </node>
+
+</launch>
