@@ -6,3 +6,5 @@
 *.vscode
 __pycache__/
 turtlelib/build
+nuturtle_description/build
+nuturtle_description/log

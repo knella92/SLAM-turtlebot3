@@ -23,11 +23,11 @@ def generate_launch_description():
             name='use_jsp',
             default_value='true',
             choices=['true', 'false'],
-            description=['Controls whether joint_state_publisher is used to',
-                         'publish default joint states']
+            description="""Controls whether joint_state_publisher is used to
+                         publish default joint states"""
         ),
 
-        DeclareLaunchArgument(              # Creates a launch argument for color
+        DeclareLaunchArgument(  # Creates a launch argument for color
             name='color',
             default_value='purple',
             choices=['red', 'green', 'blue', 'purple', ''],
@@ -41,6 +41,7 @@ def generate_launch_description():
 
         Node(
             namespace=LaunchConfiguration('color'),
+            name='robot_state_publisher',
             package='robot_state_publisher',
             executable='robot_state_publisher',
             parameters=[
@@ -59,9 +60,9 @@ def generate_launch_description():
         Node(
             namespace=LaunchConfiguration('color'),
             condition=IfCondition(LaunchConfiguration('use_jsp')),
+            name='joint_state_publisher',
             package='joint_state_publisher',
             executable='joint_state_publisher',
-            name='joint_state_publisher'
             ),
 
         Node(

@@ -24,4 +24,5 @@
     <node pkg='tf2_ros' exec='static_transform_publisher' args="--y 0.5 --frame-id nusim/world --child-frame-id green/base_footprint"/>
     <node pkg='tf2_ros' exec='static_transform_publisher' args="--x -0.75 --frame-id nusim/world --child-frame-id blue/base_footprint"/>
     <node pkg='tf2_ros' exec='static_transform_publisher' args="--y -1.0 --frame-id nusim/world --child-frame-id purple/base_footprint"/>
+    
 </launch>
