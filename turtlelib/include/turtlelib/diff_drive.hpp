@@ -22,13 +22,13 @@ namespace turtlelib
         double theta;
     };
 
-    /// \brief struct containing left and right wheel x velocities
+    /// \brief struct containing left and right wheel x rotational velocities
     struct Wheel_Vel
     {
-        /// \brief left wheel x velocity
+        /// \brief left wheel x rotational velocity
         double l;
 
-        /// \brief right wheel x velocity
+        /// \brief right wheel x rotational velocity
         double r;
     }
 
@@ -46,6 +46,9 @@ namespace turtlelib
 
             /// \brief depth of the wheels (distance between wheel frame and body frame in y dimension) 
             double D;
+
+            /// \brief radius of the wheels
+            double r;
 
             /// \brief 2D H pseudo-inverse matrix
             std::vector<std::vector<double>> H_pi;
