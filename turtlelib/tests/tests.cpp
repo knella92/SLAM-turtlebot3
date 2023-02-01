@@ -1,8 +1,53 @@
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_template_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include "turtlelib/rigid2d.hpp"
 #include <sstream>
 #include <string>
+
+
+
+TEMPLATE_TEST_CASE("Normalize rotation angle", "[normalize]", double){
+    double rad1{};
+    double rad2{};
+
+    SECTION("rad = PI"){
+        rad1 = turtlelib::PI;
+        rad2 = turtlelib::normalize_angle(rad1);
+        REQUIRE(rad2 == turtlelib::PI);
+    }
+
+    SECTION("rad = -PI"){
+        rad1 = -1.0*turtlelib::PI;
+        rad2 = turtlelib::normalize_angle(rad1);
+        REQUIRE(rad2 == turtlelib::PI);
+    }
+    
+    SECTION("rad = 0"){
+        rad1 = 0.0;
+        rad2 = turtlelib::normalize_angle(rad1);
+        REQUIRE(rad2 == 0.0);
+    }
+
+    SECTION("rad = -PI/4"){
+        rad1 = -1.0/4.0 * turtlelib::PI;
+        rad2 = turtlelib::normalize_angle(rad1);
+        REQUIRE(rad2 == -1.0/4.0 * turtlelib::PI);
+    }
+
+    SECTION("rad = 3*PI/2"){
+        rad1 = 3.0/2.0 * turtlelib::PI;
+        rad2 = turtlelib::normalize_angle(rad1);
+        REQUIRE(rad2 == -1.0/2.0 * turtlelib::PI);
+    }
+
+    SECTION("rad = -5*PI/2"){
+        rad1 = -5.0/2.0 * turtlelib::PI;
+        rad2 = turtlelib::normalize_angle(rad1);
+        REQUIRE(rad2 == -1.0/2.0 * turtlelib::PI);
+    }
+}
+
 
 
 
@@ -117,4 +162,41 @@ TEST_CASE("Operator >>", "[operator]"){
     REQUIRE(Tf.rotation() == 0.0);
     REQUIRE(Tf.translation().x == 1.0);
     REQUIRE(Tf.translation().y == 3.0);
+}
+
+
+
+TEMPLATE_TEST_CASE("Integrate twist", "[integrate]", turtlelib::Twist2D, turtlelib::Transform2D){
+    turtlelib::Twist2D Vb{};
+
+    SECTION("pure translation"){
+        Vb.w = 0.0;
+        Vb.v = {2.0,2.0};
+        turtlelib::Transform2D Tb_bp = turtlelib::integrate_twist(Vb);
+        REQUIRE(Tb_bp.translation().x == 2.0);
+        REQUIRE(Tb_bp.translation().y == 2.0);
+        REQUIRE(Tb_bp.rotation() == 0.0);
+    }
+
+    SECTION("pure rotation"){
+        Vb.w = turtlelib::PI;
+        Vb.v = {0.0,0.0};
+        turtlelib::Transform2D Tb_bp = turtlelib::integrate_twist(Vb);
+        REQUIRE(Tb_bp.translation().x == 0.0);
+        REQUIRE(Tb_bp.translation().y == 0.0);
+        REQUIRE(Tb_bp.rotation() == turtlelib::PI);
+    }
+    
+    SECTION("simultaneous translation and rotation"){
+        Vb.w = turtlelib::PI;
+        Vb.v = {2.0,2.0};
+        turtlelib::Transform2D Tb_bp = turtlelib::integrate_twist(Vb);
+        turtlelib::Transform2D test_sb{{2.0/turtlelib::PI, -2.0/turtlelib::PI}, turtlelib::PI};
+        turtlelib::Transform2D test_ssp{turtlelib::PI};
+        turtlelib::Transform2D test_bbp = test_sb.inv() * test_ssp * test_sb;
+        REQUIRE(Tb_bp.translation().x == test_bbp.translation().x);
+        REQUIRE(Tb_bp.translation().y == test_bbp.translation().y );
+        REQUIRE(Tb_bp.rotation() == test_bbp.rotation());
+    }
+
 }
