@@ -70,8 +70,7 @@ public:
     // test for determining whether obstacles/x and obstacles/y are equal in length
     const std::vector<double> obstacles_x = get_parameter("obstacles/x").as_double_array();
     const std::vector<double> obstacles_y = get_parameter("obstacles/y").as_double_array();
-    if (obstacles_x.size() != obstacles_y.size())
-    {
+    if (obstacles_x.size() != obstacles_y.size()) {
       rclcpp::shutdown();
     }
 
