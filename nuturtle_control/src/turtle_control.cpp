@@ -66,33 +66,21 @@ public:
     const int64_t t = 1000 / rate; // implicit conversion of 1000/rate to int64_t to use as time in ms
 
     // initialize publishers and timer
-    publisher_ = create_publisher<std_msgs::msg::UInt64>("~/timestep", 10);
-    obst_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/obstacles", 10);
-    timer_ = create_wall_timer(
-      std::chrono::duration<int64_t, std::milli>(t), std::bind(&SimNode::timer_callback, this));
-    //intializes services
-    reset_service_ =
-      create_service<nusim::srv::Reset>(
-      "~/reset",
-      std::bind(&SimNode::reset, this, std::placeholders::_1, std::placeholders::_2));
-    tele_service_ =
-      create_service<nusim::srv::Teleport>(
-      "~/teleport",
-      std::bind(&SimNode::teleport, this, std::placeholders::_1, std::placeholders::_2));
+    wheel_publisher_ = create_publisher<nuturtlebot_msgs::msg::WheelCommands>("/wheel_cmd", 10);
+    js_publisher_ = create_publisher<sensor_msgs::msg::JointState>("/joint_states", 10);
 
-    // initializes braodcaster
-    tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
+    // initialize subscribers
+    vel_subscriber_ = create_subscriber<geometry_msgs::msg::Twist>("/cmd_vel", 10, std::bind(&ControlNode::cmd_callback, this, std::placeholders::_1));
+    sens_subscriber_ = create_subscriber<nuturtlebot_msgs::msg::SensorData>("/sensor_data", 10, std::bind(&ControlNode::sens_callback, this, std::placeholders::_1);)
 
   }
 
 private:
   size_t count_;
-  rclcpp::Publisher<std_msgs::msg::UInt64>::SharedPtr publisher_;
-  rclcpp::TimerBase::SharedPtr timer_;
-  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr obst_publisher_;
-  rclcpp::Service<nusim::srv::Reset>::SharedPtr reset_service_;
-  rclcpp::Service<nusim::srv::Teleport>::SharedPtr tele_service_;
-  std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+  rclcpp::Publisher<nuturtlebot_msgs::msg::WheelCommands>::SharedPtr wheel_publisher_;
+  rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr js_publisher_;
+  rclcpp::Subscriber<geometry_msgs::msg::Twist>::SharedPtr vel_subscriber;
+  rclcpp::Subscriber<nuturtlebot_msgs::msg::SensorData>::SharedPtr sens_subscriber;
 
 
   /// \brief Initializes timer callback which publishes timestep, turtlebot positions, and obstacle positions at each timestep
