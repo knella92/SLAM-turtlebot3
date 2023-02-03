@@ -197,7 +197,7 @@ double turtlelib::Transform2D::rotation() const
 turtlelib::Twist2D turtlelib::Transform2D::operator()(turtlelib::Twist2D V) const
 {
     turtlelib::Twist2D V_new{};
-    double adj[3][3]{{1.0, 0.0, 0.0}
+    std::vector<std::vector<double>> adj{{1.0, 0.0, 0.0}
               ,{transf.at(1).at(2), transf.at(0).at(0), transf.at(0).at(1)}
               ,{-transf.at(0).at(2), transf.at(1).at(0), transf.at(1).at(1)}};
     V_new.w = V.w;
