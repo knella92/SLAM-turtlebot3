@@ -42,12 +42,17 @@ public:
     //declare initial parameters
     declare_parameter("wheel_radius", 0.0);
     declare_parameter("track_width", 0.0);
+    declare_parameter("motor_cmd_per_rad_sec", 0.0);
 
     //gets aforementioned parameters
     const auto radius = get_parameter("wheel_radius").as_double();
     const auto depth = get_parameter("track_width").as_double();
+    const auto mcmd_rads = get_parameter("motor_cmd_per_rad_sec").as_double();
 
-    turtlelib::DiffDrive tbot3{depth, radius};
+    turtlelib::DiffDrive tbot{depth, radius};
+    tbot3 = tbot;
+    motor_cmd_per_rad_sec = mcmd_rads;
+
 
     // initialize publishers and timer
     wheel_publisher_ = create_publisher<nuturtlebot_msgs::msg::WheelCommands>("/wheel_cmd", 10);
@@ -55,11 +60,14 @@ public:
 
     // initialize subscribers
     vel_subscriber_ = create_subscription<geometry_msgs::msg::Twist>("/cmd_vel", 10, std::bind(&ControlNode::cmd_callback, this, std::placeholders::_1));
-    //sens_subscriber_ = create_subscription<nuturtlebot_msgs::msg::SensorData>("/sensor_data", 10, std::bind(&ControlNode::sens_callback, this));
+    // sens_subscriber_ = create_subscription<nuturtlebot_msgs::msg::SensorData>("/sensor_data", 10, std::bind(&ControlNode::sens_callback, this));
 
   }
 
 private:
+
+  turtlelib::DiffDrive tbot3{0.0,0.0};
+  double motor_cmd_per_rad_sec{0.0};
   rclcpp::Publisher<nuturtlebot_msgs::msg::WheelCommands>::SharedPtr wheel_publisher_;
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr js_publisher_;
   rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr vel_subscriber_;
@@ -74,8 +82,8 @@ private:
     Vb.w = msg.angular.z;
     
     turtlelib::Wheel_Vel phidot = tbot3.inverse_kin(Vb);
-    int32 left_vel = phidot.l*60/(2*turtlelib::PI*0.229);
-    int32 right_vel = phidot.l*60/(2*turtlelib::PI*0.229);
+    int32_t left_vel = phidot.l*motor_cmd_per_rad_sec;
+    int32_t right_vel = phidot.l*motor_cmd_per_rad_sec;
     auto message = nuturtlebot_msgs::msg::WheelCommands();
     message.left_velocity = left_vel;
     message.right_velocity = right_vel;
