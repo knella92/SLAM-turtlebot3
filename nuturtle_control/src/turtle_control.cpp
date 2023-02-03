@@ -20,7 +20,6 @@
 #include "include/turtlelib"
 
 
-
 #include "std_msgs/msg/u_int64.hpp"
 #include "nusim/srv/reset.hpp"
 #include "nusim/srv/teleport.hpp"
@@ -36,7 +35,7 @@ class ControlNode : public rclcpp::Node
 {
 public:
   SimNode()
-  : Node("turtle_control"), count_(0)
+    : Node("turtle_control"), count_(0)
   {
 
     //declare initial parameters
@@ -69,8 +68,14 @@ public:
     js_publisher_ = create_publisher<sensor_msgs::msg::JointState>("/joint_states", 10);
 
     // initialize subscribers
-    vel_subscriber_ = create_subscriber<geometry_msgs::msg::Twist>("/cmd_vel", 10, std::bind(&ControlNode::cmd_callback, this, std::placeholders::_1));
-    sens_subscriber_ = create_subscriber<nuturtlebot_msgs::msg::SensorData>("/sensor_data", 10, std::bind(&ControlNode::sens_callback, this, std::placeholders::_1);)
+    vel_subscriber_ =
+      create_subscriber<geometry_msgs::msg::Twist>(
+      "/cmd_vel", 10,
+      std::bind(&ControlNode::cmd_callback, this, std::placeholders::_1));
+    sens_subscriber_ = create_subscriber<nuturtlebot_msgs::msg::SensorData>(
+      "/sensor_data", 10, std::bind(
+        &ControlNode::sens_callback, this,
+        std::placeholders::_1);)
 
   }
 

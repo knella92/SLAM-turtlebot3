@@ -20,7 +20,6 @@
 #include "include/turtlelib"
 
 
-
 #include "std_msgs/msg/u_int64.hpp"
 #include "nusim/srv/reset.hpp"
 #include "nusim/srv/teleport.hpp"
@@ -36,7 +35,7 @@ class OdomNode : public rclcpp::Node
 {
 public:
   SimNode()
-  : Node("odometry"), count_(0)
+    : Node("odometry"), count_(0)
   {
 
     //declare initial parameters
@@ -69,12 +68,15 @@ public:
     js_publisher_ = create_publisher<sensor_msgs::msg::JointState>("/joint_states", 10);
 
     // initialize subscribers
-    js_subscriber_ = create_subscriber<sensor_msgs::msg::JointState>("/joint_states", 10, std::bind(&ControlNode::js_callback, this, std::placeholders::_1));
-   
+    js_subscriber_ =
+      create_subscriber<sensor_msgs::msg::JointState>(
+      "/joint_states", 10,
+      std::bind(&ControlNode::js_callback, this, std::placeholders::_1));
+
     initialp_service_ =
-        create_service<>(
-        "~/initial_pose",
-        std::bind(&OdomNode::initial_pose, this, std::placeholders::_1, std::placeholders::_2));
+      create_service<>(
+      "~/initial_pose",
+      std::bind(&OdomNode::initial_pose, this, std::placeholders::_1, std::placeholders::_2));
 
     // initializes braodcaster
     tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
@@ -84,7 +86,6 @@ public:
 private:
   rclcpp::Publisher<nuturtlebot_msgs::msg::WheelCommands>::SharedPtr odom_publisher_;
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr js_subscriber_;
-
 
 
   void js_callback()

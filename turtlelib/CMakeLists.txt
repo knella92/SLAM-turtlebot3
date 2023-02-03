@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 project(turtlelib)
+include(CTest)
 
 # create the turtlelib library
 add_library(turtlelib src/rigid2d.cpp src/diff_drive.cpp)
