@@ -39,12 +39,16 @@ void turtlelib::DiffDrive::forward_kin(double phi_lp, double phi_rp){
     Vb.w = H_pi[0][0] * u1 + H_pi[0][1] * u2;
     Vb.v.x = H_pi[1][0] * u1 + H_pi[1][1] * u2;
     Vb.v.y = 0;
+
+    // change the below to q*A thing
+    // qdot = A(oldtheta,0,0)*dqb
     
     turtlelib::Transform2D Tb_bp = turtlelib::integrate_twist(Vb);
+    turtlelib::Config dq{Tb_bp.translation().x, Tb_bp.translation().y, Tb_bp.rotation()};
+    q.theta += dq.theta;
+    q.x += dq.x*cos(q.theta) - dq.y*sin(q.theta);
+    q.y += dq.x*sin(q.theta) + dq.y*cos(q.theta);
 
-    q.x += Twb.translation().x;
-    q.y += Twb.translation().y;
-    q.theta += Twb.rotation();
 }
 
 

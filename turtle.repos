@@ -1,0 +1,9 @@
+repositories:
+  nuturtle-knella92:
+    type: git
+    url: git@github.com:ME495-Navigation/nuturtle-knella92.git
+    version: task_E
+  nuturtlebot_msgs:
+    type: git
+    url: git@github.com:ME495-Navigation/nuturtlebot_msgs.git
+    version: humble

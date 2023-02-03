@@ -3,7 +3,7 @@
 /// \file
 /// \brief Kinematics of Differential Drive robots
 
-#include "rigid2d.hpp"
+#include "turtlelib/rigid2d.hpp"
 
 
 namespace turtlelib

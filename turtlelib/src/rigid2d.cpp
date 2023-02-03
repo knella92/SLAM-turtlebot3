@@ -1,6 +1,5 @@
 #include "turtlelib/rigid2d.hpp"
 
-
 std::ostream & turtlelib::operator<<(std::ostream & os, const Vector2D & v)
 {
     os << '[' << v.x << ' ' << v.y << ']';
@@ -96,7 +95,7 @@ double turtlelib::angle(turtlelib::Vector2D& vec1, turtlelib::Vector2D& vec2){
 }
 
 turtlelib::Transform2D::Transform2D() // creates an identity matrix
-    : transf{{1,0,0},{0,1,0},{0,0,1}}
+    : transf{{1.0,0.0,0.0},{0.0,1.0,0.0},{0.0,0.0,1.0}}
 {
 }
 
@@ -114,9 +113,9 @@ turtlelib::Transform2D::Transform2D(double radians)
 {
 }
 
-turtlelib::Transform2D::Transform2D(Vector2D trans, double radians)
-    : transf{{cos(radians),-sin(radians), trans.x}
-            ,{sin(radians),cos(radians), trans.y}
+turtlelib::Transform2D::Transform2D(Vector2D trans, double rot)
+    : transf{{cos(rot),-sin(rot), trans.x}
+            ,{sin(rot),cos(rot), trans.y}
             ,{0.0, 0.0, 1.0}}
 {
 }
@@ -124,8 +123,8 @@ turtlelib::Transform2D::Transform2D(Vector2D trans, double radians)
 turtlelib::Vector2D turtlelib::Transform2D::operator()(turtlelib::Vector2D v) const
 {
     turtlelib::Vector2D newv{};
-    newv.x = transf[0][0]*v.x + transf[0][1]*v.y + transf[0][2]*1.0;
-    newv.y = transf[1][0]*v.x + transf[1][1]*v.y + transf[1][2]*1.0;
+    newv.x = transf.at(0).at(0)*v.x + transf.at(0).at(1)*v.y + transf.at(0).at(2)*1.0;
+    newv.y = transf.at(1).at(0)*v.x + transf.at(1).at(1)*v.y + transf.at(1).at(2)*1.0;
     return newv;
 }
 
@@ -133,17 +132,17 @@ turtlelib::Transform2D turtlelib::Transform2D::inv() const
 {
     turtlelib::Transform2D invT{};
 
-    invT.transf[0][0] = transf[0][0];
-    invT.transf[0][1] = transf[0][1]*-1.0;
-    invT.transf[0][2] = -1.0*transf[0][2]*transf[0][0] - transf[1][2]*transf[1][0];
+    invT.transf.at(0).at(0) = transf.at(0).at(0);
+    invT.transf.at(0).at(1) = transf.at(0).at(1)*-1.0;
+    invT.transf.at(0).at(2) = -1.0*transf.at(0).at(2)*transf.at(0).at(0) - transf.at(1).at(2)*transf.at(1).at(0);
 
-    invT.transf[1][0] = -1.0*transf[1][0];
-    invT.transf[1][1] = transf[1][1];
-    invT.transf[1][2] = -1.0*transf[1][2]*transf[0][0] + transf[0][2]*transf[1][0];
+    invT.transf.at(1).at(0) = -1.0*transf.at(1).at(0);
+    invT.transf.at(1).at(1) = transf.at(1).at(1);
+    invT.transf.at(1).at(2) = -1.0*transf.at(1).at(2)*transf.at(0).at(0) + transf.at(0).at(2)*transf.at(1).at(0);
 
-    invT.transf[2][0] = 0.0;
-    invT.transf[2][1] = 0.0;
-    invT.transf[2][2] = 1.0;
+    invT.transf.at(2).at(0) = 0.0;
+    invT.transf.at(2).at(1) = 0.0;
+    invT.transf.at(2).at(2) = 1.0;
     
     return invT;
 }
@@ -154,17 +153,17 @@ turtlelib::Transform2D & turtlelib::Transform2D::operator*=(const Transform2D & 
     tmp = *this; // saving of lhs to temporary struct
 
     // matrix multiplication
-    tmp.transf[0][0] = transf[0][0]*rhs.transf[0][0] + transf[0][1]*rhs.transf[1][0] + transf[0][2]*rhs.transf[2][0];
-    tmp.transf[0][1] = transf[0][0]*rhs.transf[0][1] + transf[0][1]*rhs.transf[1][1] + transf[0][2]*rhs.transf[2][1];
-    tmp.transf[0][2] = transf[0][0]*rhs.transf[0][2] + transf[0][1]*rhs.transf[1][2] + transf[0][2]*rhs.transf[2][2];
+    tmp.transf.at(0).at(0) = transf.at(0).at(0)*rhs.transf.at(0).at(0) + transf.at(0).at(1)*rhs.transf.at(1).at(0) + transf.at(0).at(2)*rhs.transf.at(2).at(0);
+    tmp.transf.at(0).at(1) = transf.at(0).at(0)*rhs.transf.at(0).at(1) + transf.at(0).at(1)*rhs.transf.at(1).at(1) + transf.at(0).at(2)*rhs.transf.at(2).at(1);
+    tmp.transf.at(0).at(2) = transf.at(0).at(0)*rhs.transf.at(0).at(2) + transf.at(0).at(1)*rhs.transf.at(1).at(2) + transf.at(0).at(2)*rhs.transf.at(2).at(2);
 
-    tmp.transf[1][0] = transf[1][0]*rhs.transf[0][0] + transf[1][1]*rhs.transf[1][0] + transf[1][2]*rhs.transf[2][0];
-    tmp.transf[1][1] = transf[1][0]*rhs.transf[0][1] + transf[1][1]*rhs.transf[1][1] + transf[1][2]*rhs.transf[2][1];
-    tmp.transf[1][2] = transf[1][0]*rhs.transf[0][2] + transf[1][1]*rhs.transf[1][2] + transf[1][2]*rhs.transf[2][2];
+    tmp.transf.at(1).at(0) = transf.at(1).at(0)*rhs.transf.at(0).at(0) + transf.at(1).at(1)*rhs.transf.at(1).at(0) + transf.at(1).at(2)*rhs.transf.at(2).at(0);
+    tmp.transf.at(1).at(1) = transf.at(1).at(0)*rhs.transf.at(0).at(1) + transf.at(1).at(1)*rhs.transf.at(1).at(1) + transf.at(1).at(2)*rhs.transf.at(2).at(1);
+    tmp.transf.at(1).at(2) = transf.at(1).at(0)*rhs.transf.at(0).at(2) + transf.at(1).at(1)*rhs.transf.at(1).at(2) + transf.at(1).at(2)*rhs.transf.at(2).at(2);
 
-    tmp.transf[2][0] = 0.0;
-    tmp.transf[2][1] = 0.0;
-    tmp.transf[2][2] = 1.0;
+    tmp.transf.at(2).at(0) = 0.0;
+    tmp.transf.at(2).at(1) = 0.0;
+    tmp.transf.at(2).at(2) = 1.0;
 
     *this = tmp;
     return *this;
@@ -173,8 +172,8 @@ turtlelib::Transform2D & turtlelib::Transform2D::operator*=(const Transform2D & 
 turtlelib::Vector2D turtlelib::Transform2D::translation() const
 {
     turtlelib::Vector2D out_v{};
-    out_v.x = transf[0][2];
-    out_v.y = transf[1][2];
+    out_v.x = transf.at(0).at(2);
+    out_v.y = transf.at(1).at(2);
     return out_v;
 }
 
@@ -182,15 +181,15 @@ double turtlelib::Transform2D::rotation() const
 {
     double radians{};
 
-    if (transf[0][0]<0 && almost_equal(transf[1][0],0)) // if cos(theta) < 0 and sin(theta) is essentially zero, raises possibility for PI or -PI
+    if (transf.at(0).at(0)<0 && almost_equal(transf.at(1).at(0),0)) // if cos(theta) < 0 and sin(theta) is essentially zero, raises possibility for PI or -PI
     {
         double sing{};
-        (transf[1][0]<0) ? sing=-1.0 : sing=1.0; // if sin(theta)<0, PI is positive, and vice versa
+        (transf.at(1).at(0)<0) ? sing=-1.0 : sing=1.0; // if sin(theta)<0, PI is positive, and vice versa
         radians = PI*sing;
     }
     else
     {
-        almost_equal(transf[1][0],0) ? radians=acos(transf[1][1]) : radians=asin(transf[1][0]); // if cos(theta) = 0, use acos(cos(theta)), if not, use asin(sin(theta))
+        almost_equal(transf.at(1).at(0),0) ? radians=acos(transf.at(1).at(1)) : radians=asin(transf.at(1).at(0)); // if cos(theta) = 0, use acos(cos(theta)), if not, use asin(sin(theta))
     }
     return radians;
 }
@@ -199,11 +198,11 @@ turtlelib::Twist2D turtlelib::Transform2D::operator()(turtlelib::Twist2D V) cons
 {
     turtlelib::Twist2D V_new{};
     double adj[3][3]{{1.0, 0.0, 0.0}
-              ,{transf[1][2], transf[0][0], transf[0][1]}
-              ,{-transf[0][2], transf[1][0], transf[1][1]}};
+              ,{transf.at(1).at(2), transf.at(0).at(0), transf.at(0).at(1)}
+              ,{-transf.at(0).at(2), transf.at(1).at(0), transf.at(1).at(1)}};
     V_new.w = V.w;
-    V_new.v.x = adj[1][0]*V.w + adj[1][1]*V.v.x + adj[1][2]*V.v.y;
-    V_new.v.y = adj[2][0]*V.w + adj[2][1]*V.v.x + adj[2][2]*V.v.y;
+    V_new.v.x = adj.at(1).at(0)*V.w + adj.at(1).at(1)*V.v.x + adj.at(1).at(2)*V.v.y;
+    V_new.v.y = adj.at(2).at(0)*V.w + adj.at(2).at(1)*V.v.x + adj.at(2).at(2)*V.v.y;
 
     return V_new;
 }
@@ -253,7 +252,7 @@ std::istream & turtlelib::operator>>(std::istream & is, turtlelib::Transform2D &
     // Next two lines are to flush out the \n from the istream
     x = is.peek();
     is.get(x);
-    double radians = turtlelib::deg2rad(deg);
+    auto radians = turtlelib::deg2rad(deg);
     turtlelib::Transform2D newtf{vec, radians};
     tf = newtf;
     return is;
