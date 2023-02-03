@@ -4,4 +4,8 @@
         <param from="$(find-pkg-share nuturtle_description)/config/diff_params.yaml"/>
     </node>
 
+ <node pkg='nuturtle_control' exec='odometry' name='odometry' output='screen'/>
+
+ <include file="$(find-pkg-share nusim)/launch/nusim.launch.xml"/>
+
 </launch>

@@ -12,8 +12,8 @@ add_library(turtlelib src/rigid2d.cpp src/diff_drive.cpp)
 # can be included with #include"turtlelib/file.hpp"
 target_include_directories(turtlelib
     PUBLIC 
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
+    $<INSTALL_INTERFACE:include/>
     )
 
 # enable C++ 17

@@ -10,6 +10,59 @@ find_package(ament_cmake REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(turtlelib)
+find_package(nuturtlebot_msgs)
+find_package(sensor_msgs)
+find_package(nav_msgs)
+
+
+
+add_executable(turtle_control src/turtle_control.cpp)
+target_link_libraries(turtle_control turtlelib::turtlelib)
+add_executable(odometry src/odometry.cpp)
+target_link_libraries(odometry turtlelib::turtlelib)
+
+ament_target_dependencies(
+  turtle_control
+  rclcpp
+  std_msgs
+  geometry_msgs
+  tf2
+  tf2_ros
+  turtlelib
+  nuturtlebot_msgs
+  sensor_msgs
+  nav_msgs)
+
+  ament_target_dependencies(
+  odometry
+  rclcpp
+  std_msgs
+  geometry_msgs
+  tf2
+  tf2_ros
+  turtlelib
+  nuturtlebot_msgs
+  sensor_msgs
+  nav_msgs)
+
+install(
+  DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME})
+install(
+  TARGETS turtle_control odometry
+  DESTINATION lib/${PROJECT_NAME})
+
+
+
+
+ament_export_dependencies(rosidl_default_runtime)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

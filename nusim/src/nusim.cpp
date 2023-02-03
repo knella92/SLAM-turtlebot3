@@ -190,6 +190,9 @@ private:
     const std::vector<double> obstacles_x = get_parameter("obstacles/x").as_double_array();
     const std::vector<double> obstacles_y = get_parameter("obstacles/y").as_double_array();
     const double obstacles_r = get_parameter("obstacles/r").as_double();
+    if (obstacles_x.size() != obstacles_y.size()){
+      rclcpp::shutdown();
+    }
     const int size_x = obstacles_x.size();
 
     for (int i = 0; i < size_x; ++i) {

@@ -16,12 +16,12 @@
 #include <memory>
 
 #include "rclcpp/rclcpp.hpp"
-#include "include/turtlelib"
+#include "turtlelib/diff_drive.hpp"
+#include "nuturtlebot_msgs/msg/sensor_data.hpp"
+#include "nuturtlebot_msgs/msg/wheel_commands.hpp"
+#include "sensor_msgs/msg/joint_state.hpp"
+#include "nav_msgs/msg/odometry.hpp"
 
-
-
-#include "nusim/srv/reset.hpp"
-#include "nusim/srv/teleport.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_ros/transform_broadcaster.h"
@@ -32,76 +32,61 @@ using namespace std::chrono_literals;
 class OdomNode : public rclcpp::Node
 {
 public:
-  SimNode()
-  : Node("odometry"), count_(0)
+  OdomNode()
+  : Node("odometry")
   {
 
     //declare initial parameters
-    declare_parameter("body_id", "0.0");
+    declare_parameter("body_id", 0.0);
     declare_parameter("odom_id", "odom");
-    declare_parameter("wheel_left", 0.0);
-    declare_parameter("wheel_right", 0.0);
+    declare_parameter("wheel_left", "red");
+    declare_parameter("wheel_right", "red");
 
-    // gets aforementioned parameters
-    if (get_parameter("body_id" == 0.0)){
-      
-    }
-    const auto body_id = get_parameter("body_id").as_string();
-    const auto y0 = get_parameter("y0").as_double();
-    const auto theta0 = get_parameter("theta0").as_double();
+    // // if these are not specified, shutdown the node
+    // if (get_parameter("body_id").as_double() == 0.0){
+    //   RCLCPP_ERROR_STREAM(get_logger(), "No body frame specified.");
+    //   rclcpp::shutdown();
+    // }
+    // if (get_parameter("wheel_left").as_double() == 0.0){
+    //   RCLCPP_ERROR_STREAM(get_logger(), "No left wheel joint name specified.");
+    //   rclcpp::shutdown();
+    // }
+    // if (get_parameter("wheel_right").as_double() == 0.0){
+    //   RCLCPP_ERROR_STREAM(get_logger(), "No right wheel joint name specified.");
+    //   rclcpp::shutdown();
+    // }
 
-    // declares x, y, and theta parameters as initial position/orientation parameters
-    declare_parameter("x", x0);
-    declare_parameter("y", y0);
-    declare_parameter("theta", theta0);
+    // const auto body_id = get_parameter("body_id").as_string();
+    // const auto odom_id = get_parameter("odom_id").as_string();
+    // const auto wheel_left = get_parameter("wheel_left").as_string();
+    // const auto wheel_right = get_parameter("wheel_right").as_string();
 
-    // declares obstacle parameters
-    declare_parameter("obstacles/x", std::vector<double>({0.0}));
-    declare_parameter("obstacles/y", std::vector<double>({0.0}));
-    declare_parameter("obstacles/r", 0.0);
-
-    // saves rate parameter as an int
-    const auto rate = get_parameter("rate").as_int();
-    const int64_t t = 1000 / rate; // implicit conversion of 1000/rate to int64_t to use as time in ms
 
     // initialize publishers and timer
     odom_publisher_ = create_publisher<nav_msgs::msg::Odometry>("/odom", 10);
-    js_publisher_ = create_publisher<sensor_msgs::msg::JointState>("/joint_states", 10);
 
-    // initialize subscribers
-    js_subscriber_ = create_subscriber<sensor_msgs::msg::JointState>("/joint_states", 10, std::bind(&ControlNode::js_callback, this, std::placeholders::_1));
+    //js_subscriber_ = create_subscription<sensor_msgs::msg::JointState>("/joint_states", 10, std::bind(&OdomNode::js_callback, this));
    
-    initialp_service_ =
-        create_service<>(
-        "~/initial_pose",
-        std::bind(&OdomNode::initial_pose, this, std::placeholders::_1, std::placeholders::_2));
+    // initialp_service_ =
+    //     create_service<>(
+    //     "~/initial_pose",
+    //     std::bind(&OdomNode::initial_pose, this, std::placeholders::_1, std::placeholders::_2));
 
     // initializes braodcaster
-    tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
+    // tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
   }
 
 private:
-  rclcpp::Publisher<nuturtlebot_msgs::msg::WheelCommands>::SharedPtr odom_publisher_;
-  rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr js_subscriber_;
+  rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_publisher_;
+  rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr js_subscriber_;
 
 
 
   void js_callback()
   {
 
-    wheel_publisher_->publish(message);
-
-  }
-
-
-  void sens_callback()
-  {
-    js_publisher_->publish(message);
-  }
-
-  void initial_pose()
-  {
+    //wheel_publisher_->publish(message);
 
   }
 
