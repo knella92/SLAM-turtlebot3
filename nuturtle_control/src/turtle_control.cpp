@@ -18,16 +18,15 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "include/turtlelib"
+#include "geometry_msgs/msg/twist.hpp"
+#include "nuturtlebot_msgs"
 
 
-
-#include "std_msgs/msg/u_int64.hpp"
 #include "nusim/srv/reset.hpp"
 #include "nusim/srv/teleport.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_ros/transform_broadcaster.h"
-#include "visualization_msgs/msg/marker_array.hpp"
 
 
 using namespace std::chrono_literals;
@@ -41,28 +40,11 @@ public:
 
     //declare initial parameters
     declare_parameter("rate", 200);
-    declare_parameter("x0", 0.0);
-    declare_parameter("y0", 0.0);
-    declare_parameter("theta0", 0.0);
 
     // gets aforementioned parameters
     const auto x0 = get_parameter("x0").as_double();
     const auto y0 = get_parameter("y0").as_double();
     const auto theta0 = get_parameter("theta0").as_double();
-
-    // declares x, y, and theta parameters as initial position/orientation parameters
-    declare_parameter("x", x0);
-    declare_parameter("y", y0);
-    declare_parameter("theta", theta0);
-
-    // declares obstacle parameters
-    declare_parameter("obstacles/x", std::vector<double>({0.0}));
-    declare_parameter("obstacles/y", std::vector<double>({0.0}));
-    declare_parameter("obstacles/r", 0.0);
-
-    // saves rate parameter as an int
-    const auto rate = get_parameter("rate").as_int();
-    const int64_t t = 1000 / rate; // implicit conversion of 1000/rate to int64_t to use as time in ms
 
     // initialize publishers and timer
     wheel_publisher_ = create_publisher<nuturtlebot_msgs::msg::WheelCommands>("/wheel_cmd", 10);
@@ -77,8 +59,8 @@ public:
 private:
   rclcpp::Publisher<nuturtlebot_msgs::msg::WheelCommands>::SharedPtr wheel_publisher_;
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr js_publisher_;
-  rclcpp::Subscriber<geometry_msgs::msg::Twist>::SharedPtr vel_subscriber;
-  rclcpp::Subscriber<nuturtlebot_msgs::msg::SensorData>::SharedPtr sens_subscriber;
+  rclcpp::Subscriber<geometry_msgs::msg::Twist>::SharedPtr vel_subscriber_;
+  rclcpp::Subscriber<nuturtlebot_msgs::msg::SensorData>::SharedPtr sens_subscriber_;
 
 
   void cmd_callback()

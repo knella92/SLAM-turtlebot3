@@ -12,7 +12,6 @@
 /// CLIENTS:
 
 
-#include <chrono>
 #include <functional>
 #include <memory>
 
@@ -21,13 +20,11 @@
 
 
 
-#include "std_msgs/msg/u_int64.hpp"
 #include "nusim/srv/reset.hpp"
 #include "nusim/srv/teleport.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_ros/transform_broadcaster.h"
-#include "visualization_msgs/msg/marker_array.hpp"
 
 
 using namespace std::chrono_literals;
@@ -40,13 +37,16 @@ public:
   {
 
     //declare initial parameters
-    declare_parameter("rate", 200);
-    declare_parameter("x0", 0.0);
-    declare_parameter("y0", 0.0);
-    declare_parameter("theta0", 0.0);
+    declare_parameter("body_id", "0.0");
+    declare_parameter("odom_id", "odom");
+    declare_parameter("wheel_left", 0.0);
+    declare_parameter("wheel_right", 0.0);
 
     // gets aforementioned parameters
-    const auto x0 = get_parameter("x0").as_double();
+    if (get_parameter("body_id" == 0.0)){
+      
+    }
+    const auto body_id = get_parameter("body_id").as_string();
     const auto y0 = get_parameter("y0").as_double();
     const auto theta0 = get_parameter("theta0").as_double();
 
