@@ -32,11 +32,11 @@
 
 using namespace std::chrono_literals;
 
-class ControlNode : public rclcpp::Node
+class OdomNode : public rclcpp::Node
 {
 public:
   SimNode()
-  : Node("turtle_control"), count_(0)
+  : Node("odometry"), count_(0)
   {
 
     //declare initial parameters
@@ -65,23 +65,29 @@ public:
     const int64_t t = 1000 / rate; // implicit conversion of 1000/rate to int64_t to use as time in ms
 
     // initialize publishers and timer
-    wheel_publisher_ = create_publisher<nuturtlebot_msgs::msg::WheelCommands>("/wheel_cmd", 10);
+    odom_publisher_ = create_publisher<nav_msgs::msg::Odometry>("/odom", 10);
     js_publisher_ = create_publisher<sensor_msgs::msg::JointState>("/joint_states", 10);
 
     // initialize subscribers
-    vel_subscriber_ = create_subscriber<geometry_msgs::msg::Twist>("/cmd_vel", 10, std::bind(&ControlNode::cmd_callback, this, std::placeholders::_1));
-    sens_subscriber_ = create_subscriber<nuturtlebot_msgs::msg::SensorData>("/sensor_data", 10, std::bind(&ControlNode::sens_callback, this, std::placeholders::_1);)
+    js_subscriber_ = create_subscriber<sensor_msgs::msg::JointState>("/joint_states", 10, std::bind(&ControlNode::js_callback, this, std::placeholders::_1));
+   
+    initialp_service_ =
+        create_service<>(
+        "~/initial_pose",
+        std::bind(&OdomNode::initial_pose, this, std::placeholders::_1, std::placeholders::_2));
+
+    // initializes braodcaster
+    tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
   }
 
 private:
-  rclcpp::Publisher<nuturtlebot_msgs::msg::WheelCommands>::SharedPtr wheel_publisher_;
-  rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr js_publisher_;
-  rclcpp::Subscriber<geometry_msgs::msg::Twist>::SharedPtr vel_subscriber;
-  rclcpp::Subscriber<nuturtlebot_msgs::msg::SensorData>::SharedPtr sens_subscriber;
+  rclcpp::Publisher<nuturtlebot_msgs::msg::WheelCommands>::SharedPtr odom_publisher_;
+  rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr js_subscriber_;
 
 
-  void cmd_callback()
+
+  void js_callback()
   {
 
     wheel_publisher_->publish(message);
@@ -94,12 +100,17 @@ private:
     js_publisher_->publish(message);
   }
 
+  void initial_pose()
+  {
+
+  }
+
 };
 
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<ControlNode>());
+  rclcpp::spin(std::make_shared<OdomNode>());
   rclcpp::shutdown();
   return 0;
 }
