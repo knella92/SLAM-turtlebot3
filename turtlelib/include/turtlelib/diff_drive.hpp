@@ -30,7 +30,7 @@ namespace turtlelib
 
         /// \brief right wheel x rotational velocity
         double r;
-    }
+    };
 
 
     /// \brief forward and inverse kinematics function
@@ -55,11 +55,11 @@ namespace turtlelib
 
         public:
 
-            /// \brief robot's current right wheel position
-            double phi_r{};
-
             /// \brief robot's current left wheel position
-            double phi_l{};
+            double phi_l;
+
+            /// \brief robot's current right wheel position
+            double phi_r;
 
             /// \brief robot's current configuration q (x, y, theta)
             Config q{};
@@ -72,6 +72,8 @@ namespace turtlelib
             /// \brief initialize transforms, D, H pseudo-inverse matrix, set's current wheel positions to given values
             /// \param depth - depth between center of one wheel and center of chassis
             /// \param radius - radius of wheels
+            /// \param left_pos - current left wheel position
+            /// \param right_pos - current right wheel position
             DiffDrive(double depth, double radius, double left_pos, double right_pos);
 
             /// \brief computes wheel velocities required to make robot move at a given body twist
