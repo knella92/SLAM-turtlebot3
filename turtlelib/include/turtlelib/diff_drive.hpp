@@ -53,8 +53,7 @@ namespace turtlelib
             /// \brief 2D H pseudo-inverse matrix
             std::vector<std::vector<double>> H_pi;
 
-            /// \brief robot's current configuration q (x, y, theta)
-            Config q{};
+
 
         public:
 
@@ -63,6 +62,9 @@ namespace turtlelib
 
             /// \brief robot's current right wheel position
             double phi_r;
+
+            /// \brief robot's current configuration q (x, y, theta)
+            Config q{};
 
             /// \brief initialize transforms, D, H pseudo-inverse matrix, set's current wheel positions to zero
             /// \param depth - depth between center of one wheel and center of chassis

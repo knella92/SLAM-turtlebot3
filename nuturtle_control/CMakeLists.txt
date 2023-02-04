@@ -16,6 +16,7 @@ find_package(rosidl_default_generators REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
 find_package(turtlelib)
 find_package(nuturtlebot_msgs)
 find_package(sensor_msgs)
@@ -47,6 +48,7 @@ ament_target_dependencies(
   geometry_msgs
   tf2
   tf2_ros
+  tf2_geometry_msgs
   turtlelib
   nuturtlebot_msgs
   sensor_msgs

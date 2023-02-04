@@ -113,7 +113,7 @@ private:
     message.header.stamp = get_clock()->now();
     message.name = {"wheel_left_joint", "wheel_right_joint"};
     message.position = {tbot3.phi_l, tbot3.phi_r};
-    message.velocity = [phidot.l, phidot.r];
+    message.velocity = {phidot.l, phidot.r};
 
     js_publisher_->publish(message);
 

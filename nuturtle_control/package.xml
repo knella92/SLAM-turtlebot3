@@ -3,7 +3,7 @@
 <package format="3">
   <name>nuturtle_control</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>Turtlebot control interface</description>
   <maintainer email="kevin.nella@northwestern.edu">kevin</maintainer>
   <license>Apache License 2.0</license>
 
