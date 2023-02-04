@@ -31,7 +31,7 @@ turtlelib::Wheel_Vel turtlelib::DiffDrive::inverse_kin(Twist2D & Vb) const{
     return phidot;
 }
 
-void turtlelib::DiffDrive::forward_kin(double phi_lp, double phi_rp){
+turtlelib::Twist2D turtlelib::DiffDrive::forward_kin(double phi_lp, double phi_rp){
     turtlelib::Twist2D Vb{};
     const double u1{phi_lp - phi_l};
     const double u2{phi_rp - phi_r};
@@ -39,9 +39,6 @@ void turtlelib::DiffDrive::forward_kin(double phi_lp, double phi_rp){
     Vb.w = H_pi[0][0] * u1 + H_pi[0][1] * u2;
     Vb.v.x = H_pi[1][0] * u1 + H_pi[1][1] * u2;
     Vb.v.y = 0;
-
-    // change the below to q*A thing
-    // qdot = A(oldtheta,0,0)*dqb
     
     turtlelib::Transform2D Tb_bp = turtlelib::integrate_twist(Vb);
     turtlelib::Config dq{Tb_bp.translation().x, Tb_bp.translation().y, Tb_bp.rotation()};
@@ -49,6 +46,7 @@ void turtlelib::DiffDrive::forward_kin(double phi_lp, double phi_rp){
     q.x += dq.x*cos(q.theta) - dq.y*sin(q.theta);
     q.y += dq.x*sin(q.theta) + dq.y*cos(q.theta);
 
+    return Vb;
 }
 
 
