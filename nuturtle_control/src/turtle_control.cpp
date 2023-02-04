@@ -43,15 +43,18 @@ public:
     declare_parameter("wheel_radius", 0.0);
     declare_parameter("track_width", 0.0);
     declare_parameter("motor_cmd_per_rad_sec", 0.0);
+    declare_parameter("encoder_ticks_per_rad", 0.0);
 
     //gets aforementioned parameters
     const auto radius = get_parameter("wheel_radius").as_double();
     const auto depth = get_parameter("track_width").as_double();
     const auto mcmd_rads = get_parameter("motor_cmd_per_rad_sec").as_double();
+    const auto etprad = get_parameter("encoder_ticks_per_rad").as_double();
 
-    turtlelib::DiffDrive tbot{depth, radius};
+    const turtlelib::DiffDrive tbot{depth, radius};
     tbot3 = tbot;
     motor_cmd_per_rad_sec = mcmd_rads;
+    encoder_ticks_per_rad = etprad;
 
 
     // initialize publishers and timer
@@ -60,14 +63,16 @@ public:
 
     // initialize subscribers
     vel_subscriber_ = create_subscription<geometry_msgs::msg::Twist>("/cmd_vel", 10, std::bind(&ControlNode::cmd_callback, this, std::placeholders::_1));
-    // sens_subscriber_ = create_subscription<nuturtlebot_msgs::msg::SensorData>("/sensor_data", 10, std::bind(&ControlNode::sens_callback, this));
+    sens_subscriber_ = create_subscription<nuturtlebot_msgs::msg::SensorData>("/sensor_data", 10, std::bind(&ControlNode::sens_callback, this, std::placeholders::_1));
 
   }
 
 private:
 
   turtlelib::DiffDrive tbot3{0.0,0.0};
-  double motor_cmd_per_rad_sec{0.0};
+  double motor_cmd_per_rad_sec{};
+  double encoder_ticks_per_rad{};
+  rclcpp::Time prev_time = get_clock()->now();
   rclcpp::Publisher<nuturtlebot_msgs::msg::WheelCommands>::SharedPtr wheel_publisher_;
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr js_publisher_;
   rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr vel_subscriber_;
@@ -82,8 +87,8 @@ private:
     Vb.w = msg.angular.z;
     
     turtlelib::Wheel_Vel phidot = tbot3.inverse_kin(Vb);
-    int32_t left_vel = phidot.l*motor_cmd_per_rad_sec;
-    int32_t right_vel = phidot.l*motor_cmd_per_rad_sec;
+    const int32_t left_vel = phidot.l*motor_cmd_per_rad_sec;
+    const int32_t right_vel = phidot.l*motor_cmd_per_rad_sec;
     auto message = nuturtlebot_msgs::msg::WheelCommands();
     message.left_velocity = left_vel;
     message.right_velocity = right_vel;
@@ -92,11 +97,26 @@ private:
 
   }
 
+  void sens_callback(const nuturtlebot_msgs::msg::SensorData & msg)
+  {
+    turtlelib::Wheel_Vel phidot{};
+    rclcpp::Time time_stamp = msg.stamp;
+    int dt = time_stamp.nanoseconds() - prev_time.nanoseconds();
+    prev_time = time_stamp;
 
-  // void sens_callback()
-  // {
-  //   //js_publisher_->publish(message);
-  // }
+    phidot.l = (msg.left_encoder - tbot3.phi_l)/(dt*1.0e-9);
+    tbot3.phi_l = msg.left_encoder/encoder_ticks_per_rad;
+    phidot.r = (msg.right_encoder - tbot3.phi_r)/(dt*1.0e-9);
+    tbot3.phi_r = msg.right_encoder/encoder_ticks_per_rad;
+
+    sensor_msgs::msg::JointState message{};
+    message.name = {"wheel_left_joint", "wheel_right_joint"};
+    message.position = {tbot3.phi_l, tbot3.phi_r};
+    message.velocity = {phidot.l, phidot.r};
+
+    js_publisher_->publish(message);
+
+  }
 
 };
 
