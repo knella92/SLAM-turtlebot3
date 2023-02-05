@@ -18,6 +18,7 @@ find_package(tf2_ros REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(nuturtlebot_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 set(srv_files
   "srv/Reset.srv"
@@ -38,7 +39,8 @@ ament_target_dependencies(
   tf2
   tf2_ros
   tf2_geometry_msgs
-  nuturtlebot_msgs)
+  nuturtlebot_msgs
+  sensor_msgs)
 
 install(
   DIRECTORY launch config

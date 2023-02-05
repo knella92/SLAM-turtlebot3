@@ -37,6 +37,7 @@
 #include "visualization_msgs/msg/marker_array.hpp"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
 #include "nuturtlebot_msgs/msg/wheel_commands.hpp"
+#include "nuturtlebot_msgs/msg/sensor_data.hpp"
 
 
 using namespace std::chrono_literals;
@@ -69,6 +70,13 @@ public:
     declare_parameter("obstacles/y", std::vector<double>({0.0}));
     declare_parameter("obstacles/r", 0.0);
 
+    declare_parameter("motor_cmd_per_rad_sec", 0.0);
+    declare_parameter("motor_ticks_per_rad", 0.0);
+    const auto mcmd_rads = get_parameter("motor_cmd_per_rad_sec").as_double();
+    const auto etprad = get_parameter("encoder_ticks_per_rad").as_double();
+    motor_cmd_per_rad_sec = mcmd_rads;
+    encoder_ticks_per_rad = etprad;
+
     // saves rate parameter as an int
     const auto rate = get_parameter("rate").as_int();
 
@@ -76,6 +84,7 @@ public:
 
     // initialize publishers and timer
     publisher_ = create_publisher<std_msgs::msg::UInt64>("~/timestep", 10);
+    sens_publisher_ = create_publisher<nuturtlebot_msgs::msg::SensorData>("~/sensor_data", 10);
     obst_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/obstacles", 10);
     cmd_subscriber_ = create_subscription<nuturtlebot_msgs::msg::WheelCommands>("~/wheel_cmd", 10, std::bind(&SimNode::cmd_callback, this, std::placeholders::_1));
 
@@ -99,7 +108,12 @@ public:
 
 private:
   size_t count_;
+  double motor_cmd_per_rad_sec{};
+  double encoder_ticks_per_rad{};
+  double phi_l{0.0}; double phi_r{0.0};
+  rclcpp::Time prev_time = get_clock()->now();
   rclcpp::Publisher<std_msgs::msg::UInt64>::SharedPtr publisher_;
+  rclcpp::Publisher<nuturtlebot_msgs::msg::SensorData>::SharedPtr sens_publisher_;
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr obst_publisher_;
   rclcpp::Subscription<nuturtlebot_msgs::msg::WheelCommands>::SharedPtr cmd_subscriber_;
@@ -137,6 +151,11 @@ private:
     visualization_msgs::msg::MarkerArray obstacles = add_obstacles();
     obst_publisher_->publish(obstacles);
 
+    nuturtlebot_msgs::msg::SensorData sens_msg{};
+    sens_msg.stamp = get_clock()->now();
+    sens_msg.left_encoder = phi_l;
+    sens_msg.right_encoder = phi_r;
+    sens_publisher_->publish(sens_msg);
 
   }
 
@@ -222,8 +241,15 @@ private:
 
   void cmd_callback(const nuturtlebot_msgs::msg::WheelCommands & msg)
   {
-
+    rclcpp::Time time_stamp = get_clock()->now();
+    int dt = time_stamp.nanoseconds() - prev_time.nanoseconds();
+    prev_time = time_stamp;
+    double phidot_l{msg.left_velocity/motor_cmd_per_rad_sec};
+    phi_l += phidot_l*dt*1e-9*encoder_ticks_per_rad;
+    double phidot_r{msg.right_velocity/motor_cmd_per_rad_sec};
+    phi_r += phidot_r*dt*1e-9*encoder_ticks_per_rad;
   }
+
 };
 
 int main(int argc, char * argv[])

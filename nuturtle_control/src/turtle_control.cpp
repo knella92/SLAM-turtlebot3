@@ -85,9 +85,18 @@ private:
     Vb.w = msg.angular.z;
     
     turtlelib::Wheel_Vel phidot = tbot3.inverse_kin(Vb);
-    const int32_t left_vel = phidot.l*motor_cmd_per_rad_sec;
-    const int32_t right_vel = phidot.r*motor_cmd_per_rad_sec;
+    int32_t left_vel = phidot.l*motor_cmd_per_rad_sec;
+    int32_t right_vel = phidot.r*motor_cmd_per_rad_sec;
     auto message = nuturtlebot_msgs::msg::WheelCommands();
+    if(left_vel>265){
+      left_vel = 265;}
+    else if(left_vel<-265){
+      left_vel = -265;}
+    if(right_vel>265){
+      right_vel = 265;}
+    else if(right_vel<-265){
+      right_vel = -265;}
+    
     message.left_velocity = left_vel;
     message.right_velocity = right_vel;
 
@@ -114,7 +123,6 @@ private:
     message.velocity = {phidot.l, phidot.r};
 
     js_publisher_->publish(message);
-
   }
 
 };

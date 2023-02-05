@@ -18,7 +18,6 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "turtlelib/diff_drive.hpp"
-#include "nuturtlebot_msgs/msg/sensor_data.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "nuturtle_control/srv/initial_pose.hpp"
 #include "nav_msgs/msg/odometry.hpp"
@@ -130,11 +129,11 @@ private:
     const std::shared_ptr<nuturtle_control::srv::InitialPose::Request> request,
     const std::shared_ptr<nuturtle_control::srv::InitialPose::Response> response){
 
-      tbot3.q.x = request->x;
-      tbot3.q.y = request->y;
-      tbot3.q.theta = request->theta;
+    tbot3.q.x = request->x;
+    tbot3.q.y = request->y;
+    tbot3.q.theta = request->theta;
 
-      (void)response;
+    (void)response;
 
     }
 
