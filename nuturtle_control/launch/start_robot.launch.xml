@@ -1,11 +1,21 @@
 <launch>
 
- <node pkg='nuturtle_control' exec='turtle_control' name='turtle_control' output='screen'>
+    <arg name ="body_id" default="none"/>
+    <arg name ="odom_id" default="odom"/>
+    <arg name ="wheel_left" default="none"/>
+    <arg name ="wheel_right" default="none"/>
+
+    <node pkg='nuturtle_control' exec='turtle_control' name='turtle_control' output='screen'>
         <param from="$(find-pkg-share nuturtle_description)/config/diff_params.yaml"/>
     </node>
 
- <node pkg='nuturtle_control' exec='odometry' name='odometry' output='screen'/>
+    <node pkg='nuturtle_control' exec='odometry' name='odometry' output='screen'>
+        <param name="body_id" value="$(var body_id)"/>
+        <param name="odom_id" value="$(var odom_id)"/>
+        <param name="wheel_left" value="$(var wheel_left)"/>
+        <param name="wheel_right" value="$(var wheel_right)"/>
+    </node>
 
- <include file="$(find-pkg-share nusim)/launch/nusim.launch.xml"/>
+    <include file="$(find-pkg-share nusim)/launch/nusim.launch.xml"/>
 
 </launch>
