@@ -1,9 +1,13 @@
 <launch>
 
-    <arg name ="body_id" default="none"/>
-    <arg name ="odom_id" default="odom"/>
-    <arg name ="wheel_left" default="none"/>
-    <arg name ="wheel_right" default="none"/>
+    <arg name="body_id" description="Name of the body frame" default="none"/>
+    <arg name="odom_id" description="Name of the odometry frame" default="odom"/>
+    <arg name="wheel_left" description="Name of the left wheel frame" default="none"/>
+    <arg name="wheel_right" description="Name of the right wheel frame" default="none"/>
+
+    <arg name="cmd_src" description="Source of cmd_vel commands. Valid choices are: ['circle', 'teleop', 'none']" default="none"/>
+    <arg name="robot" description="Valid choices are: ['nusim', 'localhost', 'none']" default="nusim"/>
+    <arg name="use_rviz" description="Launch rviz with robot model, tf frames, and odometry" default="false"/>
 
     <node pkg='nuturtle_control' exec='turtle_control' name='turtle_control' output='screen'>
         <param from="$(find-pkg-share nuturtle_description)/config/diff_params.yaml"/>
@@ -16,8 +20,22 @@
         <param name="wheel_right" value="$(var wheel_right)"/>
     </node>
 
-    <node pkg='nuturtle_control' exec='circle' name='circle' output='screen'/>
+    <node pkg='nuturtle_control' exec='circle' name='circle' output='screen'
+        if="$(eval '\'$(var cmd_src)\' == \'circle\'')"/>
 
-    <include file="$(find-pkg-share nusim)/launch/nusim.launch.xml"/>
+    <node pkg='rviz2' exec='rviz2' output='screen' args='-d $(find-pkg-share nusim)/config/nusim.rviz'
+        if="$(eval '\'$(var use_rviz)\' == \'true\'')"/>
+
+    <include file="$(find-pkg-share nuturtle_description)/launch/load_one.launch.py">
+        <arg name='color' value='blue' />
+        <arg name='use_rviz' value='false'/>
+    </include>
+
+    <include file="$(find-pkg-share nusim)/launch/nusim.launch.xml"
+        if="$(eval '\'$(var robot)\' == \'nusim\'')">
+        <arg name="rviz" value="false"/>
+    </include>
+
+
 
 </launch>

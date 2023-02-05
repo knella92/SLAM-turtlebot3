@@ -36,6 +36,7 @@
 #include "tf2_ros/transform_broadcaster.h"
 #include "visualization_msgs/msg/marker_array.hpp"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
+#include "nuturtlebot_msgs/msg/wheel_commands.hpp"
 
 
 using namespace std::chrono_literals;
@@ -76,8 +77,11 @@ public:
     // initialize publishers and timer
     publisher_ = create_publisher<std_msgs::msg::UInt64>("~/timestep", 10);
     obst_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/obstacles", 10);
+    cmd_subscriber_ = create_subscription<nuturtlebot_msgs::msg::WheelCommands>("~/wheel_cmd", 10, std::bind(&SimNode::cmd_callback, this, std::placeholders::_1));
+
     timer_ = create_wall_timer(
       std::chrono::duration<int64_t, std::milli>(t), std::bind(&SimNode::timer_callback, this));
+
     //intializes services
     reset_service_ =
       create_service<nusim::srv::Reset>(
@@ -98,6 +102,7 @@ private:
   rclcpp::Publisher<std_msgs::msg::UInt64>::SharedPtr publisher_;
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr obst_publisher_;
+  rclcpp::Subscription<nuturtlebot_msgs::msg::WheelCommands>::SharedPtr cmd_subscriber_;
   rclcpp::Service<nusim::srv::Reset>::SharedPtr reset_service_;
   rclcpp::Service<nusim::srv::Teleport>::SharedPtr tele_service_;
   std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
@@ -110,7 +115,6 @@ private:
     auto message = std_msgs::msg::UInt64();
     count_++;
     message.data = count_;
-
     publisher_->publish(message);
 
     auto x = get_parameter("x").as_double();
@@ -127,11 +131,8 @@ private:
 
     t.transform.translation.x = x;
     t.transform.translation.y = y;
-
     t.transform.rotation = quat;
-
     tf_broadcaster_->sendTransform(t);
-
 
     visualization_msgs::msg::MarkerArray obstacles = add_obstacles();
     obst_publisher_->publish(obstacles);
@@ -147,6 +148,8 @@ private:
     const std::shared_ptr<nusim::srv::Reset::Request> request,
     const std::shared_ptr<nusim::srv::Reset::Response> response)
   {
+    RCLCPP_INFO(get_logger(), "Incoming request to reset");
+
     count_ = 0;
 
     auto x = get_parameter("x0").as_double();
@@ -157,7 +160,7 @@ private:
     set_parameter(rclcpp::Parameter("y", y));
     set_parameter(rclcpp::Parameter("theta", theta));
 
-    RCLCPP_INFO(get_logger(), "Incoming request to reset");
+    
     RCLCPP_INFO(get_logger(), "Resetting");
 
     (void)request;
@@ -171,11 +174,12 @@ private:
     const std::shared_ptr<nusim::srv::Teleport::Request> request,
     const std::shared_ptr<nusim::srv::Teleport::Response> response)
   {
+    RCLCPP_INFO(get_logger(), "Incoming request to teleport");
+
     set_parameter(rclcpp::Parameter("x", request->x));
     set_parameter(rclcpp::Parameter("y", request->y));
     set_parameter(rclcpp::Parameter("theta", request->theta));
 
-    RCLCPP_INFO(get_logger(), "Incoming request to teleport");
     RCLCPP_INFO(get_logger(), "Teleporting");
 
     (void)request;
@@ -214,6 +218,11 @@ private:
     }
 
     return all_obst;
+  }
+
+  void cmd_callback(const nuturtlebot_msgs::msg::WheelCommands & msg)
+  {
+
   }
 };
 

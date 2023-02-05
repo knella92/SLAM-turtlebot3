@@ -19,7 +19,6 @@
 #include "rclcpp/rclcpp.hpp"
 #include "turtlelib/diff_drive.hpp"
 #include "nuturtlebot_msgs/msg/sensor_data.hpp"
-#include "nuturtlebot_msgs/msg/wheel_commands.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "nuturtle_control/srv/initial_pose.hpp"
 #include "nav_msgs/msg/odometry.hpp"
@@ -74,9 +73,7 @@ public:
 
     // initialize publishers and timer
     odom_publisher_ = create_publisher<nav_msgs::msg::Odometry>("/odom", 10);
-
     js_subscriber_ = create_subscription<sensor_msgs::msg::JointState>("/joint_states", 10, std::bind(&OdomNode::js_callback, this, std::placeholders::_1));
-   
     initialp_service_ =
         create_service<nuturtle_control::srv::InitialPose>(
         "/initial_pose",
