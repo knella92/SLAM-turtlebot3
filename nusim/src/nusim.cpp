@@ -54,32 +54,33 @@ public:
     declare_parameter("x0", 0.0);
     declare_parameter("y0", 0.0);
     declare_parameter("theta0", 0.0);
-
     // gets aforementioned parameters
-    const auto x0 = get_parameter("x0").as_double();
-    const auto y0 = get_parameter("y0").as_double();
-    const auto theta0 = get_parameter("theta0").as_double();
-
-    // declares x, y, and theta parameters as initial position/orientation parameters
-    declare_parameter("x", x0);
-    declare_parameter("y", y0);
-    declare_parameter("theta", theta0);
+    x0 = get_parameter("x0").as_double();
+    y0 = get_parameter("y0").as_double();
+    theta0 = get_parameter("theta0").as_double();
+    x = x0;
+    y = y0;
+    theta = theta0;
 
     // declares obstacle parameters
     declare_parameter("obstacles/x", std::vector<double>({0.0}));
     declare_parameter("obstacles/y", std::vector<double>({0.0}));
     declare_parameter("obstacles/r", 0.0);
+    obstacles_x = get_parameter("obstacles/x").as_double_array();
+    obstacles_y = get_parameter("obstacles/y").as_double_array();
+    obstacles_r = get_parameter("obstacles/r").as_double();
+    if (obstacles_x.size() != obstacles_y.size()) {
+      rclcpp::shutdown();
+    }
+
 
     declare_parameter("motor_cmd_per_rad_sec", 0.0);
     declare_parameter("motor_ticks_per_rad", 0.0);
-    const auto mcmd_rads = get_parameter("motor_cmd_per_rad_sec").as_double();
-    const auto etprad = get_parameter("encoder_ticks_per_rad").as_double();
-    motor_cmd_per_rad_sec = mcmd_rads;
-    encoder_ticks_per_rad = etprad;
+    motor_cmd_per_rad_sec = get_parameter("motor_cmd_per_rad_sec").as_double();
+    encoder_ticks_per_rad = get_parameter("encoder_ticks_per_rad").as_double();
 
     // saves rate parameter as an int
     const auto rate = get_parameter("rate").as_int();
-
     const int64_t t = 1000 / rate; // implicit conversion of 1000/rate to int64_t to use as time in ms
 
     // initialize publishers and timer
@@ -108,8 +109,11 @@ public:
 
 private:
   size_t count_;
+  double x0, y0, theta0, x, y, theta;
   double motor_cmd_per_rad_sec{};
   double encoder_ticks_per_rad{};
+  std::vector<double> obstacles_x, obstacles_y;
+  double obstacles_r;
   double phi_l{0.0}; double phi_r{0.0};
   rclcpp::Time prev_time = get_clock()->now();
   rclcpp::Publisher<std_msgs::msg::UInt64>::SharedPtr publisher_;
@@ -130,10 +134,6 @@ private:
     count_++;
     message.data = count_;
     publisher_->publish(message);
-
-    auto x = get_parameter("x").as_double();
-    auto y = get_parameter("y").as_double();
-    auto theta = get_parameter("theta").as_double();
 
     tf2::Quaternion q;
     q.setRPY(0.0, 0.0, theta);
@@ -164,45 +164,28 @@ private:
   /// \param response (empty)
   /// void reset(request, response);
   void reset(
-    const std::shared_ptr<nusim::srv::Reset::Request> request,
-    const std::shared_ptr<nusim::srv::Reset::Response> response)
+    const std::shared_ptr<nusim::srv::Reset::Request>,
+    const std::shared_ptr<nusim::srv::Reset::Response>)
   {
     RCLCPP_INFO(get_logger(), "Incoming request to reset");
-
     count_ = 0;
-
-    auto x = get_parameter("x0").as_double();
-    auto y = get_parameter("y0").as_double();
-    auto theta = get_parameter("theta0").as_double();
-
-    set_parameter(rclcpp::Parameter("x", x));
-    set_parameter(rclcpp::Parameter("y", y));
-    set_parameter(rclcpp::Parameter("theta", theta));
-
-    
+    x = x0;
+    y = y0;
+    theta = theta0;
     RCLCPP_INFO(get_logger(), "Resetting");
-
-    (void)request;
-    (void)response;
-
   }
 
   /// \brief Teleport service
   /// void teleport();
   void teleport(
     const std::shared_ptr<nusim::srv::Teleport::Request> request,
-    const std::shared_ptr<nusim::srv::Teleport::Response> response)
+    const std::shared_ptr<nusim::srv::Teleport::Response>)
   {
     RCLCPP_INFO(get_logger(), "Incoming request to teleport");
-
-    set_parameter(rclcpp::Parameter("x", request->x));
-    set_parameter(rclcpp::Parameter("y", request->y));
-    set_parameter(rclcpp::Parameter("theta", request->theta));
-
+    x = request->x;
+    y = request->y;
+    theta = request->theta;
     RCLCPP_INFO(get_logger(), "Teleporting");
-
-    (void)request;
-    (void)response;
   }
 
   /// \brief Adds obstacles to MarkerArray for publishing in timer_callback()
@@ -211,18 +194,12 @@ private:
   {
     visualization_msgs::msg::MarkerArray all_obst;
 
-    const std::vector<double> obstacles_x = get_parameter("obstacles/x").as_double_array();
-    const std::vector<double> obstacles_y = get_parameter("obstacles/y").as_double_array();
-    const double obstacles_r = get_parameter("obstacles/r").as_double();
-    if (obstacles_x.size() != obstacles_y.size()) {
-      rclcpp::shutdown();
-    }
     const int size_x = obstacles_x.size();
-
+      rclcpp::Time stamp = get_clock()->now();
     for (int i = 0; i < size_x; ++i) {
       visualization_msgs::msg::Marker obst;
       obst.header.frame_id = "nusim/world";
-      obst.header.stamp = get_clock()->now();
+      obst.header.stamp = stamp;
       obst.type = visualization_msgs::msg::Marker::CYLINDER;
       obst.scale.x = obstacles_r;
       obst.scale.y = obstacles_r;
@@ -231,13 +208,14 @@ private:
       obst.color.a = 1.0;
       obst.id = i;
       obst.action = visualization_msgs::msg::Marker::ADD;
-      obst.pose.position.x = obstacles_x[i];
-      obst.pose.position.y = obstacles_y[i];
+      obst.pose.position.x = obstacles_x.at(i);
+      obst.pose.position.y = obstacles_y.at(i);
       all_obst.markers.push_back(obst);
     }
 
     return all_obst;
   }
+
 
   void cmd_callback(const nuturtlebot_msgs::msg::WheelCommands & msg)
   {

@@ -41,7 +41,6 @@ public:
     declare_parameter("wheel_radius", 0.0);
     declare_parameter("track_width", 0.0);
     declare_parameter("motor_cmd_per_rad_sec", 0.0);
-    declare_parameter("encoder_ticks_per_rad", 0.0);
 
     //gets aforementioned parameters
     const auto radius = get_parameter("wheel_radius").as_double();
