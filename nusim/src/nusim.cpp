@@ -35,6 +35,7 @@
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_ros/transform_broadcaster.h"
 #include "visualization_msgs/msg/marker_array.hpp"
+#include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
 
 
 using namespace std::chrono_literals;
@@ -116,7 +117,9 @@ private:
     auto y = get_parameter("y").as_double();
     auto theta = get_parameter("theta").as_double();
 
-
+    tf2::Quaternion q;
+    q.setRPY(0.0, 0.0, theta);
+    geometry_msgs::msg::Quaternion quat = tf2::toMsg(q);
     geometry_msgs::msg::TransformStamped t;
     t.header.stamp = get_clock()->now();
     t.header.frame_id = "nusim/world";
@@ -125,9 +128,7 @@ private:
     t.transform.translation.x = x;
     t.transform.translation.y = y;
 
-    t.transform.rotation.x = 0.0;
-    t.transform.rotation.y = 0.0;
-    t.transform.rotation.z = theta;
+    t.transform.rotation = quat;
 
     tf_broadcaster_->sendTransform(t);
 
@@ -190,7 +191,7 @@ private:
     const std::vector<double> obstacles_x = get_parameter("obstacles/x").as_double_array();
     const std::vector<double> obstacles_y = get_parameter("obstacles/y").as_double_array();
     const double obstacles_r = get_parameter("obstacles/r").as_double();
-    if (obstacles_x.size() != obstacles_y.size()){
+    if (obstacles_x.size() != obstacles_y.size()) {
       rclcpp::shutdown();
     }
     const int size_x = obstacles_x.size();

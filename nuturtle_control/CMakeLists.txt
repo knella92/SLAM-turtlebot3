@@ -17,12 +17,18 @@ find_package(geometry_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
-find_package(turtlelib)
-find_package(nuturtlebot_msgs)
-find_package(sensor_msgs)
-find_package(nav_msgs)
+find_package(turtlelib REQUIRED)
+find_package(nuturtlebot_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
 
+set(srv_files
+  "srv/InitialPose.srv")
 
+rosidl_generate_interfaces(${PROJECT_NAME}_srv
+  ${srv_files} LIBRARY_NAME ${PROJECT_NAME})
+
+rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME}_srv "rosidl_typesupport_cpp")
 
 add_executable(turtle_control src/turtle_control.cpp)
 target_link_libraries(turtle_control turtlelib::turtlelib)
@@ -61,8 +67,7 @@ install(
   TARGETS turtle_control odometry
   DESTINATION lib/${PROJECT_NAME})
 
-
-
+target_link_libraries(odometry "${cpp_typesupport_target}")
 
 ament_export_dependencies(rosidl_default_runtime)
 

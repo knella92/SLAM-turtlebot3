@@ -21,8 +21,8 @@
 #include "nuturtlebot_msgs/msg/sensor_data.hpp"
 #include "nuturtlebot_msgs/msg/wheel_commands.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
+#include "nuturtle_control/srv/initial_pose.hpp"
 #include "nav_msgs/msg/odometry.hpp"
-
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_ros/transform_broadcaster.h"
@@ -79,10 +79,10 @@ public:
 
     js_subscriber_ = create_subscription<sensor_msgs::msg::JointState>("/joint_states", 10, std::bind(&OdomNode::js_callback, this, std::placeholders::_1));
    
-    // initialp_service_ =
-    //     create_service<>(
-    //     "~/initial_pose",
-    //     std::bind(&OdomNode::initial_pose, this, std::placeholders::_1, std::placeholders::_2));
+    initialp_service_ =
+        create_service<nuturtle_control::srv::InitialPose>(
+        "/initial_pose",
+        std::bind(&OdomNode::initial_pose, this, std::placeholders::_1, std::placeholders::_2));
 
     // initializes braodcaster
     tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
@@ -96,6 +96,7 @@ private:
   rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_publisher_;
   rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr js_subscriber_;
   std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+  rclcpp::Service<nuturtle_control::srv::InitialPose>::SharedPtr initialp_service_;
 
   void js_callback(const sensor_msgs::msg::JointState & msg)
   {
@@ -117,21 +118,30 @@ private:
     odom.twist.twist.angular.z = Vb.w;
     odom_publisher_->publish(odom);
 
-    // geometry_msgs::msg::TransformStamped t;
-    // t.header.stamp = get_clock()->now();
-    // t.header.frame_id = odom_id;
-    // t.child_frame_id = body_id;
+    geometry_msgs::msg::TransformStamped t;
+    t.header.stamp = get_clock()->now();
+    t.header.frame_id = odom_id;
+    t.child_frame_id = body_id;
 
-    // t.transform.translation.x = x;
-    // t.transform.translation.y = y;
+    t.transform.translation.x = tbot3.q.x;
+    t.transform.translation.y = tbot3.q.y;
+    t.transform.rotation = quat;
 
-    // t.transform.rotation.x = 0.0;
-    // t.transform.rotation.y = 0.0;
-    // t.transform.rotation.z = theta;
-
-    // tf_broadcaster_->sendTransform(t);
+    tf_broadcaster_->sendTransform(t);
 
   }
+
+  void initial_pose(
+    const std::shared_ptr<nuturtle_control::srv::InitialPose::Request> request,
+    const std::shared_ptr<nuturtle_control::srv::InitialPose::Response> response){
+
+      tbot3.q.x = request->x;
+      tbot3.q.y = request->y;
+      tbot3.q.theta = request->theta;
+
+      (void)response;
+
+    }
 
 };
 
