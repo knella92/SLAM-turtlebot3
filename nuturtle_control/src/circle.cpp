@@ -50,13 +50,18 @@ public:
    
     control_service_ =
         create_service<nuturtle_control::srv::Control>(
-        "/control",
-        std::bind(&CircleNode::control, this, std::placeholders::_1, std::placeholders::_2));
+            "/control",
+            std::bind(&CircleNode::control, this, std::placeholders::_1, std::placeholders::_2));
 
     reverse_service_ =
         create_service<std_srvs::srv::Empty>(
-        "/reverse",
-        std::bind(&CircleNode::reverse, this, std::placeholders::_1, std::placeholders::_2));
+            "/reverse",
+            std::bind(&CircleNode::reverse, this, std::placeholders::_1, std::placeholders::_2));
+
+    stop_service_ =
+        create_service<std_srvs::srv::Empty>(
+            "/stop",
+            std::bind(&CircleNode::stop, this, std::placeholders::_1, std::placeholders::_2));
   }
 
 private:
@@ -69,13 +74,17 @@ private:
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Service<nuturtle_control::srv::Control>::SharedPtr control_service_;
     rclcpp::Service<std_srvs::srv::Empty>::SharedPtr reverse_service_;
+    rclcpp::Service<std_srvs::srv::Empty>::SharedPtr stop_service_;
 
     void timer_callback()
     {
-        geometry_msgs::msg::Twist Vb{};
-        Vb.linear.x = ang_velocity*radius;
-        Vb.angular.z = ang_velocity;
-        vel_publisher_->publish(Vb);
+        if(ang_velocity == 0.0){;}
+        else{
+            geometry_msgs::msg::Twist Vb{};
+            Vb.linear.x = ang_velocity*radius;
+            Vb.angular.z = ang_velocity;
+            vel_publisher_->publish(Vb);
+        }
     }
 
     void control(
@@ -92,8 +101,20 @@ private:
         const std::shared_ptr<std_srvs::srv::Empty::Response> response)
     {
         ang_velocity *= -1.0;
-        (void) request;
-        (void) response;
+        (void)request;
+        (void)response;
+    }
+
+    void stop(
+        const std::shared_ptr<std_srvs::srv::Empty::Request> request,
+        const std::shared_ptr<std_srvs::srv::Empty::Response> response)
+    {
+        ang_velocity = 0.0;
+        radius = 0.0;
+        geometry_msgs::msg::Twist Vb{};
+        vel_publisher_->publish(Vb);
+        (void)request;
+        (void)response;
     }
 
 };

@@ -86,7 +86,7 @@ private:
     
     turtlelib::Wheel_Vel phidot = tbot3.inverse_kin(Vb);
     const int32_t left_vel = phidot.l*motor_cmd_per_rad_sec;
-    const int32_t right_vel = phidot.l*motor_cmd_per_rad_sec;
+    const int32_t right_vel = phidot.r*motor_cmd_per_rad_sec;
     auto message = nuturtlebot_msgs::msg::WheelCommands();
     message.left_velocity = left_vel;
     message.right_velocity = right_vel;

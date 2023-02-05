@@ -16,6 +16,8 @@
         <param name="wheel_right" value="$(var wheel_right)"/>
     </node>
 
+    <node pkg='nuturtle_control' exec='circle' name='circle' output='screen'/>
+
     <include file="$(find-pkg-share nusim)/launch/nusim.launch.xml"/>
 
 </launch>
