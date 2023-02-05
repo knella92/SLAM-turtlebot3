@@ -1,4 +1,4 @@
-/// \turtle_control.cpp
+/// \odometry.cpp
 /// \brief Defines and launche nusim node with appropriate publishers and services
 ///
 /// PARAMETERS:
@@ -29,8 +29,6 @@
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_ros/transform_broadcaster.h"
 
-
-using namespace std::chrono_literals;
 
 class ControlNode : public rclcpp::Node
 {

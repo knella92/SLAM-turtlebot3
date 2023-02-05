@@ -21,9 +21,11 @@ find_package(turtlelib REQUIRED)
 find_package(nuturtlebot_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
+find_package(std_srvs REQUIRED)
 
 set(srv_files
-  "srv/InitialPose.srv")
+  "srv/InitialPose.srv"
+  "srv/Control.srv")
 
 rosidl_generate_interfaces(${PROJECT_NAME}_srv
   ${srv_files} LIBRARY_NAME ${PROJECT_NAME})
@@ -34,6 +36,8 @@ add_executable(turtle_control src/turtle_control.cpp)
 target_link_libraries(turtle_control turtlelib::turtlelib)
 add_executable(odometry src/odometry.cpp)
 target_link_libraries(odometry turtlelib::turtlelib)
+add_executable(circle src/circle.cpp)
+target_link_libraries(circle turtlelib::turtlelib)
 
 ament_target_dependencies(
   turtle_control
@@ -47,7 +51,7 @@ ament_target_dependencies(
   sensor_msgs
   nav_msgs)
 
-  ament_target_dependencies(
+ament_target_dependencies(
   odometry
   rclcpp
   std_msgs
@@ -60,14 +64,23 @@ ament_target_dependencies(
   sensor_msgs
   nav_msgs)
 
+ament_target_dependencies(
+  circle
+  rclcpp
+  std_msgs
+  std_srvs
+  geometry_msgs
+  turtlelib)
+
 install(
   DIRECTORY launch
   DESTINATION share/${PROJECT_NAME})
 install(
-  TARGETS turtle_control odometry
+  TARGETS turtle_control odometry circle
   DESTINATION lib/${PROJECT_NAME})
 
 target_link_libraries(odometry "${cpp_typesupport_target}")
+target_link_libraries(circle "${cpp_typesupport_target}")
 
 ament_export_dependencies(rosidl_default_runtime)
 
