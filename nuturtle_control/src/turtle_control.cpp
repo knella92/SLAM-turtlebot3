@@ -22,9 +22,6 @@
 #include "nuturtlebot_msgs/msg/sensor_data.hpp"
 #include "nuturtlebot_msgs/msg/wheel_commands.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
-
-
-
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_ros/transform_broadcaster.h"
@@ -41,17 +38,16 @@ public:
     declare_parameter("wheel_radius", 0.0);
     declare_parameter("track_width", 0.0);
     declare_parameter("motor_cmd_per_rad_sec", 0.0);
+    declare_parameter("encoder_ticks_per_rad", 0.0);
 
     //gets aforementioned parameters
     const auto radius = get_parameter("wheel_radius").as_double();
     const auto depth = get_parameter("track_width").as_double();
-    const auto mcmd_rads = get_parameter("motor_cmd_per_rad_sec").as_double();
-    const auto etprad = get_parameter("encoder_ticks_per_rad").as_double();
+    motor_cmd_per_rad_sec = get_parameter("motor_cmd_per_rad_sec").as_double();
+    encoder_ticks_per_rad = get_parameter("encoder_ticks_per_rad").as_double();
 
     const turtlelib::DiffDrive tbot{depth, radius};
     tbot3 = tbot;
-    motor_cmd_per_rad_sec = mcmd_rads;
-    encoder_ticks_per_rad = etprad;
 
 
     // initialize publishers and timer
@@ -80,7 +76,6 @@ private:
   {
     turtlelib::Twist2D Vb{};
     Vb.v.x = msg.linear.x;
-    Vb.v.y = msg.linear.y;
     Vb.w = msg.angular.z;
     
     turtlelib::Wheel_Vel phidot = tbot3.inverse_kin(Vb);

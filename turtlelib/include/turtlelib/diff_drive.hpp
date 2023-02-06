@@ -71,13 +71,6 @@ namespace turtlelib
             /// \param radius - radius of wheels
             DiffDrive(double depth, double radius);
 
-            /// \brief initialize transforms, D, H pseudo-inverse matrix, set's current wheel positions to given values
-            /// \param depth - depth between center of one wheel and center of chassis
-            /// \param radius - radius of wheels
-            /// \param left_pos - current left wheel position
-            /// \param right_pos - current right wheel position
-            DiffDrive(double depth, double radius, double left_pos, double right_pos);
-
             /// \brief computes wheel velocities required to make robot move at a given body twist
             /// \param Vb - given body twist
             /// \return - wheel velocities

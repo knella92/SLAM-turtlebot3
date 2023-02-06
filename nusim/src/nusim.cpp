@@ -38,6 +38,7 @@
 #include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
 #include "nuturtlebot_msgs/msg/wheel_commands.hpp"
 #include "nuturtlebot_msgs/msg/sensor_data.hpp"
+#include "turtlelib/diff_drive.hpp"
 
 
 using namespace std::chrono_literals;
@@ -73,11 +74,17 @@ public:
       rclcpp::shutdown();
     }
 
-
+    declare_parameter("wheel_radius", 0.0);
+    declare_parameter("track_width", 0.0);
     declare_parameter("motor_cmd_per_rad_sec", 0.0);
-    declare_parameter("motor_ticks_per_rad", 0.0);
+    declare_parameter("encoder_ticks_per_rad", 0.0);
     motor_cmd_per_rad_sec = get_parameter("motor_cmd_per_rad_sec").as_double();
     encoder_ticks_per_rad = get_parameter("encoder_ticks_per_rad").as_double();
+    const auto radius = get_parameter("wheel_radius").as_double();
+    const auto depth = get_parameter("track_width").as_double();
+
+    turtlelib::DiffDrive tbot{depth, radius};
+    tbot3 = tbot;
 
     // saves rate parameter as an int
     const auto rate = get_parameter("rate").as_int();
@@ -85,9 +92,9 @@ public:
 
     // initialize publishers and timer
     publisher_ = create_publisher<std_msgs::msg::UInt64>("~/timestep", 10);
-    sens_publisher_ = create_publisher<nuturtlebot_msgs::msg::SensorData>("~/sensor_data", 10);
+    sens_publisher_ = create_publisher<nuturtlebot_msgs::msg::SensorData>("red/sensor_data", 10);
     obst_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/obstacles", 10);
-    cmd_subscriber_ = create_subscription<nuturtlebot_msgs::msg::WheelCommands>("~/wheel_cmd", 10, std::bind(&SimNode::cmd_callback, this, std::placeholders::_1));
+    cmd_subscriber_ = create_subscription<nuturtlebot_msgs::msg::WheelCommands>("red/wheel_cmd", 10, std::bind(&SimNode::cmd_callback, this, std::placeholders::_1));
 
     timer_ = create_wall_timer(
       std::chrono::duration<int64_t, std::milli>(t), std::bind(&SimNode::timer_callback, this));
@@ -115,6 +122,7 @@ private:
   std::vector<double> obstacles_x, obstacles_y;
   double obstacles_r;
   double phi_l{0.0}; double phi_r{0.0};
+  turtlelib::DiffDrive tbot3{0.0,0.0};
   rclcpp::Time prev_time = get_clock()->now();
   rclcpp::Publisher<std_msgs::msg::UInt64>::SharedPtr publisher_;
   rclcpp::Publisher<nuturtlebot_msgs::msg::SensorData>::SharedPtr sens_publisher_;
@@ -138,14 +146,17 @@ private:
     tf2::Quaternion q;
     q.setRPY(0.0, 0.0, theta);
     geometry_msgs::msg::Quaternion quat = tf2::toMsg(q);
-    geometry_msgs::msg::TransformStamped t;
+    geometry_msgs::msg::TransformStamped t{};
     t.header.stamp = get_clock()->now();
     t.header.frame_id = "nusim/world";
     t.child_frame_id = "red/base_footprint";
 
     t.transform.translation.x = x;
     t.transform.translation.y = y;
-    t.transform.rotation = quat;
+    t.transform.rotation.x = quat.x;
+    t.transform.rotation.y = quat.y;
+    t.transform.rotation.z = quat.z;
+    t.transform.rotation.w = quat.w;
     tf_broadcaster_->sendTransform(t);
 
     visualization_msgs::msg::MarkerArray obstacles = add_obstacles();
@@ -153,10 +164,9 @@ private:
 
     nuturtlebot_msgs::msg::SensorData sens_msg{};
     sens_msg.stamp = get_clock()->now();
-    sens_msg.left_encoder = phi_l;
-    sens_msg.right_encoder = phi_r;
+    sens_msg.left_encoder = tbot3.phi_l;
+    sens_msg.right_encoder = tbot3.phi_r;
     sens_publisher_->publish(sens_msg);
-
   }
 
   /// \brief Reset service
@@ -172,6 +182,11 @@ private:
     x = x0;
     y = y0;
     theta = theta0;
+    phi_l = 0.0;
+    phi_r = 0.0;
+    tbot3.phi_l = 0.0;
+    tbot3.phi_r = 0.0;
+    tbot3.q = {0.0,0.0,0.0};
     RCLCPP_INFO(get_logger(), "Resetting");
   }
 
@@ -219,13 +234,19 @@ private:
 
   void cmd_callback(const nuturtlebot_msgs::msg::WheelCommands & msg)
   {
-    rclcpp::Time time_stamp = get_clock()->now();
-    int dt = time_stamp.nanoseconds() - prev_time.nanoseconds();
+    const rclcpp::Time time_stamp = get_clock()->now();
+    const auto dt = time_stamp.nanoseconds() - prev_time.nanoseconds();
     prev_time = time_stamp;
     double phidot_l{msg.left_velocity/motor_cmd_per_rad_sec};
-    phi_l += phidot_l*dt*1e-9*encoder_ticks_per_rad;
     double phidot_r{msg.right_velocity/motor_cmd_per_rad_sec};
-    phi_r += phidot_r*dt*1e-9*encoder_ticks_per_rad;
+    phi_l += phidot_l*dt*1.0e-09*encoder_ticks_per_rad;
+    phi_r += phidot_r*dt*1.0e-09*encoder_ticks_per_rad;
+    tbot3.forward_kin(phi_l, phi_r);
+    x = tbot3.q.x;
+    y = tbot3.q.y;
+    theta = tbot3.q.theta;
+    tbot3.phi_l = phi_l;
+    tbot3.phi_r = phi_r;
   }
 
 };

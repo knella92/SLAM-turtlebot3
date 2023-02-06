@@ -16,23 +16,16 @@ namespace turtlelib
     {
     }
 
-    DiffDrive::DiffDrive(double depth, double radius, double left_pos, double right_pos)
-        :Tb1{{0.0, depth}, 0.0},
-        Tb2{{0.0, -1*depth}, 0.0},
-        D{depth}, r{radius},
-        hpi00{(-1.0*radius)/(2.0*depth)}, hpi01{(1.0*radius)/(2.0*depth)}, hpi10{radius/2.0}, hpi11{radius/2.0},
-        phi_l{left_pos}, phi_r{right_pos},
-        q{0.0,0.0,0.0}
-    {
-    }
-
     Wheel_Vel DiffDrive::inverse_kin(Twist2D & Vb) const{
         if (!almost_equal(Vb.v.y,0)){
             throw std::logic_error("y component of body twist must be zero");
         }
-        const Twist2D V1 = Tb1.inv()(Vb);
-        const Twist2D V2 = Tb2.inv()(Vb);
-        const Wheel_Vel phidot{V1.v.x, V2.v.x};
+        // const Twist2D V1 = Tb1.inv()(Vb);
+        // const Twist2D V2 = Tb2.inv()(Vb);
+        // const Wheel_Vel phidot{V1.v.x, V2.v.x};
+        Wheel_Vel phidot{};
+        phidot.l = (-D*Vb.w + Vb.v.x)/r;
+        phidot.r = (D*Vb.w + Vb.v.x)/r;
         return phidot;
     }
 

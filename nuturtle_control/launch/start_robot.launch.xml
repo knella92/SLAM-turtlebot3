@@ -9,11 +9,15 @@
     <arg name="robot" description="Valid choices are: ['nusim', 'localhost', 'none']" default="nusim"/>
     <arg name="use_rviz" description="Launch rviz with robot model, tf frames, and odometry" default="false"/>
 
+    <let name="ns" value="red" if="$(eval '\'$(var robot)\' == \'nusim\'')"/>  
+
     <node pkg='nuturtle_control' exec='turtle_control' name='turtle_control' output='screen'>
         <param from="$(find-pkg-share nuturtle_description)/config/diff_params.yaml"/>
+        <remap from="wheel_cmd" to="$(var ns)/wheel_cmd"/>
     </node>
 
     <node pkg='nuturtle_control' exec='odometry' name='odometry' output='screen'>
+        <param from="$(find-pkg-share nuturtle_description)/config/diff_params.yaml"/>
         <param name="body_id" value="$(var body_id)"/>
         <param name="odom_id" value="$(var odom_id)"/>
         <param name="wheel_left" value="$(var wheel_left)"/>
@@ -21,7 +25,8 @@
     </node>
 
     <node pkg='nuturtle_control' exec='circle' name='circle' output='screen'
-        if="$(eval '\'$(var cmd_src)\' == \'circle\'')"/>
+        if="$(eval '\'$(var cmd_src)\' == \'circle\'')">
+    </node>
 
     <node pkg='rviz2' exec='rviz2' output='screen' args='-d $(find-pkg-share nusim)/config/nusim.rviz'
         if="$(eval '\'$(var use_rviz)\' == \'true\'')"/>
