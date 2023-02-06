@@ -51,7 +51,7 @@ namespace turtlelib
             double r;
 
             /// \brief 2D H pseudo-inverse matrix
-            std::vector<std::vector<double>> H_pi;
+            double hpi00, hpi01, hpi10, hpi11;
 
 
 
