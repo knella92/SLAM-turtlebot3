@@ -135,15 +135,17 @@ public:
 private:
   size_t count_;
   int rate{};
-  double x0, y0, theta0, x, y, theta;
+  double x0{}; double y0{}; double theta0{}; double x{}; double y{}; double theta{};
   double motor_cmd_per_rad_sec{};
   double encoder_ticks_per_rad{};
   rclcpp::Time prev_stamp{get_clock()->now()};
   int motor_cmd_max{};
-  std::vector<double> obstacles_x, obstacles_y, x_pos, y_pos, length;
-  std::vector<geometry_msgs::msg::Quaternion> orient;
-  double obstacles_r;
-  double arena_x, arena_y;
+  std::vector<double> obstacles_x{}; 
+  std::vector<double> obstacles_y{};
+  std::vector<double> x_pos{}; std::vector<double> y_pos{}; std::vector<double> length{};
+  std::vector<geometry_msgs::msg::Quaternion> orient{};
+  double obstacles_r{};
+  double arena_x{}; double arena_y{};
   double wall_thickness{};
   double phi_lp{0.0}; double phi_rp{0.0};
   turtlelib::DiffDrive tbot3{0.0,0.0};
