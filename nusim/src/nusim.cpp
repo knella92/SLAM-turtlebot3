@@ -128,7 +128,7 @@ public:
       std::bind(&SimNode::teleport, this, std::placeholders::_1, std::placeholders::_2));
 
     // initializes braodcaster
-    tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
+    redbot_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
   }
 
@@ -138,6 +138,7 @@ private:
   double x0, y0, theta0, x, y, theta;
   double motor_cmd_per_rad_sec{};
   double encoder_ticks_per_rad{};
+  rclcpp::Time prev_stamp{get_clock()->now()};
   int motor_cmd_max{};
   std::vector<double> obstacles_x, obstacles_y, x_pos, y_pos, length;
   std::vector<geometry_msgs::msg::Quaternion> orient;
@@ -154,7 +155,7 @@ private:
   rclcpp::Subscription<nuturtlebot_msgs::msg::WheelCommands>::SharedPtr cmd_subscriber_;
   rclcpp::Service<nusim::srv::Reset>::SharedPtr reset_service_;
   rclcpp::Service<nusim::srv::Teleport>::SharedPtr tele_service_;
-  std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+  std::unique_ptr<tf2_ros::TransformBroadcaster> redbot_broadcaster_;
 
 
   /// \brief Initializes timer callback which publishes timestep, turtlebot positions, and obstacle positions at each timestep
@@ -177,14 +178,14 @@ private:
     t.transform.translation.x = x;
     t.transform.translation.y = y;
     t.transform.rotation = quat;
-    tf_broadcaster_->sendTransform(t);
+    redbot_broadcaster_->sendTransform(t);
 
     visualization_msgs::msg::MarkerArray obstacles = add_obstacles();
     visualization_msgs::msg::MarkerArray walls = add_walls();
     obst_publisher_->publish(obstacles);
     wall_publisher_->publish(walls);
 
-    nuturtlebot_msgs::msg::SensorData sens_msg{};
+    auto sens_msg = nuturtlebot_msgs::msg::SensorData();
     sens_msg.stamp = get_clock()->now();
     sens_msg.left_encoder = tbot3.phi_l*encoder_ticks_per_rad;
     sens_msg.right_encoder = tbot3.phi_r*encoder_ticks_per_rad;
@@ -281,14 +282,19 @@ private:
 
   void cmd_callback(const nuturtlebot_msgs::msg::WheelCommands & msg)
   {
-    double phidot_l{2.84*msg.left_velocity/motor_cmd_max};
-    double phidot_r{2.84*msg.right_velocity/motor_cmd_max};
+    rclcpp::Time stamp{get_clock()->now()};
+    double phidot_l{msg.left_velocity/motor_cmd_per_rad_sec};
+    double phidot_r{msg.right_velocity/motor_cmd_per_rad_sec};
     phi_lp += phidot_l;
     phi_rp += phidot_r;
     tbot3.forward_kin(phi_lp, phi_rp);
+
+    // update position of robot
     x = tbot3.q.x;
     y = tbot3.q.y;
     theta = tbot3.q.theta;
+
+    // update wheel positions (radians) -> sensordata message
     tbot3.phi_l = phi_lp;
     tbot3.phi_r = phi_rp;
   }

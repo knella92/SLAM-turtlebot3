@@ -89,32 +89,27 @@ private:
 
     void control(
         const std::shared_ptr<nuturtle_control::srv::Control::Request> request,
-        const std::shared_ptr<nuturtle_control::srv::Control::Response> response){
+        const std::shared_ptr<nuturtle_control::srv::Control::Response>){
 
         ang_velocity = request->velocity;
         radius = request->radius;
-        (void)response;
     }
 
     void reverse(
-        const std::shared_ptr<std_srvs::srv::Empty::Request> request,
-        const std::shared_ptr<std_srvs::srv::Empty::Response> response)
+        const std::shared_ptr<std_srvs::srv::Empty::Request>,
+        const std::shared_ptr<std_srvs::srv::Empty::Response>)
     {
         ang_velocity *= -1.0;
-        (void)request;
-        (void)response;
     }
 
     void stop(
-        const std::shared_ptr<std_srvs::srv::Empty::Request> request,
-        const std::shared_ptr<std_srvs::srv::Empty::Response> response)
+        const std::shared_ptr<std_srvs::srv::Empty::Request>,
+        const std::shared_ptr<std_srvs::srv::Empty::Response>)
     {
         ang_velocity = 0.0;
         radius = 0.0;
         geometry_msgs::msg::Twist Vb{};
         vel_publisher_->publish(Vb);
-        (void)request;
-        (void)response;
     }
 
 };

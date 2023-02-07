@@ -53,8 +53,9 @@ def generate_launch_description():
                         # passes color argument into xacro file
                         ' ', 'color:=', LaunchConfiguration('color')]),
                     'frame_prefix': [LaunchConfiguration('color'),
-                                     TextSubstitution(text='/')]}
+                                     TextSubstitution(text='/')]},
                         ]
+
             ),
 
         Node(
@@ -63,6 +64,7 @@ def generate_launch_description():
             name='joint_state_publisher',
             package='joint_state_publisher',
             executable='joint_state_publisher',
+            parameters=[{'source_list': "joint_states"}]
             ),
 
         Node(
