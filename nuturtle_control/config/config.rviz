@@ -10,9 +10,9 @@ Panels:
         - /MarkerArray1
         - /RobotModel1
         - /Odometry1
-        - /Odometry1/Status1
         - /Odometry1/Topic1
         - /Odometry1/Shape1
+        - /MarkerArray2
       Splitter Ratio: 0.5
     Tree Height: 549
   - Class: rviz_common/Selection
@@ -294,6 +294,18 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /odom
       Value: true
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: MarkerArray
+      Namespaces:
+        "": true
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /nusim/walls
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -340,7 +352,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 3.3519675731658936
+      Distance: 11.068727493286133
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1

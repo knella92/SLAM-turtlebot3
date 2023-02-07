@@ -74,6 +74,21 @@ public:
       rclcpp::shutdown();
     }
 
+    declare_parameter("arena/x_length", 0.0);
+    declare_parameter("arena/y_length", 0.0);
+    declare_parameter("wall/thickness", 0.0);
+    arena_x = get_parameter("arena/x_length").as_double();
+    arena_y = get_parameter("arena/y_length").as_double();
+    wall_thickness = get_parameter("wall/thickness").as_double();
+
+    x_pos = {(arena_x + wall_thickness)/-2.0, (arena_x + wall_thickness)/2.0, 0.0, 0.0};
+    y_pos = {0.0, 0.0, (arena_y+wall_thickness)/-2.0, (arena_y + wall_thickness)/2.0};
+    length = {arena_y, arena_y, arena_x, arena_x};
+    tf2::Quaternion wx, wy;
+    wx.setRPY(0.0, 0.0, 0.0);
+    wy.setRPY(0.0, 0.0, turtlelib::PI/2.0);
+    orient = {tf2::toMsg(wy), tf2::toMsg(wy), tf2::toMsg(wx), tf2::toMsg(wx)};
+
     declare_parameter("wheel_radius", 0.0);
     declare_parameter("track_width", 0.0);
     declare_parameter("motor_cmd_max", 0);
@@ -96,6 +111,7 @@ public:
     publisher_ = create_publisher<std_msgs::msg::UInt64>("~/timestep", 10);
     sens_publisher_ = create_publisher<nuturtlebot_msgs::msg::SensorData>("red/sensor_data", 10);
     obst_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/obstacles", 10);
+    wall_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/walls", 10);
     cmd_subscriber_ = create_subscription<nuturtlebot_msgs::msg::WheelCommands>("red/wheel_cmd", 10, std::bind(&SimNode::cmd_callback, this, std::placeholders::_1));
 
     timer_ = create_wall_timer(
@@ -123,14 +139,18 @@ private:
   double motor_cmd_per_rad_sec{};
   double encoder_ticks_per_rad{};
   int motor_cmd_max{};
-  std::vector<double> obstacles_x, obstacles_y;
+  std::vector<double> obstacles_x, obstacles_y, x_pos, y_pos, length;
+  std::vector<geometry_msgs::msg::Quaternion> orient;
   double obstacles_r;
+  double arena_x, arena_y;
+  double wall_thickness{};
   double phi_lp{0.0}; double phi_rp{0.0};
   turtlelib::DiffDrive tbot3{0.0,0.0};
   rclcpp::Publisher<std_msgs::msg::UInt64>::SharedPtr publisher_;
   rclcpp::Publisher<nuturtlebot_msgs::msg::SensorData>::SharedPtr sens_publisher_;
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr obst_publisher_;
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr wall_publisher_;
   rclcpp::Subscription<nuturtlebot_msgs::msg::WheelCommands>::SharedPtr cmd_subscriber_;
   rclcpp::Service<nusim::srv::Reset>::SharedPtr reset_service_;
   rclcpp::Service<nusim::srv::Teleport>::SharedPtr tele_service_;
@@ -160,7 +180,9 @@ private:
     tf_broadcaster_->sendTransform(t);
 
     visualization_msgs::msg::MarkerArray obstacles = add_obstacles();
+    visualization_msgs::msg::MarkerArray walls = add_walls();
     obst_publisher_->publish(obstacles);
+    wall_publisher_->publish(walls);
 
     nuturtlebot_msgs::msg::SensorData sens_msg{};
     sens_msg.stamp = get_clock()->now();
@@ -210,7 +232,7 @@ private:
     visualization_msgs::msg::MarkerArray all_obst;
 
     const int size_x = obstacles_x.size();
-      rclcpp::Time stamp = get_clock()->now();
+    rclcpp::Time stamp = get_clock()->now();
     for (int i = 0; i < size_x; ++i) {
       visualization_msgs::msg::Marker obst;
       obst.header.frame_id = "nusim/world";
@@ -227,8 +249,33 @@ private:
       obst.pose.position.y = obstacles_y.at(i);
       all_obst.markers.push_back(obst);
     }
-
     return all_obst;
+  }
+
+
+  visualization_msgs::msg::MarkerArray add_walls()
+  {
+    visualization_msgs::msg::MarkerArray all_walls;
+    rclcpp::Time stamp = get_clock()->now();
+    for (int i = 0; i < 4; ++i) {
+      visualization_msgs::msg::Marker walls;
+      walls.header.frame_id = "nusim/world";
+      walls.header.stamp = stamp;
+      walls.type = visualization_msgs::msg::Marker::CUBE;
+      walls.scale.x = length.at(i);
+      walls.scale.y = wall_thickness;
+      walls.scale.z = 0.25;
+      walls.color.r = 1.0;
+      walls.color.a = 1.0;
+      walls.id = i;
+      walls.action = visualization_msgs::msg::Marker::ADD;
+      walls.pose.position.x = x_pos.at(i);
+      walls.pose.position.y = y_pos.at(i);
+      walls.pose.orientation = orient.at(i);
+      all_walls.markers.push_back(walls);
+    }
+
+    return all_walls;
   }
 
 

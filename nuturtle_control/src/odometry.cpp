@@ -125,13 +125,11 @@ private:
 
   void initial_pose(
     const std::shared_ptr<nuturtle_control::srv::InitialPose::Request> request,
-    const std::shared_ptr<nuturtle_control::srv::InitialPose::Response> response){
+    const std::shared_ptr<nuturtle_control::srv::InitialPose::Response>){
 
     tbot3.q.x = request->x;
     tbot3.q.y = request->y;
     tbot3.q.theta = request->theta;
-
-    (void)response;
 
     }
 
