@@ -55,14 +55,10 @@ public:
       rclcpp::shutdown();
     }
 
-    const auto bdy_id = get_parameter("body_id").as_string();
-    body_id = bdy_id;
-    const auto odm_id = get_parameter("odom_id").as_string();
-    odom_id = odm_id;
-    const auto wheel_l = get_parameter("wheel_left").as_string();
-    wheel_left = wheel_l;
-    const auto wheel_r = get_parameter("wheel_right").as_string();
-    wheel_right = wheel_r;
+    body_id = get_parameter("body_id").as_string();
+    odom_id = get_parameter("odom_id").as_string();
+    wheel_left = get_parameter("wheel_left").as_string();
+    wheel_right = get_parameter("wheel_right").as_string();
     const auto radius = get_parameter("wheel_radius").as_double();
     const auto depth = get_parameter("track_width").as_double();
 
@@ -95,6 +91,8 @@ private:
   void js_callback(const sensor_msgs::msg::JointState & msg)
   {
     turtlelib::Twist2D Vb = tbot3.forward_kin(msg.position[0], msg.position[1]);
+    tbot3.phi_l = msg.position[0];
+    tbot3.phi_r = msg.position[1];
     tf2::Quaternion q;
     q.setRPY(0.0,0.0,tbot3.q.theta);
     geometry_msgs::msg::Quaternion quat = tf2::toMsg(q);

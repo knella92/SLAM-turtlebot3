@@ -76,10 +76,12 @@ public:
 
     declare_parameter("wheel_radius", 0.0);
     declare_parameter("track_width", 0.0);
+    declare_parameter("motor_cmd_max", 0);
     declare_parameter("motor_cmd_per_rad_sec", 0.0);
     declare_parameter("encoder_ticks_per_rad", 0.0);
     motor_cmd_per_rad_sec = get_parameter("motor_cmd_per_rad_sec").as_double();
     encoder_ticks_per_rad = get_parameter("encoder_ticks_per_rad").as_double();
+    motor_cmd_max = get_parameter("motor_cmd_max").as_int();
     const auto radius = get_parameter("wheel_radius").as_double();
     const auto depth = get_parameter("track_width").as_double();
 
@@ -87,7 +89,7 @@ public:
     tbot3 = tbot;
 
     // saves rate parameter as an int
-    const auto rate = get_parameter("rate").as_int();
+    rate = get_parameter("rate").as_int();
     const int64_t t = 1000 / rate; // implicit conversion of 1000/rate to int64_t to use as time in ms
 
     // initialize publishers and timer
@@ -116,14 +118,15 @@ public:
 
 private:
   size_t count_;
+  int rate{};
   double x0, y0, theta0, x, y, theta;
   double motor_cmd_per_rad_sec{};
   double encoder_ticks_per_rad{};
+  int motor_cmd_max{};
   std::vector<double> obstacles_x, obstacles_y;
   double obstacles_r;
-  double phi_l{0.0}; double phi_r{0.0};
+  double phi_lp{0.0}; double phi_rp{0.0};
   turtlelib::DiffDrive tbot3{0.0,0.0};
-  rclcpp::Time prev_time = get_clock()->now();
   rclcpp::Publisher<std_msgs::msg::UInt64>::SharedPtr publisher_;
   rclcpp::Publisher<nuturtlebot_msgs::msg::SensorData>::SharedPtr sens_publisher_;
   rclcpp::TimerBase::SharedPtr timer_;
@@ -153,10 +156,7 @@ private:
 
     t.transform.translation.x = x;
     t.transform.translation.y = y;
-    t.transform.rotation.x = quat.x;
-    t.transform.rotation.y = quat.y;
-    t.transform.rotation.z = quat.z;
-    t.transform.rotation.w = quat.w;
+    t.transform.rotation = quat;
     tf_broadcaster_->sendTransform(t);
 
     visualization_msgs::msg::MarkerArray obstacles = add_obstacles();
@@ -164,8 +164,8 @@ private:
 
     nuturtlebot_msgs::msg::SensorData sens_msg{};
     sens_msg.stamp = get_clock()->now();
-    sens_msg.left_encoder = tbot3.phi_l;
-    sens_msg.right_encoder = tbot3.phi_r;
+    sens_msg.left_encoder = tbot3.phi_l*encoder_ticks_per_rad;
+    sens_msg.right_encoder = tbot3.phi_r*encoder_ticks_per_rad;
     sens_publisher_->publish(sens_msg);
   }
 
@@ -182,11 +182,11 @@ private:
     x = x0;
     y = y0;
     theta = theta0;
-    phi_l = 0.0;
-    phi_r = 0.0;
+    phi_lp = 0.0;
+    phi_rp = 0.0;
     tbot3.phi_l = 0.0;
     tbot3.phi_r = 0.0;
-    tbot3.q = {0.0,0.0,0.0};
+    tbot3.q = {x, y, theta};
     RCLCPP_INFO(get_logger(), "Resetting");
   }
 
@@ -234,19 +234,16 @@ private:
 
   void cmd_callback(const nuturtlebot_msgs::msg::WheelCommands & msg)
   {
-    const rclcpp::Time time_stamp = get_clock()->now();
-    const auto dt = time_stamp.nanoseconds() - prev_time.nanoseconds();
-    prev_time = time_stamp;
-    double phidot_l{msg.left_velocity/motor_cmd_per_rad_sec};
-    double phidot_r{msg.right_velocity/motor_cmd_per_rad_sec};
-    phi_l += phidot_l*dt*1.0e-09*encoder_ticks_per_rad;
-    phi_r += phidot_r*dt*1.0e-09*encoder_ticks_per_rad;
-    tbot3.forward_kin(phi_l, phi_r);
+    double phidot_l{2.84*msg.left_velocity/motor_cmd_max};
+    double phidot_r{2.84*msg.right_velocity/motor_cmd_max};
+    phi_lp += phidot_l;
+    phi_rp += phidot_r;
+    tbot3.forward_kin(phi_lp, phi_rp);
     x = tbot3.q.x;
     y = tbot3.q.y;
     theta = tbot3.q.theta;
-    tbot3.phi_l = phi_l;
-    tbot3.phi_r = phi_r;
+    tbot3.phi_l = phi_lp;
+    tbot3.phi_r = phi_rp;
   }
 
 };

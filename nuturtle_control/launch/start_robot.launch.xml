@@ -14,6 +14,7 @@
     <node pkg='nuturtle_control' exec='turtle_control' name='turtle_control' output='screen'>
         <param from="$(find-pkg-share nuturtle_description)/config/diff_params.yaml"/>
         <remap from="wheel_cmd" to="$(var ns)/wheel_cmd"/>
+        <remap from="sensor_data" to="$(var ns)/sensor_data"/>
     </node>
 
     <node pkg='nuturtle_control' exec='odometry' name='odometry' output='screen'>
@@ -28,7 +29,7 @@
         if="$(eval '\'$(var cmd_src)\' == \'circle\'')">
     </node>
 
-    <node pkg='rviz2' exec='rviz2' output='screen' args='-d $(find-pkg-share nusim)/config/nusim.rviz'
+    <node pkg='rviz2' exec='rviz2' output='screen' args='-d $(find-pkg-share nuturtle_control)/config/config.rviz'
         if="$(eval '\'$(var use_rviz)\' == \'true\'')"/>
 
     <include file="$(find-pkg-share nuturtle_description)/launch/load_one.launch.py">
@@ -40,6 +41,8 @@
         if="$(eval '\'$(var robot)\' == \'nusim\'')">
         <arg name="rviz" value="false"/>
     </include>
+
+    <node pkg="tf2_ros" exec="static_transform_publisher" name="world_to_odom" args='0 0 0 0 0 0 1 nusim/world odom'/>
 
 
 

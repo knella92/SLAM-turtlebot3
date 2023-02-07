@@ -73,7 +73,7 @@ ament_target_dependencies(
   turtlelib)
 
 install(
-  DIRECTORY launch
+  DIRECTORY launch config
   DESTINATION share/${PROJECT_NAME})
 install(
   TARGETS turtle_control odometry circle

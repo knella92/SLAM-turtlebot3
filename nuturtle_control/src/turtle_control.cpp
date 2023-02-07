@@ -65,7 +65,6 @@ private:
   turtlelib::DiffDrive tbot3{0.0,0.0};
   double motor_cmd_per_rad_sec{};
   double encoder_ticks_per_rad{};
-  rclcpp::Time prev_time = get_clock()->now();
   rclcpp::Publisher<nuturtlebot_msgs::msg::WheelCommands>::SharedPtr wheel_publisher_;
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr js_publisher_;
   rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr vel_subscriber_;
@@ -101,13 +100,9 @@ private:
   void sens_callback(const nuturtlebot_msgs::msg::SensorData & msg)
   {
     turtlelib::Wheel_Vel phidot{};
-    rclcpp::Time time_stamp = msg.stamp;
-    int dt = time_stamp.nanoseconds() - prev_time.nanoseconds();
-    prev_time = time_stamp;
-
-    phidot.l = (msg.left_encoder - tbot3.phi_l)/(dt*1.0e-9);
+    phidot.l = (msg.left_encoder/encoder_ticks_per_rad - tbot3.phi_l);
     tbot3.phi_l = msg.left_encoder/encoder_ticks_per_rad;
-    phidot.r = (msg.right_encoder - tbot3.phi_r)/(dt*1.0e-9);
+    phidot.r = (msg.right_encoder/encoder_ticks_per_rad - tbot3.phi_r);
     tbot3.phi_r = msg.right_encoder/encoder_ticks_per_rad;
 
     sensor_msgs::msg::JointState message{};
