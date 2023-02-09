@@ -12,3 +12,7 @@ Odometry Error:
 dx = 9.09 CM
 dy = 1.8 CM
 dtheta = 41 degrees
+
+
+<video src=https://user-images.githubusercontent.com/58793794/217950496-93bcb4ad-9c3e-4133-9091-a5ba8538c6b9.mp4/>
+
