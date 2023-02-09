@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['inv_25',['inv',['../classturtlelib_1_1Transform2D.html#a16ead59fc6ba17f27aad305613431c7d',1,'turtlelib::Transform2D']]]
+  ['forward_5fkin_56',['forward_kin',['../classturtlelib_1_1DiffDrive.html#a32a76fb93ea4a24ab74f55afe3f62df8',1,'turtlelib::DiffDrive']]]
 ];

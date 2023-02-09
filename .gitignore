@@ -5,7 +5,8 @@
 *.#file
 *.vscode
 __pycache__/
-turtlelib/build
-turtlelib/frame_main
-nuturtle_description/build
-nuturtle_description/log
+/turtlelib/build
+/turtlelib/Testing
+/turtlelib/frame_main
+/nuturtle_description/build
+/nuturtle_description/log

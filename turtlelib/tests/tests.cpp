@@ -310,7 +310,7 @@ TEMPLATE_TEST_CASE("Inverse Kinematics", "[inverse]", Twist2D, Transform2D){
     }
 }
 
-TEMPLATE_TEST_CASE("forward Kinematics", "[inverse]", Twist2D, Transform2D){
+TEMPLATE_TEST_CASE("forward Kinematics", "[forward]", Twist2D, Transform2D){
     Twist2D Vb{};
     DiffDrive bot{.16,.033};
 
@@ -375,4 +375,10 @@ TEMPLATE_TEST_CASE("forward Kinematics", "[inverse]", Twist2D, Transform2D){
         CHECK_THAT(Vb.v.x, WithinRel(3.56, 0.0001));
         CHECK_THAT(Vb.v.y, WithinRel(0, 0.0001));
     }
+
+    SECTION("Impossible to follow twist"){
+        Vb.w = -5.43;
+        Vb.v = {3.56,5.0};
+        CHECK_THROWS(bot.inverse_kin(Vb));
+}
 }

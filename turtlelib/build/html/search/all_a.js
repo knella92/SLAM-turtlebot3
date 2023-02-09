@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['x_20',['x',['../structturtlelib_1_1Vector2D.html#a8e675b8f19a35056218cbb41f7cb4341',1,'turtlelib::Vector2D']]]
+  ['q_27',['q',['../classturtlelib_1_1DiffDrive.html#a947334d2583ab1b9597589dcc05ee088',1,'turtlelib::DiffDrive']]]
 ];

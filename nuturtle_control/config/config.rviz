@@ -72,39 +72,6 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_footprint:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        base_scan:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        caster_back_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        imu_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        wheel_left_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        wheel_right_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
       Mass Properties:
         Inertia: false
         Mass: false
@@ -136,20 +103,6 @@ Visualization Manager:
           Value: true
         odom:
           Value: true
-        red/base_footprint:
-          Value: false
-        red/base_link:
-          Value: false
-        red/base_scan:
-          Value: false
-        red/caster_back_link:
-          Value: false
-        red/imu_link:
-          Value: false
-        red/wheel_left_link:
-          Value: false
-        red/wheel_right_link:
-          Value: false
       Marker Scale: 1
       Name: TF
       Show Arrows: false
@@ -170,25 +123,13 @@ Visualization Manager:
                   {}
                 blue/wheel_right_link:
                   {}
-          red/base_footprint:
-            red/base_link:
-              red/base_scan:
-                {}
-              red/caster_back_link:
-                {}
-              red/imu_link:
-                {}
-              red/wheel_left_link:
-                {}
-              red/wheel_right_link:
-                {}
       Update Interval: 0
       Value: true
     - Class: rviz_default_plugins/MarkerArray
       Enabled: true
       Name: MarkerArray
       Namespaces:
-        "": true
+        {}
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -273,7 +214,7 @@ Visualization Manager:
           Value: true
         Value: false
       Enabled: true
-      Keep: 100
+      Keep: 50
       Name: Odometry
       Position Tolerance: 0.10000000149011612
       Shape:
@@ -282,8 +223,8 @@ Visualization Manager:
         Axes Radius: 0.10000000149011612
         Color: 255; 25; 0
         Head Length: 0.10000000149011612
-        Head Radius: 0.10000000149011612
-        Shaft Length: 0.5
+        Head Radius: 0.05000000074505806
+        Shaft Length: 0.20000000298023224
         Shaft Radius: 0.019999999552965164
         Value: Arrow
       Topic:
@@ -298,7 +239,7 @@ Visualization Manager:
       Enabled: true
       Name: MarkerArray
       Namespaces:
-        "": true
+        {}
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -352,7 +293,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 7.26504373550415
+      Distance: 3.5114095211029053
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -388,5 +329,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1200
-  X: 341
-  Y: 220
+  X: 80
+  Y: 85

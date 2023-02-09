@@ -50,10 +50,11 @@ install(
     DESTINATION lib/cmake/${PROJECT_NAME}
 )
 
-# find_package(Doxygen)
-# set(DOXYGEN_USE_MDFILE_AS_MAINPAGE README.md) # Use the readme in your doxygen docs
-# doxygen_add_docs(doxygen include/ src/ README.md ALL)
-
+if(NOT CMAKE_CROSSCOMPILING)
+  find_package(Doxygen)
+  set(DOXYGEN_USE_MDFILE_AS_MAINPAGE README.md) # Use the readme in your doxygen docs
+  doxygen_add_docs(doxygen include/ src/ README.md ALL)
+endif()
 
 
 # Use the cmake testing functionality. A test is just an executable.

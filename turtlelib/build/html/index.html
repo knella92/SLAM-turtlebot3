@@ -76,69 +76,106 @@ Components</h1>
 Conceptual Questions</h1>
 <ol type="1">
 <li>We need to be able to ~normalize~ Vector2D objects (i.e., find the unit vector in the direction of a given Vector2D):<ul>
-<li><p class="startli">Propose three different designs for implementing the ~normalize~ functionality</p>
-<p class="startli">Design 1)</p>
-<p class="startli">Vector2D normalize(const Vector2D* vec) { double mag{}; Vector2D n_vec; mag = sqrt(vec.x*vec.x + vec.y*vec.y); n_vec.x = vec.x/mag; <br  />
- n_vec.y = vec.y/mag; return n_vec; }</p>
+<li>Propose three different designs for implementing the ~normalize~ functionality<ul>
+<li>Design 1)</li>
+<li>Vector2D normalize(const &amp;Vector2D vec)</li>
+<li>{<ul>
+<li>double mag{};</li>
+<li>Vector2D n_vec;</li>
+<li>mag = sqrt(vec.x*vec.x + vec.y*vec.y);</li>
+<li>n_vec.x = vec.x/mag; <br  />
+</li>
+<li>n_vec.y = vec.y/mag;</li>
+<li>return n_vec;</li>
+</ul>
+</li>
+<li>}</li>
+<li>Design 2)</li>
+<li>Vector2D normalize(const Vector2D vec)</li>
+<li>{<ul>
+<li>double mag{};</li>
+<li>Vector2D n_vec;</li>
+<li>mag = pow(pow(tw.x, 2) + pow(tw.y, 2), 0.5);</li>
+<li>n_vec.x = vec.x/mag;</li>
+<li>n_vec.y = vec.y/mag;</li>
+<li>return n_vec;</li>
+</ul>
+</li>
+<li>}</li>
+<li>Design 3)</li>
+<li>Vector2D normalize(Vector2D vec)</li>
+<li>{<ul>
+<li>double mag{};</li>
+<li>mag = pow((pow(vec.x,2) + pow(vec.y,2)), 0.5);</li>
+<li>vec.x /= mag;</li>
+<li>vec.y /= mag;</li>
+<li>return vec;</li>
+</ul>
+</li>
+<li>}</li>
+</ul>
+</li>
+<li>Discuss the pros and cons of each proposed method, in light of the C++ Core Guidelines.<ul>
+<li>Design 1)<ul>
+<li>Pros:<ul>
+<li>Uses pointer so doesn't need to make a copy of the value to run the function.</li>
+<li>Uses const keyword with pointer to guarantee no change of the value in memory.</li>
+</ul>
+</li>
+<li>Cons:<ul>
+<li>Have to create new object, increasing overhead and memory usage.</li>
+<li>Have to create pointer variable, increasing chance of value change.</li>
+</ul>
 </li>
 </ul>
 </li>
-</ol>
-<pre class="fragment">  Design 2)
-
-  Vector2D normalize(const Vector2D vec)
-  {
-     double mag{};
-     Vector2D n_vec;
-     mag = pow(pow(tw.x, 2) + pow(tw.y, 2), 0.5);
-     n_vec.x = vec.x/mag;
-     n_vec.y = vec.y/mag;
-     return n_vec;
-  }
-
-
-  Design 3)
-
-  Vector2D normalize(Vector2D vec)
-  {
-     double mag{};
-     mag = pow((pow(vec.x,2) + pow(vec.y,2)), 0.5);
-     vec.x /= mag;
-     vec.y /= mag;
-     return vec;
-  }
-</pre><ul>
-<li><p class="startli">Discuss the pros and cons of each proposed method, in light of the C++ Core Guidelines.</p>
-<p class="startli">Design 1) Pros: -Uses pointer so doesn't need to make a copy of the value to run the function. -Uses const keyword with pointer to guarantee no change of the value in memory.</p>
-<p class="startli">Cons: Have to create new object, increasing overhead and memory usage. Have to create pointer variable, increasing chance of value change.</p>
-<p class="startli">Design 2) Pros: -Uses the input parameter uses const keyword to indicate that it will not be changed (immutable)</p>
-<p class="startli">Cons: -Can't do anything to vec so you have to create and initialize a new struct, increasing computation time and memory usage</p>
+<li>Design 2)<ul>
+<li>Pros:<ul>
+<li>Uses the input parameter uses const keyword to indicate that it will not be changed (immutable).</li>
+</ul>
+</li>
+<li>Cons:<ul>
+<li>Can't do anything to vec so you have to create and initialize a new struct, increasing computation time and memory usage.</li>
+</ul>
 </li>
 </ul>
-<pre class="fragment">  Design 3)
-  Pros:
-     -Don't have to create and initialize a new Vector2D struct, can just return the parameter after it's been acted on.
-
-  Cons:
-     -This may cause confusion since the function itself looks like it's changing the object's vec data, however it's just using the local variable.
-</pre><ul>
-<li><p class="startli">Which of the methods would you implement and why?</p>
-<p class="startli">I would implement Design 3 - don't have to worry about creating pointers or new objects.</p>
+</li>
+<li>Design 3)<ul>
+<li>Pros:<ul>
+<li>Don't have to create and initialize a new Vector2D struct, can just return the parameter after it's been acted on.</li>
+</ul>
+</li>
+<li>Cons:<ul>
+<li>This may cause confusion since the function itself looks like it's changing the object's vec data, however it's just using the local variable.</li>
+</ul>
 </li>
 </ul>
-<p>What is the difference between a class and a struct in C++?</p>
-<p>The difference is the default accessibility of its members methods. They are public in a struct while private in a class. Other than that there are no differences.</p>
-<ol type="1">
-<li><p class="startli">Why is Vector2D a struct and Transform2D a Class (refer to at least 2 specific C++ core guidelines in your answer)?</p>
-<p class="startli">Vector2D's variables are public and therefore can be a struct by default, while Transform2D has private variables.</p>
 </li>
-<li><p class="startli">Why are some of the constructors in Transform2D explicit (refer to a specific C++ core guideline in your answer)?</p>
-<p class="startli">They are single argument constructors, which should be made explicit according to C++ core guidelines to avoid unintended conversions.</p>
+</ul>
 </li>
-<li><p class="startli">Why is Transform2D::inv() declared const while Transform2D::operator*=() is not?</p><ul>
+<li>Which of the methods would you implement and why?<ul>
+<li>I would implement Design 3 - don't have to worry about creating pointers or new objects</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>What is the difference between a class and a struct in C++?<ul>
+<li>The difference is the default accessibility of its members methods. They are public in a struct while private in a class. Other than that there are no differences.</li>
+</ul>
+</li>
+<li>Why is Vector2D a struct and Transform2D a Class (refer to at least 2 specific C++ core guidelines in your answer)?<ul>
+<li>Vector2D's variables are public and therefore can be a struct by default, while Transform2D has private variables.</li>
+</ul>
+</li>
+<li>Why are some of the constructors in Transform2D explicit (refer to a specific C++ core guideline in your answer)?<ul>
+<li>They are single argument constructors, which should be made explicit according to C++ core guidelines to avoid unintended conversions.</li>
+</ul>
+</li>
+<li>Why is Transform2D::inv() declared const while Transform2D::operator*=() is not?<ul>
 <li>Refer to [[<a href="https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#con-constants-and-immutability">https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#con-constants-and-immutability</a>][C++ Core Guidelines (Constants and Immutability)]] in your answer</li>
+<li>inv() is declared constant to guarantee that we do not change the object's member variables within the function. operator*= is not because we</li>
+<li>are directly altering the internals of the left hand side of the operation, using const would prevent that and throw an error. </li>
 </ul>
-<p class="startli">inv() is declared constant to guarantee that we do not change the object's member variables within the function. operator*= is not because we are directly altering the internals of the left hand side of the operation, using const would prevent that and throw an error. </p>
 </li>
 </ol>
 </div></div><!-- PageDoc -->

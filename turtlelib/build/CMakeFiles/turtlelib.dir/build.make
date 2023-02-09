@@ -83,17 +83,33 @@ CMakeFiles/turtlelib.dir/src/rigid2d.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/turtlelib.dir/src/rigid2d.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/kevin/workspaces/SLAM/hw1/src/nuturtle-knella92/turtlelib/src/rigid2d.cpp -o CMakeFiles/turtlelib.dir/src/rigid2d.cpp.s
 
+CMakeFiles/turtlelib.dir/src/diff_drive.cpp.o: CMakeFiles/turtlelib.dir/flags.make
+CMakeFiles/turtlelib.dir/src/diff_drive.cpp.o: ../src/diff_drive.cpp
+CMakeFiles/turtlelib.dir/src/diff_drive.cpp.o: CMakeFiles/turtlelib.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/kevin/workspaces/SLAM/hw1/src/nuturtle-knella92/turtlelib/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/turtlelib.dir/src/diff_drive.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/turtlelib.dir/src/diff_drive.cpp.o -MF CMakeFiles/turtlelib.dir/src/diff_drive.cpp.o.d -o CMakeFiles/turtlelib.dir/src/diff_drive.cpp.o -c /home/kevin/workspaces/SLAM/hw1/src/nuturtle-knella92/turtlelib/src/diff_drive.cpp
+
+CMakeFiles/turtlelib.dir/src/diff_drive.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/turtlelib.dir/src/diff_drive.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/kevin/workspaces/SLAM/hw1/src/nuturtle-knella92/turtlelib/src/diff_drive.cpp > CMakeFiles/turtlelib.dir/src/diff_drive.cpp.i
+
+CMakeFiles/turtlelib.dir/src/diff_drive.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/turtlelib.dir/src/diff_drive.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/kevin/workspaces/SLAM/hw1/src/nuturtle-knella92/turtlelib/src/diff_drive.cpp -o CMakeFiles/turtlelib.dir/src/diff_drive.cpp.s
+
 # Object files for target turtlelib
 turtlelib_OBJECTS = \
-"CMakeFiles/turtlelib.dir/src/rigid2d.cpp.o"
+"CMakeFiles/turtlelib.dir/src/rigid2d.cpp.o" \
+"CMakeFiles/turtlelib.dir/src/diff_drive.cpp.o"
 
 # External object files for target turtlelib
 turtlelib_EXTERNAL_OBJECTS =
 
 libturtlelib.a: CMakeFiles/turtlelib.dir/src/rigid2d.cpp.o
+libturtlelib.a: CMakeFiles/turtlelib.dir/src/diff_drive.cpp.o
 libturtlelib.a: CMakeFiles/turtlelib.dir/build.make
 libturtlelib.a: CMakeFiles/turtlelib.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/kevin/workspaces/SLAM/hw1/src/nuturtle-knella92/turtlelib/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX static library libturtlelib.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/kevin/workspaces/SLAM/hw1/src/nuturtle-knella92/turtlelib/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX static library libturtlelib.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/turtlelib.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/turtlelib.dir/link.txt --verbose=$(VERBOSE)
 

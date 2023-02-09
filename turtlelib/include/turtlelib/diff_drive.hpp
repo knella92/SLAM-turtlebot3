@@ -54,8 +54,17 @@ namespace turtlelib
             
  
 
-            /// \brief 2D H pseudo-inverse matrix
-            double hpi00, hpi01, hpi10, hpi11;
+            /// \brief Moore-Penrose pseudomatrix element [0][0]
+            double hpi00;
+            
+            /// \brief Moore-Penrose pseudomatrix element [0][1]
+            double hpi01;
+
+            /// \brief Moore-Penrose pseudomatrix element [1][0]
+            double hpi10;
+
+            /// \brief Moore-Penrose pseudomatrix element [1][1]
+            double hpi11;
 
 
 
@@ -91,9 +100,6 @@ namespace turtlelib
             /// \param phi_rp - new right wheel position (phi_r')
             /// \return claculated body twist
             turtlelib::Twist2D forward_kin(double phi_lp, double phi_rp);
-
-
-            
 
     };
 

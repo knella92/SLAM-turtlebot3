@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['y_44',['y',['../structturtlelib_1_1Vector2D.html#a841c32accb9a4fa36a302c57b88ed9a1',1,'turtlelib::Vector2D']]]
+  ['theta_83',['theta',['../structturtlelib_1_1Config.html#a6debf6692936334c8bb43924d9837297',1,'turtlelib::Config']]]
 ];

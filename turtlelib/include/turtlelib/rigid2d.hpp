@@ -191,10 +191,32 @@ namespace turtlelib
     {
     private:
 
-        /// \brief variables to store members of the transformation matrix
-        double t00, t01, t02;
-        double t10, t11, t12;
-        double t20, t21, t22;
+        /// \brief Transformation matrix element [0][0]
+        double t00;
+
+        /// \brief Transformation matrix element [0][1]
+        double t01;
+
+        /// \brief Transformation matrix element [0][2]
+        double t02;
+
+        /// \brief Transformation matrix element [1][0]
+        double t10;
+
+        /// \brief Transformation matrix element [1][1]
+        double t11;
+
+        /// \brief Transformation matrix element [1][2]
+        double t12;
+
+        /// \brief Transformation matrix element [2][0]
+        double t20;
+
+        /// \brief Transformation matrix element [2][1]
+        double t21;
+
+        /// \brief Transformation matrix element [2][2]
+        double t22;
 
     public:
         /// \brief Create an identity transformation

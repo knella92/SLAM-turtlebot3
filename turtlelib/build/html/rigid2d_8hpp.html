@@ -77,15 +77,22 @@ $(function() {
 <p>Two-dimensional rigid body transformations.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;iosfwd&gt;</code><br />
-<code>#include &lt;iostream&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for rigid2d.hpp:</div>
 <div class="dyncontent">
 <div class="center"><img src="rigid2d_8hpp__incl.png" border="0" usemap="#ainclude_2turtlelib_2rigid2d_8hpp" alt=""/></div>
 <map name="ainclude_2turtlelib_2rigid2d_8hpp" id="ainclude_2turtlelib_2rigid2d_8hpp">
 <area shape="rect" title="Two&#45;dimensional rigid body transformations." alt="" coords="5,5,207,32"/>
-<area shape="rect" title=" " alt="" coords="25,80,91,107"/>
-<area shape="rect" title=" " alt="" coords="115,80,195,107"/>
+<area shape="rect" title=" " alt="" coords="73,80,139,107"/>
+</map>
+</div>
+</div><div class="textblock"><div class="dynheader">
+This graph shows which files directly or indirectly include this file:</div>
+<div class="dyncontent">
+<div class="center"><img src="rigid2d_8hpp__dep__incl.png" border="0" usemap="#ainclude_2turtlelib_2rigid2d_8hppdep" alt=""/></div>
+<map name="ainclude_2turtlelib_2rigid2d_8hppdep" id="ainclude_2turtlelib_2rigid2d_8hppdep">
+<area shape="rect" title="Two&#45;dimensional rigid body transformations." alt="" coords="5,5,207,32"/>
+<area shape="rect" href="diff__drive_8hpp.html" title="Kinematics of Differential Drive robots." alt="" coords="31,80,181,121"/>
 </map>
 </div>
 </div>
@@ -97,6 +104,7 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A 2-Dimensional Vector.  <a href="structturtlelib_1_1Vector2D.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structturtlelib_1_1Twist2D.html">turtlelib::Twist2D</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A twist in two dimensions.  <a href="structturtlelib_1_1Twist2D.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classturtlelib_1_1Transform2D.html">turtlelib::Transform2D</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">a rigid body transformation in 2 dimensions  <a href="classturtlelib_1_1Transform2D.html#details">More...</a><br /></td></tr>
@@ -113,9 +121,33 @@ Functions</h2></td></tr>
 <tr class="memitem:a61c288863ff74346e761950749593acd"><td class="memItemLeft" align="right" valign="top">constexpr double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rigid2d_8hpp.html#a61c288863ff74346e761950749593acd">turtlelib::rad2deg</a> (double rad)</td></tr>
 <tr class="memdesc:a61c288863ff74346e761950749593acd"><td class="mdescLeft">&#160;</td><td class="mdescRight">convert radians to degrees  <a href="rigid2d_8hpp.html#a61c288863ff74346e761950749593acd">More...</a><br /></td></tr>
 <tr class="separator:a61c288863ff74346e761950749593acd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af25d569600bec0f9c92b14674326203b"><td class="memItemLeft" align="right" valign="top"><a id="af25d569600bec0f9c92b14674326203b"></a>
-Vector2D&#160;</td><td class="memItemRight" valign="bottom"><b>turtlelib::normalize</b> (Vector2D v)</td></tr>
-<tr class="separator:af25d569600bec0f9c92b14674326203b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a091938661eb45f72f6e2e7f08f3a53c3"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rigid2d_8hpp.html#a091938661eb45f72f6e2e7f08f3a53c3">turtlelib::dot</a> (Vector2D &amp;vec1, Vector2D &amp;vec2)</td></tr>
+<tr class="memdesc:a091938661eb45f72f6e2e7f08f3a53c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute the dot product of two 2D vectors  <a href="rigid2d_8hpp.html#a091938661eb45f72f6e2e7f08f3a53c3">More...</a><br /></td></tr>
+<tr class="separator:a091938661eb45f72f6e2e7f08f3a53c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66e70813473124e3448fefb57416c8ec"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rigid2d_8hpp.html#a66e70813473124e3448fefb57416c8ec">turtlelib::magnitude</a> (Vector2D &amp;vec)</td></tr>
+<tr class="memdesc:a66e70813473124e3448fefb57416c8ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute the magnitude of a 2D vector  <a href="rigid2d_8hpp.html#a66e70813473124e3448fefb57416c8ec">More...</a><br /></td></tr>
+<tr class="separator:a66e70813473124e3448fefb57416c8ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad85412acb68aad05958f927d1739c803"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rigid2d_8hpp.html#ad85412acb68aad05958f927d1739c803">turtlelib::angle</a> (Vector2D &amp;vec1, Vector2D &amp;vec2)</td></tr>
+<tr class="memdesc:ad85412acb68aad05958f927d1739c803"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute the angle between two 2D vectors  <a href="rigid2d_8hpp.html#ad85412acb68aad05958f927d1739c803">More...</a><br /></td></tr>
+<tr class="separator:ad85412acb68aad05958f927d1739c803"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a008753fc47122b4f87df0c1d973fc2c0"><td class="memItemLeft" align="right" valign="top">Vector2D&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rigid2d_8hpp.html#a008753fc47122b4f87df0c1d973fc2c0">turtlelib::normalize</a> (Vector2D v)</td></tr>
+<tr class="memdesc:a008753fc47122b4f87df0c1d973fc2c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">output the normalized 2D vector of the input parameter  <a href="rigid2d_8hpp.html#a008753fc47122b4f87df0c1d973fc2c0">More...</a><br /></td></tr>
+<tr class="separator:a008753fc47122b4f87df0c1d973fc2c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab843653c7e93b5be92f291027bb7973f"><td class="memItemLeft" align="right" valign="top">Vector2D&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rigid2d_8hpp.html#ab843653c7e93b5be92f291027bb7973f">turtlelib::operator+</a> (Vector2D lhs, const Vector2D rhs)</td></tr>
+<tr class="memdesc:ab843653c7e93b5be92f291027bb7973f"><td class="mdescLeft">&#160;</td><td class="mdescRight">adds two vectors together, returning their sum  <a href="rigid2d_8hpp.html#ab843653c7e93b5be92f291027bb7973f">More...</a><br /></td></tr>
+<tr class="separator:ab843653c7e93b5be92f291027bb7973f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99fe3917b8c3ee2c883917c75fddb999"><td class="memItemLeft" align="right" valign="top">Vector2D&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rigid2d_8hpp.html#a99fe3917b8c3ee2c883917c75fddb999">turtlelib::operator-</a> (Vector2D lhs, const Vector2D rhs)</td></tr>
+<tr class="memdesc:a99fe3917b8c3ee2c883917c75fddb999"><td class="mdescLeft">&#160;</td><td class="mdescRight">gives difference between two vectors together  <a href="rigid2d_8hpp.html#a99fe3917b8c3ee2c883917c75fddb999">More...</a><br /></td></tr>
+<tr class="separator:a99fe3917b8c3ee2c883917c75fddb999"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9f75384ac962722c565435380e0f2c7"><td class="memItemLeft" align="right" valign="top">Vector2D&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rigid2d_8hpp.html#ab9f75384ac962722c565435380e0f2c7">turtlelib::operator*</a> (double lhs, const Vector2D rhs)</td></tr>
+<tr class="memdesc:ab9f75384ac962722c565435380e0f2c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">gives product of left scalar multiplication of 2D vector  <a href="rigid2d_8hpp.html#ab9f75384ac962722c565435380e0f2c7">More...</a><br /></td></tr>
+<tr class="separator:ab9f75384ac962722c565435380e0f2c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f3673ae96bee1edf31ac5e148924e33"><td class="memItemLeft" align="right" valign="top">Vector2D&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rigid2d_8hpp.html#a7f3673ae96bee1edf31ac5e148924e33">turtlelib::operator*</a> (Vector2D lhs, const double rhs)</td></tr>
+<tr class="memdesc:a7f3673ae96bee1edf31ac5e148924e33"><td class="mdescLeft">&#160;</td><td class="mdescRight">gives product of right scalar multiplication of 2D vector  <a href="rigid2d_8hpp.html#a7f3673ae96bee1edf31ac5e148924e33">More...</a><br /></td></tr>
+<tr class="separator:a7f3673ae96bee1edf31ac5e148924e33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5346908b3d20a3e4c4bddbbbfbf8b44"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rigid2d_8hpp.html#aa5346908b3d20a3e4c4bddbbbfbf8b44">turtlelib::normalize_angle</a> (double rad)</td></tr>
+<tr class="memdesc:aa5346908b3d20a3e4c4bddbbbfbf8b44"><td class="mdescLeft">&#160;</td><td class="mdescRight">output the normalized angle of the input paramater  <a href="rigid2d_8hpp.html#aa5346908b3d20a3e4c4bddbbbfbf8b44">More...</a><br /></td></tr>
+<tr class="separator:aa5346908b3d20a3e4c4bddbbbfbf8b44"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeaaf8b0d1fe6cae379d45ac31f418f6d"><td class="memItemLeft" align="right" valign="top"><a id="aeaaf8b0d1fe6cae379d45ac31f418f6d"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rigid2d_8hpp.html#aeaaf8b0d1fe6cae379d45ac31f418f6d">turtlelib::operator&lt;&lt;</a> (std::ostream &amp;os, const Vector2D &amp;v)</td></tr>
 <tr class="memdesc:aeaaf8b0d1fe6cae379d45ac31f418f6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">output a 2 dimensional vector as [xcomponent ycomponent] os - stream to output to v - the vector to print <br /></td></tr>
@@ -130,16 +162,18 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="
 std::istream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rigid2d_8hpp.html#a93ae97798c822cf263c95cf511e9767e">turtlelib::operator&gt;&gt;</a> (std::istream &amp;is, Transform2D &amp;tf)</td></tr>
 <tr class="memdesc:a93ae97798c822cf263c95cf511e9767e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a transformation from stdin Should be able to read input either as output by operator&lt;&lt; or as 3 numbers (degrees, dx, dy) separated by spaces or newlines For example: 90 2 3. <br /></td></tr>
 <tr class="separator:a93ae97798c822cf263c95cf511e9767e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acb8b04fad621779b564664cf1e22836d"><td class="memItemLeft" align="right" valign="top">Transform2D&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rigid2d_8hpp.html#acb8b04fad621779b564664cf1e22836d">turtlelib::operator*</a> (Transform2D lhs, const Transform2D &amp;rhs)</td></tr>
-<tr class="memdesc:acb8b04fad621779b564664cf1e22836d"><td class="mdescLeft">&#160;</td><td class="mdescRight">multiply two transforms together, returning their composition  <a href="rigid2d_8hpp.html#acb8b04fad621779b564664cf1e22836d">More...</a><br /></td></tr>
-<tr class="separator:acb8b04fad621779b564664cf1e22836d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20b5f7907e660e6ed153c9531f9a7a87"><td class="memItemLeft" align="right" valign="top">Transform2D&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rigid2d_8hpp.html#a20b5f7907e660e6ed153c9531f9a7a87">turtlelib::operator*</a> (Transform2D lhs, const Transform2D &amp;rhs)</td></tr>
+<tr class="memdesc:a20b5f7907e660e6ed153c9531f9a7a87"><td class="mdescLeft">&#160;</td><td class="mdescRight">multiply two transforms together, returning their composition  <a href="rigid2d_8hpp.html#a20b5f7907e660e6ed153c9531f9a7a87">More...</a><br /></td></tr>
+<tr class="separator:a20b5f7907e660e6ed153c9531f9a7a87"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6f5caac97404b05f6ff38c012547ff72"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rigid2d_8hpp.html#a6f5caac97404b05f6ff38c012547ff72">turtlelib::operator&lt;&lt;</a> (std::ostream &amp;os, const Twist2D &amp;tw)</td></tr>
 <tr class="memdesc:a6f5caac97404b05f6ff38c012547ff72"><td class="mdescLeft">&#160;</td><td class="mdescRight">should print a human readable version of the Twist: An example output: [1 3 5]  <a href="rigid2d_8hpp.html#a6f5caac97404b05f6ff38c012547ff72">More...</a><br /></td></tr>
 <tr class="separator:a6f5caac97404b05f6ff38c012547ff72"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a345f8b47dfdeaede6e1247719825a8f3"><td class="memItemLeft" align="right" valign="top"><a id="a345f8b47dfdeaede6e1247719825a8f3"></a>
-std::istream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rigid2d_8hpp.html#a345f8b47dfdeaede6e1247719825a8f3">turtlelib::operator&gt;&gt;</a> (std::istream &amp;is, Twist2D &amp;tw)</td></tr>
-<tr class="memdesc:a345f8b47dfdeaede6e1247719825a8f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a twist from stdin Should be able to read input either as output by operator&lt;&lt; or as 3 numbers (w x y) separated by spaces For example: 1 2 3. <br /></td></tr>
+<tr class="memitem:a345f8b47dfdeaede6e1247719825a8f3"><td class="memItemLeft" align="right" valign="top">std::istream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rigid2d_8hpp.html#a345f8b47dfdeaede6e1247719825a8f3">turtlelib::operator&gt;&gt;</a> (std::istream &amp;is, Twist2D &amp;tw)</td></tr>
+<tr class="memdesc:a345f8b47dfdeaede6e1247719825a8f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a twist from stdin Should be able to read input either as output by operator&lt;&lt; or as 3 numbers (w x y) separated by spaces For example: 1 2 3.  <a href="rigid2d_8hpp.html#a345f8b47dfdeaede6e1247719825a8f3">More...</a><br /></td></tr>
 <tr class="separator:a345f8b47dfdeaede6e1247719825a8f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e2e328cf76d8a8cf1a36086aa9e0501"><td class="memItemLeft" align="right" valign="top">Transform2D&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rigid2d_8hpp.html#a3e2e328cf76d8a8cf1a36086aa9e0501">turtlelib::integrate_twist</a> (Twist2D Vb)</td></tr>
+<tr class="memdesc:a3e2e328cf76d8a8cf1a36086aa9e0501"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the transformation corresponding to a rigid body following a constant twist (in its original body frame) for one time unit.  <a href="rigid2d_8hpp.html#a3e2e328cf76d8a8cf1a36086aa9e0501">More...</a><br /></td></tr>
+<tr class="separator:a3e2e328cf76d8a8cf1a36086aa9e0501"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -204,6 +238,44 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 
 </div>
 </div>
+<a id="ad85412acb68aad05958f927d1739c803"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad85412acb68aad05958f927d1739c803">&#9670;&nbsp;</a></span>angle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double turtlelib::angle </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structturtlelib_1_1Vector2D.html">Vector2D</a> &amp;&#160;</td>
+          <td class="paramname"><em>vec1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structturtlelib_1_1Vector2D.html">Vector2D</a> &amp;&#160;</td>
+          <td class="paramname"><em>vec2</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>compute the angle between two 2D vectors </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">vec1</td><td>- first vector </td></tr>
+    <tr><td class="paramname">vec2</td><td>- second vector </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>- angle between the vectors </dd></dl>
+
+</div>
+</div>
 <a id="a4d87f8e178c9a51fb90ae09d3ed2457e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4d87f8e178c9a51fb90ae09d3ed2457e">&#9670;&nbsp;</a></span>deg2rad()</h2>
 
@@ -239,14 +311,198 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 
 </div>
 </div>
-<a id="acb8b04fad621779b564664cf1e22836d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acb8b04fad621779b564664cf1e22836d">&#9670;&nbsp;</a></span>operator*()</h2>
+<a id="a091938661eb45f72f6e2e7f08f3a53c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a091938661eb45f72f6e2e7f08f3a53c3">&#9670;&nbsp;</a></span>dot()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classturtlelib_1_1Transform2D.html">turtlelib::Transform2D</a> turtlelib::operator* </td>
+          <td class="memname">double turtlelib::dot </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structturtlelib_1_1Vector2D.html">Vector2D</a> &amp;&#160;</td>
+          <td class="paramname"><em>vec1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structturtlelib_1_1Vector2D.html">Vector2D</a> &amp;&#160;</td>
+          <td class="paramname"><em>vec2</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>compute the dot product of two 2D vectors </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">vec1</td><td>- first vector </td></tr>
+    <tr><td class="paramname">vec2</td><td>- second vector </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>- dot product with double point precision </dd></dl>
+
+</div>
+</div>
+<a id="a3e2e328cf76d8a8cf1a36086aa9e0501"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3e2e328cf76d8a8cf1a36086aa9e0501">&#9670;&nbsp;</a></span>integrate_twist()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Transform2D turtlelib::integrate_twist </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structturtlelib_1_1Twist2D.html">Twist2D</a>&#160;</td>
+          <td class="paramname"><em>Vb</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Computes the transformation corresponding to a rigid body following a constant twist (in its original body frame) for one time unit. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Vb</td><td>- constant twist within original body frame of rigid body </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>transformation corresponding new body frame from original body frame </dd></dl>
+
+</div>
+</div>
+<a id="a66e70813473124e3448fefb57416c8ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a66e70813473124e3448fefb57416c8ec">&#9670;&nbsp;</a></span>magnitude()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double turtlelib::magnitude </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structturtlelib_1_1Vector2D.html">Vector2D</a> &amp;&#160;</td>
+          <td class="paramname"><em>vec</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>compute the magnitude of a 2D vector </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">vec</td><td>- vector </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>- magnitude of the vector </dd></dl>
+
+</div>
+</div>
+<a id="a008753fc47122b4f87df0c1d973fc2c0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a008753fc47122b4f87df0c1d973fc2c0">&#9670;&nbsp;</a></span>normalize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Vector2D turtlelib::normalize </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structturtlelib_1_1Vector2D.html">Vector2D</a>&#160;</td>
+          <td class="paramname"><em>v</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>output the normalized 2D vector of the input parameter </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">v</td><td>- 2D vector input </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>normalized vector </dd></dl>
+
+</div>
+</div>
+<a id="aa5346908b3d20a3e4c4bddbbbfbf8b44"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5346908b3d20a3e4c4bddbbbfbf8b44">&#9670;&nbsp;</a></span>normalize_angle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double turtlelib::normalize_angle </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>rad</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>output the normalized angle of the input paramater </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">rad</td><td>- angular rotation input </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>normalized angular rotation </dd></dl>
+
+</div>
+</div>
+<a id="ab9f75384ac962722c565435380e0f2c7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9f75384ac962722c565435380e0f2c7">&#9670;&nbsp;</a></span>operator*() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Vector2D turtlelib::operator* </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structturtlelib_1_1Vector2D.html">Vector2D</a>&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>gives product of left scalar multiplication of 2D vector </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">lhs</td><td>- scalar value (left side) </td></tr>
+    <tr><td class="paramname">rhs</td><td>- 2D vector to be multiplied (right side) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>- the final 2D vector </dd></dl>
+
+</div>
+</div>
+<a id="a20b5f7907e660e6ed153c9531f9a7a87"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20b5f7907e660e6ed153c9531f9a7a87">&#9670;&nbsp;</a></span>operator*() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Transform2D turtlelib::operator* </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classturtlelib_1_1Transform2D.html">Transform2D</a>&#160;</td>
           <td class="paramname"><em>lhs</em>, </td>
@@ -274,6 +530,120 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><a class="el
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the composition of the two transforms HINT: This function should be implemented in terms of *= </dd></dl>
+
+</div>
+</div>
+<a id="a7f3673ae96bee1edf31ac5e148924e33"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f3673ae96bee1edf31ac5e148924e33">&#9670;&nbsp;</a></span>operator*() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Vector2D turtlelib::operator* </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structturtlelib_1_1Vector2D.html">Vector2D</a>&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>gives product of right scalar multiplication of 2D vector </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">lhs</td><td>- 2D vector (left side) </td></tr>
+    <tr><td class="paramname">rhs</td><td>- scalar value to multiply by (right side) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>- the final 2D vector </dd></dl>
+
+</div>
+</div>
+<a id="ab843653c7e93b5be92f291027bb7973f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab843653c7e93b5be92f291027bb7973f">&#9670;&nbsp;</a></span>operator+()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Vector2D turtlelib::operator+ </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structturtlelib_1_1Vector2D.html">Vector2D</a>&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structturtlelib_1_1Vector2D.html">Vector2D</a>&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>adds two vectors together, returning their sum </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">lhs</td><td>- left hand side of operator </td></tr>
+    <tr><td class="paramname">rhs</td><td>- right hand side of operator </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>- the vector sum </dd></dl>
+
+</div>
+</div>
+<a id="a99fe3917b8c3ee2c883917c75fddb999"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99fe3917b8c3ee2c883917c75fddb999">&#9670;&nbsp;</a></span>operator-()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Vector2D turtlelib::operator- </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structturtlelib_1_1Vector2D.html">Vector2D</a>&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structturtlelib_1_1Vector2D.html">Vector2D</a>&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>gives difference between two vectors together </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">lhs</td><td>- left hand side of operator </td></tr>
+    <tr><td class="paramname">rhs</td><td>- right hand side of operator </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>- the vector difference </dd></dl>
 
 </div>
 </div>
@@ -351,8 +721,45 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 
 </div>
 </div>
+<a id="a345f8b47dfdeaede6e1247719825a8f3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a345f8b47dfdeaede6e1247719825a8f3">&#9670;&nbsp;</a></span>operator&gt;&gt;() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::istream &amp; turtlelib::operator&gt;&gt; </td>
+          <td>(</td>
+          <td class="paramtype">std::istream &amp;&#160;</td>
+          <td class="paramname"><em>is</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structturtlelib_1_1Twist2D.html">Twist2D</a> &amp;&#160;</td>
+          <td class="paramname"><em>tw</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Read a twist from stdin Should be able to read input either as output by operator&lt;&lt; or as 3 numbers (w x y) separated by spaces For example: 1 2 3. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">is</td><td>- input stream </td></tr>
+    <tr><td class="paramname">tw</td><td>- input twist </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a2b9ed1d35fe6b05ce5a496b256690326"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2b9ed1d35fe6b05ce5a496b256690326">&#9670;&nbsp;</a></span>operator&gt;&gt;()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b9ed1d35fe6b05ce5a496b256690326">&#9670;&nbsp;</a></span>operator&gt;&gt;() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">

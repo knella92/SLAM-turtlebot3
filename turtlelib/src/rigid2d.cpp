@@ -301,28 +301,16 @@ namespace turtlelib
             std::cout<<"under 0\n";
             if (rem > -0.5)
             {
-<<<<<<< HEAD
-                is>>w;
-=======
                 rad = rem*2.0*PI;
->>>>>>> task_F
             }
             else if (x < -0.5)
             {
-<<<<<<< HEAD
-                is>>v.x;
-=======
                 x = rem + 1.0;
                 rad = x*2.0*PI;
->>>>>>> task_F
             }
             else
             {
-<<<<<<< HEAD
-                is>>v.y;
-=======
                 rad = PI;
->>>>>>> task_F
             }
             return rad;
         }

@@ -180,13 +180,6 @@ private:
     message.data = count_;
     publisher_->publish(message);
 
-<<<<<<< HEAD
-    auto x = get_parameter("x").as_double();
-    auto y = get_parameter("y").as_double();
-
-    auto theta = get_parameter("theta").as_double();
-=======
->>>>>>> task_F
 
     // create and send transform between world and red robot
     tf2::Quaternion q;
@@ -255,20 +248,8 @@ private:
   {
     visualization_msgs::msg::MarkerArray all_obst;
 
-<<<<<<< HEAD
-    const std::vector<double> obstacles_x = get_parameter("obstacles/x").as_double_array();
-    const std::vector<double> obstacles_y = get_parameter("obstacles/y").as_double_array();
-    const double obstacles_r = get_parameter("obstacles/r").as_double();
-    if (obstacles_x.size() != obstacles_y.size()) {
-      rclcpp::shutdown();
-    }
-    const int size_x = obstacles_x.size();
-
-
-=======
     const int size_x = obstacles_x.size();
     rclcpp::Time stamp = get_clock()->now();
->>>>>>> task_F
     for (int i = 0; i < size_x; ++i) {
       visualization_msgs::msg::Marker obst;
       obst.header.frame_id = "nusim/world";

@@ -17,20 +17,11 @@
 #include <memory>
 
 #include "rclcpp/rclcpp.hpp"
-<<<<<<< HEAD
-#include "include/turtlelib"
-
-
-#include "std_msgs/msg/u_int64.hpp"
-#include "nusim/srv/reset.hpp"
-#include "nusim/srv/teleport.hpp"
-=======
 #include "turtlelib/diff_drive.hpp"
 #include "geometry_msgs/msg/twist.hpp"
 #include "nuturtlebot_msgs/msg/sensor_data.hpp"
 #include "nuturtlebot_msgs/msg/wheel_commands.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
->>>>>>> task_F
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_ros/transform_broadcaster.h"
@@ -39,13 +30,8 @@
 class ControlNode : public rclcpp::Node
 {
 public:
-<<<<<<< HEAD
-  SimNode()
-    : Node("turtle_control"), count_(0)
-=======
   ControlNode()
   : Node("turtle_control")
->>>>>>> task_F
   {
 
     //declare initial parameters
@@ -70,19 +56,8 @@ public:
     js_publisher_ = create_publisher<sensor_msgs::msg::JointState>("/joint_states", 40);
 
     // initialize subscribers
-<<<<<<< HEAD
-    vel_subscriber_ =
-      create_subscriber<geometry_msgs::msg::Twist>(
-      "/cmd_vel", 10,
-      std::bind(&ControlNode::cmd_callback, this, std::placeholders::_1));
-    sens_subscriber_ = create_subscriber<nuturtlebot_msgs::msg::SensorData>(
-      "/sensor_data", 10, std::bind(
-        &ControlNode::sens_callback, this,
-        std::placeholders::_1);)
-=======
     vel_subscriber_ = create_subscription<geometry_msgs::msg::Twist>("/cmd_vel", 10, std::bind(&ControlNode::vel_callback, this, std::placeholders::_1));
     sens_subscriber_ = create_subscription<nuturtlebot_msgs::msg::SensorData>("/sensor_data", 40, std::bind(&ControlNode::sens_callback, this, std::placeholders::_1));
->>>>>>> task_F
 
   }
 
