@@ -1,15 +1,18 @@
 /// \circle.cpp
-/// \brief Defines and launche nusim node with appropriate publishers and services
+/// \brief Defines and launches circle node that offers service to send a circular motion twist velocity command
 ///
 /// PARAMETERS:
-
+///     frequency (int): Rate of command velocity publishing
 /// PUBLISHES:
-
+///     (/cmd_vel) (Twist): Vector with x, y, and rotational velocities in radians/second to be converted to wheel commands
 /// SUBSCRIBES:
-
+///     none
 /// SERVERS:
-
+///     (/control) (Control): Service to input a desired circular motion (angular velocity (m/s) and raidus (m))
+///     (/reverse) (Empty): Service to reverse the current input motion
+///     (/stop) (Empty): Service to stop motion
 /// CLIENTS:
+///     none
 
 
 #include <functional>
