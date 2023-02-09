@@ -179,9 +179,16 @@ namespace turtlelib
     double Transform2D::rotation() const
     {
         double radians{};
-        // if acos(t00)
-        // almost_equal(t00,0) ? radians=acos(t11) : radians=asin(t10); // if cos(theta) = 0, use acos(cos(theta)), if not, use asin(sin(theta))
-        radians = acos(t00);
+        if((t00 > 0 || t00 < 0) && t10 > 0){
+            radians = acos(t00);
+        }
+        else if (t00 > 0 && t10 < 0){
+            radians = asin(t10);
+        }
+        else if (t00 < 0 && t10 < 0){
+            radians = -acos(t00);
+        }
+
         return radians;
     }
 

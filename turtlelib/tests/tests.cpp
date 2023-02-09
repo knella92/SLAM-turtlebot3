@@ -2,6 +2,7 @@
 #include <catch2/catch_template_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include "turtlelib/rigid2d.hpp"
+#include "turtlelib/diff_drive.hpp"
 #include <sstream>
 #include <string>
 #include <cmath>
@@ -10,6 +11,8 @@ using turtlelib::PI;
 using turtlelib::Transform2D;
 using turtlelib::Twist2D;
 using turtlelib::Vector2D;
+using turtlelib::DiffDrive;
+using turtlelib::Wheel_Vel;
 using std::stringstream;
 using Catch::Matchers::WithinAbs;
 using Catch::Matchers::WithinRel;
@@ -104,7 +107,7 @@ TEST_CASE("Operator - () ", "[operator]"){
 TEST_CASE(" Inverse transform 1", "[transform]"){
     const Transform2D T{{1.0,0.0},1.0};
 
-    CHECK_THAT(T.inv().rotation(), WithinRel(1.0));
+    CHECK_THAT(T.inv().rotation(), WithinRel(-1.0));
     CHECK_THAT(T.inv().translation().x, WithinRel(-0.5403, 0.0001));
     CHECK_THAT(T.inv().translation().y, WithinRel(0.84147, 0.0001));
 }
@@ -124,7 +127,7 @@ TEMPLATE_TEST_CASE("Operator - *= ", "[operator]", Transform2D){
         const Transform2D T2{{3.0,5.0},-3.0*PI/2.0};
         T1*=T2;
 
-        CHECK_THAT(T1.rotation(),WithinRel(3*PI/4.0)||WithinRel(-PI/2.0));
+        CHECK_THAT(T1.rotation(),WithinRel(3*PI/4.0, .0001));
         CHECK_THAT(T1.translation().x, WithinRel(-1.0-sqrt(2)));
         CHECK_THAT(T1.translation().y,WithinRel(2+4*sqrt(2)));
     }
@@ -134,7 +137,7 @@ TEMPLATE_TEST_CASE("Operator - *= ", "[operator]", Transform2D){
         const Transform2D T2{{-3.0,6.0},2.3};
         T1*=T2;
 
-        CHECK_THAT(T1.rotation(),WithinRel(2.217, 0.001)||WithinRel(-0.8412, 0.001));
+        CHECK_THAT(T1.rotation(),WithinRel(2.217, 0.001));
         CHECK_THAT(T1.translation().x, WithinRel(1.5089, 0.0001));
         CHECK_THAT(T1.translation().y,WithinRel(4.2285, 0.0001));
     }
@@ -144,7 +147,7 @@ TEMPLATE_TEST_CASE("Operator - *= ", "[operator]", Transform2D){
         const Transform2D T2{{-3.4, 2.333},-8.3};
         T1*=T2;
 
-        CHECK_THAT(T1.rotation(),WithinRel(1.9336, 0.001)||WithinRel(-1.1247, 0.001));
+        CHECK_THAT(T1.rotation(),WithinRel(-1.9336, 0.001));
         CHECK_THAT(T1.translation().x, WithinRel(-1.5821, 0.0001));
         CHECK_THAT(T1.translation().y,WithinRel(7.5424, 0.0001));
     }
@@ -156,9 +159,23 @@ TEST_CASE("Translation", "[translation]"){
     CHECK_THAT(T.translation().y, WithinRel(5.0));
 }
 
-TEST_CASE("Rotation", "[rotation]"){
-    Transform2D T{{1.0,5.0},PI/4.0};
+TEST_CASE("Rotation", "[quadrant 1]"){
+    Transform2D T{{3.0,5.0},PI/4.0};
     CHECK_THAT(T.rotation(), WithinRel(PI/4.0));
+}
+
+TEST_CASE("Rotation", "[quadrant 2]"){
+    Transform2D T{{7.0,2.0},3.0*PI/4.0};
+    CHECK_THAT(T.rotation(), WithinRel(3*PI/4.0));
+}
+TEST_CASE("Rotation", "[quadrant 3]"){
+    Transform2D T{{-98.0,5.0},5.0*PI/4.0};
+    CHECK_THAT(T.rotation(), WithinRel(5.0*PI/4.0) || WithinRel(-3.0*PI/4.0));
+}
+
+TEST_CASE("Rotation", "[quadrant 4]"){
+    Transform2D T{{1.0,5.0},-PI/4.0};
+    CHECK_THAT(T.rotation(), WithinRel(-PI/4.0));
 }
 
 
@@ -235,5 +252,127 @@ TEMPLATE_TEST_CASE("Integrate twist", "[integrate]", Twist2D, Transform2D){
         CHECK_THAT(Tb_bp.translation().x, WithinRel(-0.1502, .001));
         CHECK_THAT(Tb_bp.translation().y, WithinRel(-0.9806, 0.001));
         CHECK_THAT(Tb_bp.rotation(), WithinRel(0.8532, 0.0001) || WithinRel(-0.8532, 0.0001));
+    }
+}
+
+TEMPLATE_TEST_CASE("Inverse Kinematics", "[inverse]", Twist2D, Transform2D){
+    Twist2D Vb{};
+    DiffDrive bot{.16,.033};
+
+    SECTION("pure translation"){
+        Vb.w = 0.0;
+        Vb.v = {5.0,0};
+        Wheel_Vel phidot = bot.inverse_kin(Vb);
+        CHECK_THAT(phidot.l, WithinRel(151.5151, 0.0001));
+        CHECK_THAT(phidot.r, WithinRel(151.5151, 0.0001));
+    }
+
+    SECTION("pure translation"){
+        Vb.w = 0.0;
+        Vb.v = {-52.0,0.0};
+        Wheel_Vel phidot = bot.inverse_kin(Vb);
+        CHECK_THAT(phidot.l, WithinRel(-1575.7575, 0.0001));
+        CHECK_THAT(phidot.r, WithinRel(-1575.7575, 0.0001));
+    }
+
+
+    SECTION("pure rotation"){
+        Vb.w = PI;
+        Vb.v = {0.0,0.0};
+        Wheel_Vel phidot = bot.inverse_kin(Vb);
+        CHECK_THAT(phidot.l, WithinRel(-2.4242*PI, 0.0001));
+        CHECK_THAT(phidot.r, WithinRel(2.4242*PI, 0.0001));
+    }
+    
+    SECTION("pure rotation"){
+        Vb.w = -36.0;
+        Vb.v = {0.0,0.0};
+        Wheel_Vel phidot = bot.inverse_kin(Vb);
+        CHECK_THAT(phidot.l, WithinRel(87.2727, 0.0001));
+        CHECK_THAT(phidot.r, WithinRel(-87.2727, 0.0001));
+    }
+
+    SECTION("simultaneous translation and rotation 1"){
+        Vb.w = PI;
+        Vb.v = {2.0,0.0};
+        Wheel_Vel phidot = bot.inverse_kin(Vb);
+        CHECK_THAT(phidot.l, WithinRel(52.9901, 0.0001));
+        CHECK_THAT(phidot.r, WithinRel(68.222, 0.0001));
+    }
+
+
+    SECTION("simultaneous translation and rotation 2"){
+        Vb.w = -5.43;
+        Vb.v = {3.56,0.0};
+        Wheel_Vel phidot = bot.inverse_kin(Vb);
+        CHECK_THAT(phidot.l, WithinRel(121.0424, 0.0001));
+        CHECK_THAT(phidot.r, WithinRel(94.715, 0.0001));
+    }
+}
+
+TEMPLATE_TEST_CASE("forward Kinematics", "[inverse]", Twist2D, Transform2D){
+    Twist2D Vb{};
+    DiffDrive bot{.16,.033};
+
+    SECTION("pure translation"){
+        Vb.w = 0.0;
+        Vb.v = {5.0,0};
+        Wheel_Vel phidot = bot.inverse_kin(Vb);
+        Vb = bot.forward_kin(phidot.l, phidot.r);
+        CHECK_THAT(Vb.w, WithinRel(0.0, 0.0001));
+        CHECK_THAT(Vb.v.x, WithinRel(5.0, 0.0001));
+        CHECK_THAT(Vb.v.y, WithinRel(0, 0.0001));
+    }
+
+    SECTION("pure translation"){
+        Vb.w = 0.0;
+        Vb.v = {-52.0,0.0};
+        Wheel_Vel phidot = bot.inverse_kin(Vb);
+        Vb = bot.forward_kin(phidot.l, phidot.r);
+        CHECK_THAT(Vb.w, WithinRel(0.0, 0.0001));
+        CHECK_THAT(Vb.v.x, WithinRel(-52.0, 0.0001));
+        CHECK_THAT(Vb.v.y, WithinRel(0, 0.0001));
+    }
+
+
+    SECTION("pure rotation"){
+        Vb.w = PI;
+        Vb.v = {0.0,0.0};
+        Wheel_Vel phidot = bot.inverse_kin(Vb);
+        Vb = bot.forward_kin(phidot.l, phidot.r);
+        CHECK_THAT(Vb.w, WithinRel(PI, 0.0001));
+        CHECK_THAT(Vb.v.x, WithinRel(0.0, 0.0001));
+        CHECK_THAT(Vb.v.y, WithinRel(0.0, 0.0001));
+    }
+    
+    SECTION("pure rotation"){
+        Vb.w = -36.0;
+        Vb.v = {0.0,0.0};
+        Wheel_Vel phidot = bot.inverse_kin(Vb);
+        Vb = bot.forward_kin(phidot.l, phidot.r);
+        CHECK_THAT(Vb.w, WithinRel(-36.0, 0.0001));
+        CHECK_THAT(Vb.v.x, WithinRel(0.0, 0.0001));
+        CHECK_THAT(Vb.v.y, WithinRel(0.0, 0.0001));
+    }
+
+    SECTION("simultaneous translation and rotation 1"){
+        Vb.w = PI;
+        Vb.v = {2.0,0.0};
+        Wheel_Vel phidot = bot.inverse_kin(Vb);
+        Vb = bot.forward_kin(phidot.l, phidot.r);
+        CHECK_THAT(Vb.w, WithinRel(PI, 0.0001));
+        CHECK_THAT(Vb.v.x, WithinRel(2.0, 0.0001));
+        CHECK_THAT(Vb.v.y, WithinRel(0.0, 0.0001));
+    }
+
+
+    SECTION("simultaneous translation and rotation 2"){
+        Vb.w = -5.43;
+        Vb.v = {3.56,0.0};
+        Wheel_Vel phidot = bot.inverse_kin(Vb);
+        Vb = bot.forward_kin(phidot.l, phidot.r);
+        CHECK_THAT(Vb.w, WithinRel(-5.43, 0.0001));
+        CHECK_THAT(Vb.v.x, WithinRel(3.56, 0.0001));
+        CHECK_THAT(Vb.v.y, WithinRel(0, 0.0001));
     }
 }

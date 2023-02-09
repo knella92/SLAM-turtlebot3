@@ -20,9 +20,7 @@ namespace turtlelib
         if (!almost_equal(Vb.v.y,0)){
             throw std::logic_error("y component of body twist must be zero");
         }
-        // const Twist2D V1 = Tb1.inv()(Vb);
-        // const Twist2D V2 = Tb2.inv()(Vb);
-        // const Wheel_Vel phidot{V1.v.x, V2.v.x};
+
         Wheel_Vel phidot{};
         phidot.l = (-D*Vb.w + Vb.v.x)/r;
         phidot.r = (D*Vb.w + Vb.v.x)/r;
