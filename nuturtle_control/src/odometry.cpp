@@ -1,15 +1,21 @@
-/// \turtle_control.cpp
-/// \brief Defines and launche nusim node with appropriate publishers and services
+/// \odometry.cpp
+/// \brief Defines and launches odometry node to update and publish/broadcast joint positions and velocities
 ///
 /// PARAMETERS:
-
+///     wheel_radius (double): Radius of the turtlebot's wheels
+///     track_width (double): Distance between the turtlebot's wheels
+///     body_id (string): Name of odometry frame's child frame (base_footprint)
+///     odom_id (string): Name of odometry frame
+///     wheel_left (string): Name of left wheel joint
+///     wheel_right (string): Name of right wheel joint
 /// PUBLISHES:
-
+///     (/odom) (Odometry): Body configuration and twist
 /// SUBSCRIBES:
-
+///     (/joint_states) (JointState): Joint position and velocity messages
 /// SERVERS:
-
+///     (/initial_pose) (InitialPose): Input for a full reset of odometry to begin at desired position and orientation
 /// CLIENTS:
+///     none
 
 
 #include <functional>
@@ -66,7 +72,7 @@ public:
     tbot3 = tbot;
 
 
-    // initialize publishers and timer
+    // initialize publisher, subscriber, and service
     odom_publisher_ = create_publisher<nav_msgs::msg::Odometry>("/odom", 10);
     js_subscriber_ = create_subscription<sensor_msgs::msg::JointState>("/joint_states", 10, std::bind(&OdomNode::js_callback, this, std::placeholders::_1));
     initialp_service_ =
