@@ -292,7 +292,7 @@ namespace turtlelib
     /// time unit
     /// \param Vb - constant twist within original body frame of rigid body
     /// \return transformation corresponding new body frame from original body frame
-    Transform2D integrate_twist(Twist2D& Vb);
+    Transform2D integrate_twist(Twist2D Vb);
 
 
 }

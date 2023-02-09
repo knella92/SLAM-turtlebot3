@@ -134,12 +134,16 @@ public:
 
 private:
   size_t count_;
-  int rate{};
+  int rate;
+  double dt{};
+  int prev_time = get_clock()->now().nanoseconds();
+  int current_time{};
+  int i{0};
   double x0{}; double y0{}; double theta0{}; double x{}; double y{}; double theta{};
   double motor_cmd_per_rad_sec{};
   double encoder_ticks_per_rad{};
-  rclcpp::Time prev_stamp{get_clock()->now()};
   int motor_cmd_max{};
+  double phidot_l{}; double phidot_r{};
   std::vector<double> obstacles_x{}; 
   std::vector<double> obstacles_y{};
   std::vector<double> x_pos{}; std::vector<double> y_pos{}; std::vector<double> length{};
@@ -169,24 +173,39 @@ private:
     message.data = count_;
     publisher_->publish(message);
 
+    // integrate wheel velocity to publish displacements
+    // curr_stamp = get_clock()->now().nanoseconds();
+    // dt = (curr_stamp - prev_stamp)*1.0e-9;
+    calc_positions();
+
+    // create and send transform between world and red robot
     tf2::Quaternion q;
     q.setRPY(0.0, 0.0, theta);
+    // RCLCPP_INFO_STREAM(get_logger(), "new rotation angle = " << theta);
+    //RCLCPP_INFO_STREAM(get_logger(), "new x = " << x);
+    // RCLCPP_INFO_STREAM(get_logger(), "new q = " << q.x << " " << q.y << " " << q.z << " " << q.w);
     geometry_msgs::msg::Quaternion quat = tf2::toMsg(q);
+    // RCLCPP_INFO_STREAM(get_logger(), "new quat = " << quat.x << " " << quat.y << " " << quat.z << " " << quat.w);
     geometry_msgs::msg::TransformStamped t{};
     t.header.stamp = get_clock()->now();
+    
     t.header.frame_id = "nusim/world";
     t.child_frame_id = "red/base_footprint";
-
     t.transform.translation.x = x;
+    // RCLCPP_INFO_STREAM(get_logger(), "transform x = " << t.transform.translation.x);
+    
     t.transform.translation.y = y;
     t.transform.rotation = quat;
+    // RCLCPP_INFO_STREAM(get_logger(), "transform quat = " << t.transform.rotation.x << " " << t.transform.rotation.y << " " << t.transform.rotation.z << " " << t.transform.rotation.w);
     redbot_broadcaster_->sendTransform(t);
 
+    // publish obstacles and walls (each time callback)
     visualization_msgs::msg::MarkerArray obstacles = add_obstacles();
     visualization_msgs::msg::MarkerArray walls = add_walls();
     obst_publisher_->publish(obstacles);
     wall_publisher_->publish(walls);
 
+    // publish sensor message for odometry
     auto sens_msg = nuturtlebot_msgs::msg::SensorData();
     sens_msg.stamp = get_clock()->now();
     sens_msg.left_encoder = tbot3.phi_l*encoder_ticks_per_rad;
@@ -284,21 +303,44 @@ private:
 
   void cmd_callback(const nuturtlebot_msgs::msg::WheelCommands & msg)
   {
-    rclcpp::Time stamp{get_clock()->now()};
-    double phidot_l{msg.left_velocity/motor_cmd_per_rad_sec};
-    double phidot_r{msg.right_velocity/motor_cmd_per_rad_sec};
-    phi_lp += phidot_l;
-    phi_rp += phidot_r;
-    tbot3.forward_kin(phi_lp, phi_rp);
+      
+      
+      phidot_l = msg.left_velocity/motor_cmd_per_rad_sec;
+      phidot_r = msg.right_velocity/motor_cmd_per_rad_sec;
+      //if(phidot_l < 0){phidot_l*=0.5; phidot_r*=0.5;}
+      // RCLCPP_INFO_STREAM(get_logger(), "new left wheel position = " << phi_lp);
+      // tbot3.forward_kin(phi_lp, phi_rp);
 
-    // update position of robot
-    x = tbot3.q.x;
-    y = tbot3.q.y;
-    theta = tbot3.q.theta;
+      // // update position of robot
+      // x = tbot3.q.x;
+      // y = tbot3.q.y;
+      // theta = tbot3.q.theta;
 
-    // update wheel positions (radians) -> sensordata message
-    tbot3.phi_l = phi_lp;
-    tbot3.phi_r = phi_rp;
+      // // update wheel positions (radians) -> sensordata message
+      // tbot3.phi_l = phi_lp;
+      // tbot3.phi_r = phi_rp;
+      // // prev_time = stamp;
+    
+  }
+
+  void calc_positions()
+  {
+      // phi_lp += phidot_l*dt;
+      // phi_rp += phidot_r*dt;
+      tbot3.forward_kin(phidot_l/rate, phidot_r/rate);
+      
+      // update position of robot
+      x = tbot3.q.x;
+      y = tbot3.q.y;
+      RCLCPP_INFO_STREAM(get_logger(), "dtheta = " << tbot3.q.theta - theta);
+      theta = tbot3.q.theta;
+      // RCLCPP_INFO_STREAM(get_logger(), "" << phi_lp - tbot3.phi_l << " " << phi_rp - tbot3.phi_r);
+      // tbot3.phi_l = phi_lp;
+      // tbot3.phi_r = phi_rp;
+
+      // make velocity = 0 until next wheel command
+      phidot_l = 0.0;
+      phidot_r = 0.0;
   }
 
 };

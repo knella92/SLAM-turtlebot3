@@ -1,4 +1,5 @@
 #include "turtlelib/rigid2d.hpp"
+#include "turtlelib/diff_drive.hpp"
 #include <iostream>
 
 
@@ -7,7 +8,25 @@ int main()
     
     turtlelib::Transform2D T_ab, T_bc;
     turtlelib::Vector2D v{};
-    turtlelib::Twist2D V_b{};
+
+    turtlelib::Twist2D V_b{turtlelib::PI, {0.0, 0.0}};
+    turtlelib::DiffDrive d{0.16,0.033};
+    turtlelib::Wheel_Vel phidot = d.inverse_kin(V_b);
+    std::cout << phidot.l << " " << phidot.r << std::endl;
+    std::cout << d.forward_kin(phidot.l, phidot.r) << std::endl;
+
+    turtlelib::Twist2D V_b2{-turtlelib::PI, {0.0,0.0}};
+    phidot = d.inverse_kin(V_b2);
+    std::cout << phidot.l << " " << phidot.r << std::endl;
+    std::cout << d.forward_kin(phidot.l, phidot.r) << std::endl;
+
+    phidot = d.inverse_kin(V_b2);
+    std::cout << phidot.l << " " << phidot.r << std::endl;
+    std::cout << d.forward_kin(phidot.l, phidot.r) << std::endl;
+
+    phidot = d.inverse_kin(V_b2);
+    std::cout << phidot.l << " " << phidot.r << std::endl;
+    std::cout << d.forward_kin(phidot.l, phidot.r) << std::endl;
     
     std::cout << "Enter transform T_{a,b}:" << std::endl;
     std::cin >> T_ab;

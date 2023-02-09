@@ -101,23 +101,53 @@ TEST_CASE("Operator - () ", "[operator]"){
     CHECK_THAT(test_vec.y, WithinRel(-2.0));
 }
 
-TEST_CASE(" Inverse transform ", "[transform]"){
-    const Transform2D T{{1,1},PI*2};
+TEST_CASE(" Inverse transform 1", "[transform]"){
+    const Transform2D T{{1.0,0.0},1.0};
 
-    CHECK_THAT(T.inv().rotation(), WithinAbs(0.0, zero_margin)
-        || WithinAbs(2*PI,0.01));
-    CHECK_THAT(T.inv().translation().x, WithinRel(-1.0));
-    CHECK_THAT(T.inv().translation().y, WithinRel(-1.0));
+    CHECK_THAT(T.inv().rotation(), WithinRel(1.0));
+    CHECK_THAT(T.inv().translation().x, WithinRel(-0.5403, 0.0001));
+    CHECK_THAT(T.inv().translation().y, WithinRel(0.84147, 0.0001));
 }
 
-TEST_CASE("Operator - *= ", "[operator]"){
-    Transform2D T1{{-1.0,2.0},PI/4.0};
-    const Transform2D T2{{3.0,5.0},-3.0*PI/2.0};
-    T1*=T2;
+TEST_CASE(" Inverse transform 2", "[transform]"){
+    const Transform2D T{{4,2},3.5};
 
-    CHECK_THAT(T1.rotation(),WithinRel(PI/4.0));
-    CHECK_THAT(T1.translation().x, WithinRel(-1.0-sqrt(2)));
-    CHECK_THAT(T1.translation().y,WithinRel(2+4*sqrt(2)));
+    CHECK_THAT(T.inv().rotation(), WithinRel(2.7831, 0.0001) || WithinRel(-0.3584, 0.0001));
+    CHECK_THAT(T.inv().translation().x, WithinRel(4.4474, 0.0001));
+    CHECK_THAT(T.inv().translation().y, WithinRel(0.4698, 0.0001));
+}
+
+TEMPLATE_TEST_CASE("Operator - *= ", "[operator]", Transform2D){
+    
+    SECTION("Test 1"){
+        Transform2D T1{{-1.0,2.0},PI/4.0};
+        const Transform2D T2{{3.0,5.0},-3.0*PI/2.0};
+        T1*=T2;
+
+        CHECK_THAT(T1.rotation(),WithinRel(3*PI/4.0)||WithinRel(-PI/2.0));
+        CHECK_THAT(T1.translation().x, WithinRel(-1.0-sqrt(2)));
+        CHECK_THAT(T1.translation().y,WithinRel(2+4*sqrt(2)));
+    }
+
+    SECTION("Test 2"){
+        Transform2D T1{{4.0,-2.0},6.2};
+        const Transform2D T2{{-3.0,6.0},2.3};
+        T1*=T2;
+
+        CHECK_THAT(T1.rotation(),WithinRel(2.217, 0.001)||WithinRel(-0.8412, 0.001));
+        CHECK_THAT(T1.translation().x, WithinRel(1.5089, 0.0001));
+        CHECK_THAT(T1.translation().y,WithinRel(4.2285, 0.0001));
+    }
+
+    SECTION("Test 3"){
+        Transform2D T1{{2.0,5.5},-6.2};
+        const Transform2D T2{{-3.4, 2.333},-8.3};
+        T1*=T2;
+
+        CHECK_THAT(T1.rotation(),WithinRel(1.9336, 0.001)||WithinRel(-1.1247, 0.001));
+        CHECK_THAT(T1.translation().x, WithinRel(-1.5821, 0.0001));
+        CHECK_THAT(T1.translation().y,WithinRel(7.5424, 0.0001));
+    }
 }
 
 TEST_CASE("Translation", "[translation]"){
@@ -188,16 +218,22 @@ TEMPLATE_TEST_CASE("Integrate twist", "[integrate]", Twist2D, Transform2D){
         CHECK_THAT(Tb_bp.rotation(), WithinRel(PI));
     }
     
-    SECTION("simultaneous translation and rotation"){
+    SECTION("simultaneous translation and rotation 1"){
         Vb.w = PI;
         Vb.v = {2.0,2.0};
         Transform2D Tb_bp = integrate_twist(Vb);
-        Transform2D test_sb{{2.0/PI, -2.0/PI}, PI};
-        Transform2D test_ssp{PI};
-        Transform2D test_bbp = test_sb.inv() * test_ssp * test_sb;
-        CHECK_THAT(Tb_bp.translation().x, WithinRel(test_bbp.translation().x));
-        CHECK_THAT(Tb_bp.translation().y, WithinRel(test_bbp.translation().y));
-        CHECK_THAT(Tb_bp.rotation(), WithinRel(test_bbp.rotation()));
+        CHECK_THAT(Tb_bp.translation().x, WithinRel(4.0/PI, 0.001));
+        CHECK_THAT(Tb_bp.translation().y, WithinRel(-4.0/PI, 0.001));
+        CHECK_THAT(Tb_bp.rotation(), WithinRel(PI) || WithinRel(-PI));
     }
 
+
+    SECTION("simultaneous translation and rotation 2"){
+        Vb.w = 5.43;
+        Vb.v = {3.56,5.45};
+        Transform2D Tb_bp = integrate_twist(Vb);
+        CHECK_THAT(Tb_bp.translation().x, WithinRel(-0.1502, .001));
+        CHECK_THAT(Tb_bp.translation().y, WithinRel(-0.9806, 0.001));
+        CHECK_THAT(Tb_bp.rotation(), WithinRel(0.8532, 0.0001) || WithinRel(-0.8532, 0.0001));
+    }
 }

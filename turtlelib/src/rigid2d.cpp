@@ -138,9 +138,14 @@ namespace turtlelib
 
     Transform2D Transform2D::inv() const
     {
-        Transform2D invT{{-t02*t00 - t12*t10,
-                          -t12*t00 + t02*t10},
-                          -acos(t00)}; 
+        Transform2D invT{};
+        invT.t00 = t00;
+        invT.t01 = t10;
+        invT.t02 = -t02*t00 - t12*t10;
+        invT.t10 = t01;
+        invT.t11 = t00;
+        invT.t12 = -t12*t00 + t02*t10;
+        
         return invT;
     }
 
@@ -174,7 +179,9 @@ namespace turtlelib
     double Transform2D::rotation() const
     {
         double radians{};
-        almost_equal(t10,0) ? radians=acos(t11) : radians=asin(t10); // if cos(theta) = 0, use acos(cos(theta)), if not, use asin(sin(theta))
+        // if acos(t00)
+        // almost_equal(t00,0) ? radians=acos(t11) : radians=asin(t10); // if cos(theta) = 0, use acos(cos(theta)), if not, use asin(sin(theta))
+        radians = acos(t00);
         return radians;
     }
 
@@ -372,7 +379,7 @@ namespace turtlelib
         return is;
     }
 
-    Transform2D integrate_twist(Twist2D& Vb)
+    Transform2D integrate_twist(Twist2D Vb)
     {
         if (almost_equal(Vb.w,0))
         {
@@ -381,7 +388,7 @@ namespace turtlelib
             return Tb_bp;
         }
         else{
-            const Transform2D Ts_b{{Vb.v.y/Vb.w, -1*Vb.v.x/Vb.w}, Vb.w}; // Also equal to Tsp_bp
+            const Transform2D Ts_b{{Vb.v.y/Vb.w, -Vb.v.x/Vb.w}, Vb.w}; // Also equal to Tsp_bp
             const Transform2D Ts_sp{Vb.w};
             const Transform2D Tb_bp = Ts_b.inv() * Ts_sp * Ts_b;
             return Tb_bp;
