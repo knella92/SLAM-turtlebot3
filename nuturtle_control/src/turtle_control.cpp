@@ -96,7 +96,7 @@ private:
     if(right_cmd > motor_cmd_max){
       right_cmd = motor_cmd_max;}
     else if(right_cmd < -motor_cmd_max){
-      right_cmd = motor_cmd_max;}
+      right_cmd = -motor_cmd_max;}
     
     message.left_velocity = left_cmd;
     message.right_velocity = right_cmd;
@@ -115,7 +115,6 @@ private:
     tbot3.phi_l = msg.left_encoder/encoder_ticks_per_rad;
     phidot.r = (msg.right_encoder/encoder_ticks_per_rad - tbot3.phi_r)/(1e-9*dt);
     tbot3.phi_r = msg.right_encoder/encoder_ticks_per_rad;
-
 
     message.name = {"wheel_left_joint", "wheel_right_joint"};
     message.position = {tbot3.phi_l, tbot3.phi_r};

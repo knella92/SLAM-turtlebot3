@@ -90,7 +90,7 @@ private:
 
   void js_callback(const sensor_msgs::msg::JointState & msg)
   {
-    turtlelib::Twist2D Vb = tbot3.forward_kin(msg.position[0], msg.position[1]);
+    turtlelib::Twist2D Vb = tbot3.forward_kin(msg.position[0] - tbot3.phi_l, msg.position[1] - tbot3.phi_r);
     tbot3.phi_l = msg.position[0];
     tbot3.phi_r = msg.position[1];
     tf2::Quaternion q;

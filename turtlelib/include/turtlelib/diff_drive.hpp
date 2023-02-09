@@ -70,10 +70,16 @@ namespace turtlelib
             /// \brief robot's current configuration q (x, y, theta)
             Config q{};
 
-            /// \brief initialize transforms, D, H pseudo-inverse matrix, set's current wheel positions to zero
-            /// \param track_width - depth between center of one wheel and center of chassis
+            /// \brief initializes DiffDrive object
+            /// \param track_width - width between wheel frame origins
             /// \param radius - radius of wheels
             DiffDrive(double track_width, double radius);
+
+            /// \brief initialize transforms, D, H pseudo-inverse matrix, sets initial configuration to given parameters
+            /// \param track_width - width between wheel frame origins
+            /// \param radius - radius of wheels
+            /// \param cfg = initial body configuration of robot
+            DiffDrive(double track_width, double radius, Config cfg);
 
             /// \brief computes wheel velocities required to make robot move at a given body twist
             /// \param Vb - given body twist

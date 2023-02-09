@@ -16,6 +16,16 @@ namespace turtlelib
     {
     }
 
+    DiffDrive::DiffDrive(double track_width, double radius, Config cfg)
+     :  D{track_width/2.0}, r{radius},
+        Tb1{{0.0,D}, 0.0},
+        Tb2{{0.0, -D}, 0.0},
+        hpi00{(radius)/(-2.0*D)}, hpi01{(radius)/(2.0*D)}, hpi10{radius/2.0}, hpi11{radius/2.0},
+        phi_l{0.0}, phi_r{0.0},
+        q{cfg.x,cfg.y,cfg.theta}
+    {
+    }
+
     Wheel_Vel DiffDrive::inverse_kin(Twist2D & Vb) const{
         if (!almost_equal(Vb.v.y,0)){
             throw std::logic_error("y component of body twist must be zero");
