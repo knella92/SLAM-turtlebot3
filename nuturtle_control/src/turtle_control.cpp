@@ -1,19 +1,24 @@
-/// \odometry.cpp
-/// \brief Defines and launche nusim node with appropriate publishers and services
+/// \turtle_control.cpp
+/// \brief Defines and launches the control interface for the turtlebot (both simulation and real)
 ///
 /// PARAMETERS:
-
+///      wheel_radius (double): Radius of the turtlebot's wheels
+///      track_width (double): Distance between the turtlebot's wheels
+///      motor_cmd_per_rad_sec (double): Conversion factor from radians/second to "motor commands"
+///      encoder_ticks_per_rad (double): Conversion factor from radians to encoder ticks
+///      motor_cmd_max (double): Maximum motor command integer
 /// PUBLISHES:
-
+///     (/wheel_cmd) (WheelCommands): Integer value between -265 and 265 denoting command to motors
+///     (/joint_states) (JointState): Joint position and velocity messages
 /// SUBSCRIBES:
-
+///     (/cmd_vel) (Twist): Vector with x, y, and rotational velocities in radians/second to be converted to wheel commands
+///     (/sensor_data) (SensorData): Encoder position messages in ticks
 /// SERVERS:
-
+///     none
 /// CLIENTS:
+///     none
 
 
-#include <chrono>
-#include <functional>
 #include <memory>
 
 #include "rclcpp/rclcpp.hpp"
@@ -67,7 +72,7 @@ private:
   double motor_cmd_per_rad_sec{0.0};
   double encoder_ticks_per_rad{0.0};
   int motor_cmd_max{0};
-  rclcpp::Time prev_time{};
+  rclcpp::Time prev_time{get_clock()->now()};
   rclcpp::Publisher<nuturtlebot_msgs::msg::WheelCommands>::SharedPtr cmd_publisher_;
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr js_publisher_;
   rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr vel_subscriber_;
