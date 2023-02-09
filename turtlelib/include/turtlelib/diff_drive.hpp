@@ -9,6 +9,7 @@
 namespace turtlelib
 {
 
+
     /// \brief a robot's configuration
     struct Config
     {
@@ -38,20 +39,25 @@ namespace turtlelib
     {
 
         private:
-            /// \brief transform from body frame to wheel 1 (left)
-            Transform2D Tb1;
-
-            /// \brief transform from body frame to wheel 2 (right)
-            Transform2D Tb2;
-
             /// \brief depth of the wheels (distance between wheel frame and body frame in y dimension) 
             double D;
 
             /// \brief radius of the wheels
             double r;
 
+            /// \brief transform from body frame to wheel 1 (left)
+            Transform2D Tb1;
+
+            /// \brief transform from body frame to wheel 2 (right)
+            Transform2D Tb2;
+
+            
+ 
+
             /// \brief 2D H pseudo-inverse matrix
-            std::vector<std::vector<double>> H_pi;
+            double hpi00, hpi01, hpi10, hpi11;
+
+
 
         public:
 
@@ -64,17 +70,16 @@ namespace turtlelib
             /// \brief robot's current configuration q (x, y, theta)
             Config q{};
 
-            /// \brief initialize transforms, D, H pseudo-inverse matrix, set's current wheel positions to zero
-            /// \param depth - depth between center of one wheel and center of chassis
+            /// \brief initializes DiffDrive object
+            /// \param track_width - width between wheel frame origins
             /// \param radius - radius of wheels
-            DiffDrive(double depth, double radius);
+            DiffDrive(double track_width, double radius);
 
-            /// \brief initialize transforms, D, H pseudo-inverse matrix, set's current wheel positions to given values
-            /// \param depth - depth between center of one wheel and center of chassis
+            /// \brief initialize transforms, D, H pseudo-inverse matrix, sets initial configuration to given parameters
+            /// \param track_width - width between wheel frame origins
             /// \param radius - radius of wheels
-            /// \param left_pos - current left wheel position
-            /// \param right_pos - current right wheel position
-            DiffDrive(double depth, double radius, double left_pos, double right_pos);
+            /// \param cfg = initial body configuration of robot
+            DiffDrive(double track_width, double radius, Config cfg);
 
             /// \brief computes wheel velocities required to make robot move at a given body twist
             /// \param Vb - given body twist
@@ -84,8 +89,8 @@ namespace turtlelib
             /// \brief updates robot's configuration given new wheel positions
             /// \param phi_lp - new left wheel position (phi_l')
             /// \param phi_rp - new right wheel position (phi_r')
-            /// \return updated configuration
-            void forward_kin(double phi_lp, double phi_rp);
+            /// \return claculated body twist
+            turtlelib::Twist2D forward_kin(double phi_lp, double phi_rp);
 
 
             

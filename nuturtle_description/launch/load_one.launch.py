@@ -53,8 +53,9 @@ def generate_launch_description():
                         # passes color argument into xacro file
                         ' ', 'color:=', LaunchConfiguration('color')]),
                     'frame_prefix': [LaunchConfiguration('color'),
-                                     TextSubstitution(text='/')]}
+                                     TextSubstitution(text='/')]},
                         ]
+
             ),
 
         Node(

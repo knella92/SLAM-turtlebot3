@@ -11,10 +11,12 @@ add_library(turtlelib src/rigid2d.cpp src/diff_drive.cpp)
 # Public include directories can be used by other targets that link against turtlelib
 # By adding include/ to the include path, this means that files in e.g., include/turtlelib
 # can be included with #include"turtlelib/file.hpp"
+# CMake also has the ability to generate doxygen documentation
+
 target_include_directories(turtlelib
     PUBLIC 
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
+    $<INSTALL_INTERFACE:include/>
     )
 
 # enable C++ 17
@@ -48,11 +50,11 @@ install(
     DESTINATION lib/cmake/${PROJECT_NAME}
 )
 
+# find_package(Doxygen)
+# set(DOXYGEN_USE_MDFILE_AS_MAINPAGE README.md) # Use the readme in your doxygen docs
+# doxygen_add_docs(doxygen include/ src/ README.md ALL)
 
-# CMake also has the ability to generate doxygen documentation
-find_package(Doxygen)
-set(DOXYGEN_USE_MDFILE_AS_MAINPAGE README.md) # Use the readme in your doxygen docs
-doxygen_add_docs(doxygen include/ src/ README.md ALL)
+
 
 # Use the cmake testing functionality. A test is just an executable.
 # We use the catch2 unit testing framework

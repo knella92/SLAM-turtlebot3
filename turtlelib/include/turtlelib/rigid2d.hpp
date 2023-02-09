@@ -3,11 +3,7 @@
 /// \file
 /// \brief Two-dimensional rigid body transformations.
 
-
 #include<iosfwd> // contains forward definitions for iostream objects
-#include<iostream>
-#include <cmath>
-#include <vector>
 
 namespace turtlelib
 {
@@ -25,7 +21,13 @@ namespace turtlelib
     /// if given a compile-time constant as input
     constexpr bool almost_equal(double d1, double d2, double epsilon=1.0e-12)
     {
-        return (abs(d1-d2)<epsilon)?true:false;
+       double diff{d1-d2};
+        if(diff < epsilon && diff > -1*epsilon){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
     /// \brief convert degrees to radians
@@ -189,8 +191,10 @@ namespace turtlelib
     {
     private:
 
-        /// \brief a private vector to store the transformation
-        std::vector<std::vector<double>> transf;
+        /// \brief variables to store members of the transformation matrix
+        double t00, t01, t02;
+        double t10, t11, t12;
+        double t20, t21, t22;
 
     public:
         /// \brief Create an identity transformation
@@ -288,7 +292,7 @@ namespace turtlelib
     /// time unit
     /// \param Vb - constant twist within original body frame of rigid body
     /// \return transformation corresponding new body frame from original body frame
-    Transform2D integrate_twist(Twist2D& Vb);
+    Transform2D integrate_twist(Twist2D Vb);
 
 
 }
