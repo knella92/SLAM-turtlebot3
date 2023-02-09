@@ -36,7 +36,7 @@ class OdomNode : public rclcpp::Node
 {
 public:
   OdomNode()
-    : Node("odometry"), count_(0)
+  : Node("odometry")
   {
 
     //declare initial parameters
@@ -48,15 +48,13 @@ public:
     declare_parameter("track_width", 0.0);
 
     // if these are not specified, shutdown the node
-    if (get_parameter("body_id").as_string() == "none"){
+    if (get_parameter("body_id").as_string() == "none") {
       RCLCPP_ERROR_STREAM(get_logger(), "No body frame specified.");
       rclcpp::shutdown();
-    }
-    else if (get_parameter("wheel_left").as_string() == "none"){
+    } else if (get_parameter("wheel_left").as_string() == "none") {
       RCLCPP_ERROR_STREAM(get_logger(), "No left wheel joint name specified.");
       rclcpp::shutdown();
-    }
-    else if (get_parameter("wheel_right").as_string() == "none"){
+    } else if (get_parameter("wheel_right").as_string() == "none") {
       RCLCPP_ERROR_STREAM(get_logger(), "No right wheel joint name specified.");
       rclcpp::shutdown();
     }
@@ -74,11 +72,14 @@ public:
 
     // initialize publisher, subscriber, and service
     odom_publisher_ = create_publisher<nav_msgs::msg::Odometry>("/odom", 10);
-    js_subscriber_ = create_subscription<sensor_msgs::msg::JointState>("/joint_states", 10, std::bind(&OdomNode::js_callback, this, std::placeholders::_1));
+    js_subscriber_ = create_subscription<sensor_msgs::msg::JointState>(
+      "/joint_states", 10, std::bind(
+        &OdomNode::js_callback, this,
+        std::placeholders::_1));
     initialp_service_ =
-        create_service<nuturtle_control::srv::InitialPose>(
-        "/initial_pose",
-        std::bind(&OdomNode::initial_pose, this, std::placeholders::_1, std::placeholders::_2));
+      create_service<nuturtle_control::srv::InitialPose>(
+      "/initial_pose",
+      std::bind(&OdomNode::initial_pose, this, std::placeholders::_1, std::placeholders::_2));
 
     // initializes braodcaster
     tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
@@ -86,8 +87,7 @@ public:
   }
 
 private:
-
-  turtlelib::DiffDrive tbot3{0.0,0.0};
+  turtlelib::DiffDrive tbot3{0.0, 0.0};
   std::string body_id, odom_id, wheel_left, wheel_right;
   rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_publisher_;
   rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr js_subscriber_;
@@ -96,13 +96,15 @@ private:
 
   void js_callback(const sensor_msgs::msg::JointState & msg)
   {
-    turtlelib::Twist2D Vb = tbot3.forward_kin(msg.position[0] - tbot3.phi_l, msg.position[1] - tbot3.phi_r);
+    turtlelib::Twist2D Vb = tbot3.forward_kin(
+      msg.position[0] - tbot3.phi_l,
+      msg.position[1] - tbot3.phi_r);
     tbot3.phi_l = msg.position[0];
     tbot3.phi_r = msg.position[1];
     tf2::Quaternion q;
-    q.setRPY(0.0,0.0,tbot3.q.theta);
+    q.setRPY(0.0, 0.0, tbot3.q.theta);
     geometry_msgs::msg::Quaternion quat = tf2::toMsg(q);
-    
+
     nav_msgs::msg::Odometry odom{};
     odom.header.frame_id = odom_id;
     odom.header.stamp = get_clock()->now();
@@ -131,13 +133,14 @@ private:
 
   void initial_pose(
     const std::shared_ptr<nuturtle_control::srv::InitialPose::Request> request,
-    const std::shared_ptr<nuturtle_control::srv::InitialPose::Response>){
+    const std::shared_ptr<nuturtle_control::srv::InitialPose::Response>)
+  {
 
     tbot3.q.x = request->x;
     tbot3.q.y = request->y;
     tbot3.q.theta = request->theta;
 
-    }
+  }
 
 };
 

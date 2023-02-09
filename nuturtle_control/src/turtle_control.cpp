@@ -61,14 +61,19 @@ public:
     js_publisher_ = create_publisher<sensor_msgs::msg::JointState>("/joint_states", 40);
 
     // initialize subscribers
-    vel_subscriber_ = create_subscription<geometry_msgs::msg::Twist>("/cmd_vel", 10, std::bind(&ControlNode::vel_callback, this, std::placeholders::_1));
-    sens_subscriber_ = create_subscription<nuturtlebot_msgs::msg::SensorData>("/sensor_data", 40, std::bind(&ControlNode::sens_callback, this, std::placeholders::_1));
+    vel_subscriber_ =
+      create_subscription<geometry_msgs::msg::Twist>(
+      "/cmd_vel", 10,
+      std::bind(&ControlNode::vel_callback, this, std::placeholders::_1));
+    sens_subscriber_ = create_subscription<nuturtlebot_msgs::msg::SensorData>(
+      "/sensor_data", 40, std::bind(
+        &ControlNode::sens_callback, this,
+        std::placeholders::_1));
 
   }
 
 private:
-
-  turtlelib::DiffDrive tbot3{0.0,0.0};
+  turtlelib::DiffDrive tbot3{0.0, 0.0};
   double motor_cmd_per_rad_sec{0.0};
   double encoder_ticks_per_rad{0.0};
   int motor_cmd_max{0};
@@ -82,27 +87,29 @@ private:
   void vel_callback(const geometry_msgs::msg::Twist & msg)
   {
     // convert to Twist2D for inverse kinematics function
-    turtlelib::Twist2D Vb{0.0,{0.0,0.0}};
+    turtlelib::Twist2D Vb{0.0, {0.0, 0.0}};
     Vb.v.x = msg.linear.x;
     Vb.v.y = msg.linear.y;
     Vb.w = msg.angular.z;
 
-    
+
     turtlelib::Wheel_Vel phidot = tbot3.inverse_kin(Vb);
     // convert rad/s to motor command (wheel command)
-    int left_cmd = phidot.l*motor_cmd_per_rad_sec;
-    int right_cmd = phidot.r*motor_cmd_per_rad_sec;
+    int left_cmd = phidot.l * motor_cmd_per_rad_sec;
+    int right_cmd = phidot.r * motor_cmd_per_rad_sec;
     // "normalizes" wheel command
     auto message = nuturtlebot_msgs::msg::WheelCommands();
-    if(left_cmd > motor_cmd_max){
-      left_cmd = motor_cmd_max;}
-    else if(left_cmd < -motor_cmd_max){
-      left_cmd = -motor_cmd_max;}
-    if(right_cmd > motor_cmd_max){
-      right_cmd = motor_cmd_max;}
-    else if(right_cmd < -motor_cmd_max){
-      right_cmd = -motor_cmd_max;}
-    
+    if (left_cmd > motor_cmd_max) {
+      left_cmd = motor_cmd_max;
+    } else if (left_cmd < -motor_cmd_max) {
+      left_cmd = -motor_cmd_max;
+    }
+    if (right_cmd > motor_cmd_max) {
+      right_cmd = motor_cmd_max;
+    } else if (right_cmd < -motor_cmd_max) {
+      right_cmd = -motor_cmd_max;
+    }
+
     message.left_velocity = left_cmd;
     message.right_velocity = right_cmd;
 
@@ -116,10 +123,10 @@ private:
     message.header.stamp = get_clock()->now();
     auto dt = message.header.stamp.nanosec - prev_time.nanoseconds();
     turtlelib::Wheel_Vel phidot{};
-    phidot.l = (msg.left_encoder/encoder_ticks_per_rad - tbot3.phi_l)/(1e-9*dt);
-    tbot3.phi_l = msg.left_encoder/encoder_ticks_per_rad;
-    phidot.r = (msg.right_encoder/encoder_ticks_per_rad - tbot3.phi_r)/(1e-9*dt);
-    tbot3.phi_r = msg.right_encoder/encoder_ticks_per_rad;
+    phidot.l = (msg.left_encoder / encoder_ticks_per_rad - tbot3.phi_l) / (1e-9 * dt);
+    tbot3.phi_l = msg.left_encoder / encoder_ticks_per_rad;
+    phidot.r = (msg.right_encoder / encoder_ticks_per_rad - tbot3.phi_r) / (1e-9 * dt);
+    tbot3.phi_r = msg.right_encoder / encoder_ticks_per_rad;
 
     message.name = {"wheel_left_joint", "wheel_right_joint"};
     message.position = {tbot3.phi_l, tbot3.phi_r};

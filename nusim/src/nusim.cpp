@@ -81,12 +81,12 @@ public:
     arena_y = get_parameter("arena/y_length").as_double();
     wall_thickness = get_parameter("wall/thickness").as_double();
 
-    x_pos = {(arena_x + wall_thickness)/-2.0, (arena_x + wall_thickness)/2.0, 0.0, 0.0};
-    y_pos = {0.0, 0.0, (arena_y+wall_thickness)/-2.0, (arena_y + wall_thickness)/2.0};
+    x_pos = {(arena_x + wall_thickness) / -2.0, (arena_x + wall_thickness) / 2.0, 0.0, 0.0};
+    y_pos = {0.0, 0.0, (arena_y + wall_thickness) / -2.0, (arena_y + wall_thickness) / 2.0};
     length = {arena_y, arena_y, arena_x, arena_x};
     tf2::Quaternion wx, wy;
     wx.setRPY(0.0, 0.0, 0.0);
-    wy.setRPY(0.0, 0.0, turtlelib::PI/2.0);
+    wy.setRPY(0.0, 0.0, turtlelib::PI / 2.0);
     orient = {tf2::toMsg(wy), tf2::toMsg(wy), tf2::toMsg(wx), tf2::toMsg(wx)};
 
     declare_parameter("wheel_radius", 0.0);
@@ -100,7 +100,7 @@ public:
     const auto radius = get_parameter("wheel_radius").as_double();
     const auto track_width = get_parameter("track_width").as_double();
 
-    turtlelib::Config q{x0,y0,theta0};
+    turtlelib::Config q{x0, y0, theta0};
     turtlelib::DiffDrive tbot{track_width, radius, q};
     tbot3 = tbot;
 
@@ -120,7 +120,11 @@ public:
     sens_publisher_ = create_publisher<nuturtlebot_msgs::msg::SensorData>("red/sensor_data", 10);
     obst_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/obstacles", 10);
     wall_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/walls", 10);
-    cmd_subscriber_ = create_subscription<nuturtlebot_msgs::msg::WheelCommands>("red/wheel_cmd", 10, std::bind(&SimNode::cmd_callback, this, std::placeholders::_1));
+    cmd_subscriber_ = create_subscription<nuturtlebot_msgs::msg::WheelCommands>(
+      "red/wheel_cmd", 10, std::bind(
+        &SimNode::cmd_callback, this,
+        std::placeholders::
+        _1));
 
     timer_ = create_wall_timer(
       std::chrono::duration<int64_t, std::milli>(t), std::bind(&SimNode::timer_callback, this));
@@ -151,7 +155,7 @@ private:
   double motor_cmd_per_rad_sec{};
   double encoder_ticks_per_rad{};
   int motor_cmd_max{};
-  std::vector<double> obstacles_x{}; 
+  std::vector<double> obstacles_x{};
   std::vector<double> obstacles_y{};
   std::vector<double> x_pos{}; std::vector<double> y_pos{}; std::vector<double> length{};
   std::vector<geometry_msgs::msg::Quaternion> orient{};
@@ -159,7 +163,7 @@ private:
   double arena_x{}; double arena_y{};
   double wall_thickness{};
   double phi_lp{0.0}; double phi_rp{0.0};
-  turtlelib::DiffDrive tbot3{0.0,0.0};
+  turtlelib::DiffDrive tbot3{0.0, 0.0};
   rclcpp::Publisher<std_msgs::msg::UInt64>::SharedPtr publisher_;
   rclcpp::Publisher<nuturtlebot_msgs::msg::SensorData>::SharedPtr sens_publisher_;
   rclcpp::TimerBase::SharedPtr timer_;
@@ -203,8 +207,8 @@ private:
     // publish sensor message for odometry
     auto sens_msg = nuturtlebot_msgs::msg::SensorData();
     sens_msg.stamp = get_clock()->now();
-    sens_msg.left_encoder = tbot3.phi_l*encoder_ticks_per_rad;
-    sens_msg.right_encoder = tbot3.phi_r*encoder_ticks_per_rad;
+    sens_msg.left_encoder = tbot3.phi_l * encoder_ticks_per_rad;
+    sens_msg.right_encoder = tbot3.phi_r * encoder_ticks_per_rad;
     sens_publisher_->publish(sens_msg);
   }
 
@@ -298,16 +302,16 @@ private:
 
   void cmd_callback(const nuturtlebot_msgs::msg::WheelCommands & msg)
   {
-      
-      phidot_l = msg.left_velocity/motor_cmd_per_rad_sec;
-      phidot_r = msg.right_velocity/motor_cmd_per_rad_sec;
-      tbot3.forward_kin(phidot_l/rate, phidot_r/rate);
 
-      // update position of robot
-      x = tbot3.q.x;
-      y = tbot3.q.y;
-      theta = tbot3.q.theta;
-    
+    phidot_l = msg.left_velocity / motor_cmd_per_rad_sec;
+    phidot_r = msg.right_velocity / motor_cmd_per_rad_sec;
+    tbot3.forward_kin(phidot_l / rate, phidot_r / rate);
+
+    // update position of robot
+    x = tbot3.q.x;
+    y = tbot3.q.y;
+    theta = tbot3.q.theta;
+
   }
 
 };
