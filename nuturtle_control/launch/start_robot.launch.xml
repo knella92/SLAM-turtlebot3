@@ -11,6 +11,7 @@
     <arg name="ns" default=""/>
 
     <let name="ns" value="blue" if="$(eval '\'$(var use_rviz)\' == \'true\'')"/>
+    <let name="ns" value="red" if="$(eval '\'$(var robot)\' == \'nusim\'')"/>
     
     <node pkg='nuturtle_control' exec='turtle_control' name='turtle_control' output='screen'>
         <param from="$(find-pkg-share nuturtle_description)/config/diff_params.yaml"/>
@@ -37,7 +38,7 @@
 
     <include file="$(find-pkg-share nusim)/launch/nusim.launch.xml"
         if="$(eval '\'$(var robot)\' == \'nusim\'')">
-        <arg name="rviz" value="false"/>
+        <arg name="rviz" value="true"/>
     </include>
 
     <include file="$(find-pkg-share nuturtle_description)/launch/load_one.launch.py"
@@ -57,6 +58,8 @@
     <node pkg="tf2_ros" exec="static_transform_publisher" name="world_to_odom" args='0 0 0 0 0 0 1 nusim/world odom'
         if="$(eval '\'$(var robot)\' == \'nusim\'')"/>
 
+    <node pkg='hls_lfcd_lds_driver' exec='hdls_laser_publisher'
+        if="$(eval '\'$(var robot)\' == \'localhost\'')"/>
 
 
 </launch>
