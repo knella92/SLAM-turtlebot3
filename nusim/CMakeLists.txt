@@ -20,6 +20,7 @@ find_package(tf2_geometry_msgs REQUIRED)
 find_package(nuturtlebot_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(turtlelib REQUIRED)
+find_package(nav_msgs REQUIRED)
 
 set(srv_files
   "srv/Reset.srv"
@@ -42,7 +43,8 @@ ament_target_dependencies(
   tf2_ros
   tf2_geometry_msgs
   nuturtlebot_msgs
-  sensor_msgs)
+  sensor_msgs
+  nav_msgs)
 
 install(
   DIRECTORY launch config

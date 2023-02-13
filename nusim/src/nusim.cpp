@@ -39,6 +39,7 @@
 #include "nuturtlebot_msgs/msg/wheel_commands.hpp"
 #include "nuturtlebot_msgs/msg/sensor_data.hpp"
 #include "turtlelib/diff_drive.hpp"
+#include "nav_msgs/msg/path.hpp"
 
 
 using namespace std::chrono_literals;
@@ -120,6 +121,7 @@ public:
     sens_publisher_ = create_publisher<nuturtlebot_msgs::msg::SensorData>("red/sensor_data", 10);
     obst_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/obstacles", 10);
     wall_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/walls", 10);
+    path_publisher_ = create_publisher<nav_msgs::msg::Path>("~/path", 10);
     cmd_subscriber_ = create_subscription<nuturtlebot_msgs::msg::WheelCommands>(
       "red/wheel_cmd", 10, std::bind(
         &SimNode::cmd_callback, this,
@@ -169,6 +171,7 @@ private:
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr obst_publisher_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr wall_publisher_;
+  rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr path_publisher_;
   rclcpp::Subscription<nuturtlebot_msgs::msg::WheelCommands>::SharedPtr cmd_subscriber_;
   rclcpp::Service<nusim::srv::Reset>::SharedPtr reset_service_;
   rclcpp::Service<nusim::srv::Teleport>::SharedPtr tele_service_;
@@ -210,6 +213,15 @@ private:
     sens_msg.left_encoder = tbot3.phi_l * encoder_ticks_per_rad;
     sens_msg.right_encoder = tbot3.phi_r * encoder_ticks_per_rad;
     sens_publisher_->publish(sens_msg);
+
+    //publish path
+    // auto path_msg = nav_msgs::msg::Path();
+    // path_msg.header.stamp = get_clock()->now();
+    // path_msg.header.frame_id = "nusim/world";
+    // path_msg.poses[count_].pose.position.x = x;
+    // path_msg.poses[count_].pose.position.y = y;
+    // path_msg.poses[count_].pose.orientation = quat;
+
   }
 
   /// \brief Reset service
@@ -302,7 +314,6 @@ private:
 
   void cmd_callback(const nuturtlebot_msgs::msg::WheelCommands & msg)
   {
-
     phidot_l = msg.left_velocity / motor_cmd_per_rad_sec;
     phidot_r = msg.right_velocity / motor_cmd_per_rad_sec;
     tbot3.forward_kin(phidot_l / rate, phidot_r / rate);
@@ -311,8 +322,9 @@ private:
     x = tbot3.q.x;
     y = tbot3.q.y;
     theta = tbot3.q.theta;
-
   }
+
+
 
 };
 
