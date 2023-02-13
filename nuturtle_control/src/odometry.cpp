@@ -117,7 +117,6 @@ private:
     odom.pose.pose.position.x = tbot3.q.x;
     odom.pose.pose.position.y = tbot3.q.y;
     odom.pose.pose.orientation = quat;
-
     odom.twist.twist.linear.x = Vb.v.x;
     odom.twist.twist.linear.y = Vb.v.y;
     odom.twist.twist.angular.z = Vb.w;
@@ -127,11 +126,9 @@ private:
     t.header.stamp = get_clock()->now();
     t.header.frame_id = odom_id;
     t.child_frame_id = body_id;
-
     t.transform.translation.x = tbot3.q.x;
     t.transform.translation.y = tbot3.q.y;
     t.transform.rotation = quat;
-
     tf_broadcaster_->sendTransform(t);
 
     publish_path(quat);

@@ -40,9 +40,6 @@ namespace turtlelib
     Twist2D DiffDrive::forward_kin(double dphi_l, double dphi_r){
         Twist2D Vb{};
 
-        phi_l += dphi_l;
-        phi_r += dphi_r;
-
         Vb.w = hpi00*dphi_l + hpi01*dphi_r;
         Vb.v.x = hpi10*dphi_l + hpi11*dphi_r;
         Vb.v.y = 0.0;
@@ -54,6 +51,12 @@ namespace turtlelib
         q.y += dq.x*sin(q.theta) + dq.y*cos(q.theta);
 
         return Vb;
+    }
+
+    void DiffDrive::update_wheel_pose(double dphi_l, double dphi_r)
+    {
+        phi_l += dphi_l;
+        phi_r += dphi_r;
     }
 
 }

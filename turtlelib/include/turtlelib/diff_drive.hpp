@@ -95,11 +95,16 @@ namespace turtlelib
             /// \return - wheel velocities
             Wheel_Vel inverse_kin(Twist2D & Vb) const;
 
-            /// \brief updates robot's configuration given new wheel positions
-            /// \param phi_lp - new left wheel position (phi_l')
-            /// \param phi_rp - new right wheel position (phi_r')
+            /// \brief updates robot's configuration given change in wheel positions
+            /// \param dphi_l - change in left wheel position
+            /// \param dphi_r - change in right wheel position
             /// \return claculated body twist
-            turtlelib::Twist2D forward_kin(double phi_lp, double phi_rp);
+            turtlelib::Twist2D forward_kin(double dphi_l, double dphi_r);
+
+            /// \brief updates robot's wheel positions (radians)
+            /// \param dphi_l - change in left wheel position
+            /// @param dphi_r - change in right wheel position
+            void update_wheel_pose(double dphi_l, double dphi_r);
 
     };
 

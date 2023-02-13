@@ -113,9 +113,17 @@ public:
       rclcpp::shutdown();
     }
 
-    input_noise = get_parameter("input_noise").as_double();
-    input_noise = sqrt(input_noise);
+    declare_parameter("input_noise", 0.0);
+    declare_parameter("slip_fraction", 0.0);
+    const auto input_noise = get_parameter("input_noise").as_double();
+    const auto stddv = sqrt(input_noise);
+    std::normal_distribution<double> w(0.0, stddv);
+    w_i = w;
+    std::uniform_real_distribution<double> distr(-slip_fraction, slip_fraction);
+    n_i = distr;
+
     slip_fraction = get_parameter("slip_fraction").as_double();
+    
 
     // saves rate parameter as an int
     rate = get_parameter("rate").as_int();
@@ -162,12 +170,17 @@ private:
   std::vector<double> obstacles_y{};
   std::vector<double> x_pos{}; std::vector<double> y_pos{}; std::vector<double> length{};
   std::vector<geometry_msgs::msg::Quaternion> orient{};
+  std::normal_distribution<double> w_i{};
+  std::uniform_real_distribution<double> n_i{};
+  std::default_random_engine generator;
   double obstacles_r{};
   double arena_x{}; double arena_y{};
   double wall_thickness{};
   double phi_lp{0.0}; double phi_rp{0.0};
   double input_noise{}; double slip_fraction;
   turtlelib::DiffDrive tbot3{0.0, 0.0};
+
+  // initialize publishers, subscribers, timer, services
   rclcpp::Publisher<std_msgs::msg::UInt64>::SharedPtr publisher_;
   rclcpp::Publisher<nuturtlebot_msgs::msg::SensorData>::SharedPtr sens_publisher_;
   rclcpp::TimerBase::SharedPtr timer_;
@@ -203,12 +216,6 @@ private:
     t.transform.rotation = quat;
     redbot_broadcaster_->sendTransform(t);
 
-    // publish obstacles and walls (each time callback)
-    visualization_msgs::msg::MarkerArray obstacles = add_obstacles();
-    visualization_msgs::msg::MarkerArray walls = add_walls();
-    obst_publisher_->publish(obstacles);
-    wall_publisher_->publish(walls);
-
     // publish sensor message for odometry
     auto sens_msg = nuturtlebot_msgs::msg::SensorData();
     sens_msg.stamp = get_clock()->now();
@@ -217,6 +224,13 @@ private:
     sens_publisher_->publish(sens_msg);
 
 
+    // publish obstacles and walls (each time callback)
+    visualization_msgs::msg::MarkerArray obstacles = add_obstacles();
+    visualization_msgs::msg::MarkerArray walls = add_walls();
+    obst_publisher_->publish(obstacles);
+    wall_publisher_->publish(walls);
+
+    // publish path
     auto path_msg = nav_msgs::msg::Path();
     auto pose_msg = geometry_msgs::msg::PoseStamped();
     pose_msg.header.stamp = get_clock()->now();
@@ -230,6 +244,40 @@ private:
     path_publisher_->publish(path_msg);
 
   }
+
+
+  void cmd_callback(const nuturtlebot_msgs::msg::WheelCommands & msg)
+  {
+    const auto u_l = msg.left_velocity / motor_cmd_per_rad_sec;
+    const auto u_r = msg.right_velocity / motor_cmd_per_rad_sec;
+    double v_l{}; double v_r{};
+    
+    if(turtlelib::almost_equal(u_l,0.0) && turtlelib::almost_equal(u_r, 0.0))
+    {
+      v_l = u_l;
+      v_r = u_r;
+    }
+    else
+    {
+      v_l = u_l + w_i(generator);
+      v_r = u_r + w_i(generator);
+    }
+
+    tbot3.forward_kin(v_l / rate, v_r / rate);
+
+    const auto dphi_l = (u_l * (1+n_i(generator))/rate);
+    const auto dphi_r = (u_r * (1+n_i(generator))/rate);
+    tbot3.update_wheel_pose(dphi_l, dphi_r);
+    
+
+    // update body configuration of robot
+    x = tbot3.q.x;
+    y = tbot3.q.y;
+    theta = tbot3.q.theta;
+
+
+  }
+
 
   /// \brief Reset service
   /// \param request (empty)
@@ -264,6 +312,7 @@ private:
     theta = request->theta;
     RCLCPP_INFO(get_logger(), "Teleporting");
   }
+
 
   /// \brief Adds obstacles to MarkerArray for publishing in timer_callback()
   /// \return MarkerArray
@@ -317,36 +366,6 @@ private:
 
     return all_walls;
   }
-
-
-  void cmd_callback(const nuturtlebot_msgs::msg::WheelCommands & msg)
-  {
-    const auto u_l = msg.left_velocity / motor_cmd_per_rad_sec;
-    const auto u_r = msg.right_velocity / motor_cmd_per_rad_sec;
-    
-    std::default_random_engine generator{};
-    std::normal_distribution<double> w_l(0.0, input_noise);
-    std::normal_distribution<double> w_r(0.0, input_noise);
-    
-    if(almost_equal(u_l,0.0) && almost_equal(u_r, 0.0))
-    {
-      const auto v_l = u_l;
-      const auto v_r = u_r;
-    }
-    const auto v_l = u_l + w_l(generator);
-    const auto v_r = u_r + w_r(generator);
-
-    tbot3.forward_kin(u_l / rate, u_r / rate);
-
-
-    // update position of robot
-    x = tbot3.q.x;
-    y = tbot3.q.y;
-    theta = tbot3.q.theta;
-
-
-  }
-
 
 
 };
