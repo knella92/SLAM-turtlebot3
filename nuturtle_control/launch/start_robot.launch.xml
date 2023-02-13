@@ -38,7 +38,7 @@
 
     <include file="$(find-pkg-share nusim)/launch/nusim.launch.xml"
         if="$(eval '\'$(var robot)\' == \'nusim\'')">
-        <arg name="rviz" value="true"/>
+        <arg name="rviz" value="false"/>
     </include>
 
     <include file="$(find-pkg-share nuturtle_description)/launch/load_one.launch.py"
