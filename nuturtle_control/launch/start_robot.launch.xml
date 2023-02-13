@@ -8,15 +8,14 @@
     <arg name="cmd_src" description="Source of cmd_vel commands. Valid choices are: ['circle', 'teleop', 'none']" default="none"/>
     <arg name="robot" description="Valid choices are: ['nusim', 'localhost', 'none']" default="nusim"/>
     <arg name="use_rviz" description="Launch rviz with robot model, tf frames, and odometry" default="false"/>
-    <arg name="ns" default=""/>
 
     <let name="ns" value="blue" if="$(eval '\'$(var use_rviz)\' == \'true\'')"/>
-    <let name="ns" value="red" if="$(eval '\'$(var robot)\' == \'nusim\'')"/>
+    <let name="nsr" value="red" if="$(eval '\'$(var robot)\' == \'nusim\'')"/>
     
     <node pkg='nuturtle_control' exec='turtle_control' name='turtle_control' output='screen'>
         <param from="$(find-pkg-share nuturtle_description)/config/diff_params.yaml"/>
-        <remap from="wheel_cmd" to="$(var ns)/wheel_cmd"/>
-        <remap from="sensor_data" to="$(var ns)/sensor_data"/>
+        <remap from="wheel_cmd" to="$(var nsr)/wheel_cmd"/>
+        <remap from="sensor_data" to="$(var nsr)/sensor_data"/>
         <remap from="joint_states" to="blue/joint_states"/>
     </node>
 
