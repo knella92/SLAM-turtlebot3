@@ -50,8 +50,6 @@
         <arg name='use_jsp' value='true'/>
     </include>
 
-
-
     <node pkg='numsr_turtlebot' exec='numsr_turtlebot'
         if="$(eval '\'$(var robot)\' == \'localhost\'')"/>
 
