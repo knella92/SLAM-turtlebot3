@@ -52,12 +52,11 @@ public:
   : Node("nusim"), count_(0)
   {
 
-    //declare initial parameters
+    // initial pose parameters
     declare_parameter("rate", 200);
     declare_parameter("x0", 0.0);
     declare_parameter("y0", 0.0);
     declare_parameter("theta0", 0.0);
-    // gets aforementioned parameters
     x0 = get_parameter("x0").as_double();
     y0 = get_parameter("y0").as_double();
     theta0 = get_parameter("theta0").as_double();
@@ -65,7 +64,7 @@ public:
     y = y0;
     theta = theta0;
 
-    // declares obstacle parameters
+    // obstacle parameters
     declare_parameter("obstacles/x", std::vector<double>({0.0}));
     declare_parameter("obstacles/y", std::vector<double>({0.0}));
     declare_parameter("obstacles/r", 0.0);
@@ -76,13 +75,13 @@ public:
       rclcpp::shutdown();
     }
 
+    // wall parameters
     declare_parameter("arena/x_length", 0.0);
     declare_parameter("arena/y_length", 0.0);
     declare_parameter("wall/thickness", 0.0);
     arena_x = get_parameter("arena/x_length").as_double();
     arena_y = get_parameter("arena/y_length").as_double();
     wall_thickness = get_parameter("wall/thickness").as_double();
-
     x_pos = {(arena_x + wall_thickness) / -2.0, (arena_x + wall_thickness) / 2.0, 0.0, 0.0};
     y_pos = {0.0, 0.0, (arena_y + wall_thickness) / -2.0, (arena_y + wall_thickness) / 2.0};
     length = {arena_y, arena_y, arena_x, arena_x};
@@ -90,7 +89,14 @@ public:
     wx.setRPY(0.0, 0.0, 0.0);
     wy.setRPY(0.0, 0.0, turtlelib::PI / 2.0);
     orient = {tf2::toMsg(wy), tf2::toMsg(wy), tf2::toMsg(wx), tf2::toMsg(wx)};
+    // test for determining whether obstacles/x and obstacles/y are equal in length
+    const std::vector<double> obstacles_x = get_parameter("obstacles/x").as_double_array();
+    const std::vector<double> obstacles_y = get_parameter("obstacles/y").as_double_array();
+    if (obstacles_x.size() != obstacles_y.size()) {
+      rclcpp::shutdown();
+    }
 
+    // turtlebot parameters
     declare_parameter("wheel_radius", 0.0);
     declare_parameter("track_width", 0.0);
     declare_parameter("motor_cmd_max", 0);
@@ -101,29 +107,28 @@ public:
     motor_cmd_max = get_parameter("motor_cmd_max").as_int();
     const auto radius = get_parameter("wheel_radius").as_double();
     const auto track_width = get_parameter("track_width").as_double();
-
     turtlelib::Config q{x0, y0, theta0};
     turtlelib::DiffDrive tbot{track_width, radius, q};
     tbot3 = tbot;
 
-    // test for determining whether obstacles/x and obstacles/y are equal in length
-    const std::vector<double> obstacles_x = get_parameter("obstacles/x").as_double_array();
-    const std::vector<double> obstacles_y = get_parameter("obstacles/y").as_double_array();
-    if (obstacles_x.size() != obstacles_y.size()) {
-      rclcpp::shutdown();
-    }
-
+    // noise parameters
     declare_parameter("input_noise", 0.0);
     declare_parameter("slip_fraction", 0.0);
     const auto input_noise = get_parameter("input_noise").as_double();
     const auto stddv = sqrt(input_noise);
     std::normal_distribution<double> w(0.0, stddv);
     w_i = w;
+    slip_fraction = get_parameter("slip_fraction").as_double();
     std::uniform_real_distribution<double> distr(-slip_fraction, slip_fraction);
     n_i = distr;
 
-    slip_fraction = get_parameter("slip_fraction").as_double();
-    
+    // sensor parameters
+    declare_parameter("basic_sensor_variance", 0.0);
+    declare_parameter("max_range",5.0);
+    const auto basic_sensor_variance = get_parameter("basic_sensor_variance").as_double();
+    std::normal_distribution<double> sv(0.0,sqrt(basic_sensor_variance));
+    sens_var = sv;
+    max_range = get_parameter("max_range").as_double();
 
     // saves rate parameter as an int
     rate = get_parameter("rate").as_int();
@@ -135,6 +140,7 @@ public:
     obst_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/obstacles", 10);
     wall_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/walls", 10);
     path_publisher_ = create_publisher<nav_msgs::msg::Path>("~/path", 10);
+    fake_sensor_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/fake_sensor", 10);
     cmd_subscriber_ = create_subscription<nuturtlebot_msgs::msg::WheelCommands>(
       "red/wheel_cmd", 10, std::bind(
         &SimNode::cmd_callback, this,
@@ -171,6 +177,7 @@ private:
   std::vector<double> x_pos{}; std::vector<double> y_pos{}; std::vector<double> length{};
   std::vector<geometry_msgs::msg::Quaternion> orient{};
   std::normal_distribution<double> w_i{};
+  std::normal_distribution<double> sens_var{};
   std::uniform_real_distribution<double> n_i{};
   std::default_random_engine generator;
   double obstacles_r{};
@@ -178,6 +185,7 @@ private:
   double wall_thickness{};
   double phi_lp{0.0}; double phi_rp{0.0};
   double input_noise{}; double slip_fraction;
+  double max_range{};
   turtlelib::DiffDrive tbot3{0.0, 0.0};
 
   // initialize publishers, subscribers, timer, services
@@ -186,6 +194,7 @@ private:
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr obst_publisher_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr wall_publisher_;
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr fake_sensor_publisher_;
   rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr path_publisher_;
   rclcpp::Subscription<nuturtlebot_msgs::msg::WheelCommands>::SharedPtr cmd_subscriber_;
   rclcpp::Service<nusim::srv::Reset>::SharedPtr reset_service_;
@@ -225,7 +234,7 @@ private:
 
 
     // publish obstacles and walls (each time callback)
-    visualization_msgs::msg::MarkerArray obstacles = add_obstacles();
+    visualization_msgs::msg::MarkerArray obstacles = add_obstacles(0, 0.0, "red");
     visualization_msgs::msg::MarkerArray walls = add_walls();
     obst_publisher_->publish(obstacles);
     wall_publisher_->publish(walls);
@@ -242,6 +251,12 @@ private:
     path_msg.header.stamp = pose_msg.header.stamp;
     path_msg.header.frame_id = pose_msg.header.frame_id;
     path_publisher_->publish(path_msg);
+
+    if(std::fmod(count_, 5) == 0)
+    {
+      visualization_msgs::msg::MarkerArray sensor_obstacles = add_obstacles(1, sens_var(generator), "yellow");
+      fake_sensor_publisher_->publish(sensor_obstacles);
+    }
 
   }
 
@@ -316,7 +331,7 @@ private:
 
   /// \brief Adds obstacles to MarkerArray for publishing in timer_callback()
   /// \return MarkerArray
-  visualization_msgs::msg::MarkerArray add_obstacles()
+  visualization_msgs::msg::MarkerArray add_obstacles(int sensor_ind, double sens_var, std::string color)
   {
     visualization_msgs::msg::MarkerArray all_obst;
 
@@ -330,14 +345,36 @@ private:
       obst.scale.x = obstacles_r;
       obst.scale.y = obstacles_r;
       obst.scale.z = 0.25;
-      obst.color.r = 1.0;
+      if(color == "red")
+      {
+        obst.color.r = 1.0;
+      }
+      else if(color == "yellow")
+      {
+        obst.color.r = 1.0;
+        obst.color.g = 0.917;
+      }
       obst.color.a = 1.0;
       obst.id = i;
-      obst.action = visualization_msgs::msg::Marker::ADD;
-      obst.pose.position.x = obstacles_x.at(i);
-      obst.pose.position.y = obstacles_y.at(i);
+      obst.pose.position.x = obstacles_x.at(i) + sens_var;
+      obst.pose.position.y = obstacles_y.at(i) + sens_var;
+      if(sensor_ind == 1)
+      {
+        if(sqrt(std::pow(obst.pose.position.x,2) + std::pow(obst.pose.position.y, 2)) > max_range)
+        {
+          obst.action = visualization_msgs::msg::Marker::DELETE;
+        }
+        else{
+          obst.action = visualization_msgs::msg::Marker::ADD;
+        }
+      }
+      else
+      {
+        obst.action = visualization_msgs::msg::Marker::ADD;
+      }
       all_obst.markers.push_back(obst);
     }
+
     return all_obst;
   }
 
