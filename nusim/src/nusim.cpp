@@ -26,6 +26,7 @@
 #include <chrono>
 #include <functional>
 #include <memory>
+#include <random>
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/u_int64.hpp"
@@ -112,6 +113,10 @@ public:
       rclcpp::shutdown();
     }
 
+    input_noise = get_parameter("input_noise").as_double();
+    input_noise = sqrt(input_noise);
+    slip_fraction = get_parameter("slip_fraction").as_double();
+
     // saves rate parameter as an int
     rate = get_parameter("rate").as_int();
     const int64_t t = 1000 / rate; // implicit conversion of 1000/rate to int64_t to use as time in ms
@@ -148,15 +153,11 @@ public:
 
 private:
   size_t count_;
-  int rate;
-  double dt{};
-  int prev_time = get_clock()->now().nanoseconds();
-  int current_time{};
+  int rate{};
+  int prev_time = get_clock()->now().nanoseconds(); int current_time{};
   double x0{}; double y0{}; double theta0{}; double x{}; double y{}; double theta{};
   double phidot_l{}; double phidot_r{};
-  double motor_cmd_per_rad_sec{};
-  double encoder_ticks_per_rad{};
-  int motor_cmd_max{};
+  double motor_cmd_per_rad_sec{}; double encoder_ticks_per_rad{}; int motor_cmd_max{};
   std::vector<double> obstacles_x{};
   std::vector<double> obstacles_y{};
   std::vector<double> x_pos{}; std::vector<double> y_pos{}; std::vector<double> length{};
@@ -165,6 +166,7 @@ private:
   double arena_x{}; double arena_y{};
   double wall_thickness{};
   double phi_lp{0.0}; double phi_rp{0.0};
+  double input_noise{}; double slip_fraction;
   turtlelib::DiffDrive tbot3{0.0, 0.0};
   rclcpp::Publisher<std_msgs::msg::UInt64>::SharedPtr publisher_;
   rclcpp::Publisher<nuturtlebot_msgs::msg::SensorData>::SharedPtr sens_publisher_;
@@ -214,13 +216,18 @@ private:
     sens_msg.right_encoder = tbot3.phi_r * encoder_ticks_per_rad;
     sens_publisher_->publish(sens_msg);
 
-    //publish path
-    // auto path_msg = nav_msgs::msg::Path();
-    // path_msg.header.stamp = get_clock()->now();
-    // path_msg.header.frame_id = "nusim/world";
-    // path_msg.poses[count_].pose.position.x = x;
-    // path_msg.poses[count_].pose.position.y = y;
-    // path_msg.poses[count_].pose.orientation = quat;
+
+    auto path_msg = nav_msgs::msg::Path();
+    auto pose_msg = geometry_msgs::msg::PoseStamped();
+    pose_msg.header.stamp = get_clock()->now();
+    pose_msg.header.frame_id = "nusim/world";
+    pose_msg.pose.position.x = x;
+    pose_msg.pose.position.y = y;
+    pose_msg.pose.orientation = quat;
+    path_msg.poses.push_back(pose_msg);
+    path_msg.header.stamp = pose_msg.header.stamp;
+    path_msg.header.frame_id = pose_msg.header.frame_id;
+    path_publisher_->publish(path_msg);
 
   }
 
@@ -314,14 +321,30 @@ private:
 
   void cmd_callback(const nuturtlebot_msgs::msg::WheelCommands & msg)
   {
-    phidot_l = msg.left_velocity / motor_cmd_per_rad_sec;
-    phidot_r = msg.right_velocity / motor_cmd_per_rad_sec;
-    tbot3.forward_kin(phidot_l / rate, phidot_r / rate);
+    const auto u_l = msg.left_velocity / motor_cmd_per_rad_sec;
+    const auto u_r = msg.right_velocity / motor_cmd_per_rad_sec;
+    
+    std::default_random_engine generator{};
+    std::normal_distribution<double> w_l(0.0, input_noise);
+    std::normal_distribution<double> w_r(0.0, input_noise);
+    
+    if(almost_equal(u_l,0.0) && almost_equal(u_r, 0.0))
+    {
+      const auto v_l = u_l;
+      const auto v_r = u_r;
+    }
+    const auto v_l = u_l + w_l(generator);
+    const auto v_r = u_r + w_r(generator);
+
+    tbot3.forward_kin(u_l / rate, u_r / rate);
+
 
     // update position of robot
     x = tbot3.q.x;
     y = tbot3.q.y;
     theta = tbot3.q.theta;
+
+
   }
 
 

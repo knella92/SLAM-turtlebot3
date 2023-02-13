@@ -30,6 +30,7 @@
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_ros/transform_broadcaster.h"
+#include "nav_msgs/msg/path.hpp"
 
 
 class OdomNode : public rclcpp::Node
@@ -46,6 +47,8 @@ public:
     declare_parameter("wheel_right", "none");
     declare_parameter("wheel_radius", 0.0);
     declare_parameter("track_width", 0.0);
+    declare_parameter("input_noise", 0.0);
+    declare_parameter("slip_fraction", 0.0);
 
     // if these are not specified, shutdown the node
     if (get_parameter("body_id").as_string() == "none") {
@@ -72,6 +75,7 @@ public:
 
     // initialize publisher, subscriber, and service
     odom_publisher_ = create_publisher<nav_msgs::msg::Odometry>("/odom", 10);
+    path_publisher_ = create_publisher<nav_msgs::msg::Path>("/path", 10);
     js_subscriber_ = create_subscription<sensor_msgs::msg::JointState>(
       "/joint_states", 10, std::bind(
         &OdomNode::js_callback, this,
@@ -90,6 +94,7 @@ private:
   turtlelib::DiffDrive tbot3{0.0, 0.0};
   std::string body_id, odom_id, wheel_left, wheel_right;
   rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_publisher_;
+  rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr path_publisher_;
   rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr js_subscriber_;
   std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
   rclcpp::Service<nuturtle_control::srv::InitialPose>::SharedPtr initialp_service_;
@@ -129,6 +134,8 @@ private:
 
     tf_broadcaster_->sendTransform(t);
 
+    publish_path(quat);
+
   }
 
   void initial_pose(
@@ -140,6 +147,21 @@ private:
     tbot3.q.y = request->y;
     tbot3.q.theta = request->theta;
 
+  }
+
+  void publish_path(geometry_msgs::msg::Quaternion quat)
+  {
+    auto path_msg = nav_msgs::msg::Path();
+    auto pose_msg = geometry_msgs::msg::PoseStamped();
+    pose_msg.header.stamp = get_clock()->now();
+    pose_msg.header.frame_id = "nusim/world";
+    pose_msg.pose.position.x = tbot3.q.x;
+    pose_msg.pose.position.y = tbot3.q.y;
+    pose_msg.pose.orientation = quat;
+    path_msg.poses.push_back(pose_msg);
+    path_msg.header.stamp = pose_msg.header.stamp;
+    path_msg.header.frame_id = pose_msg.header.frame_id;
+    path_publisher_->publish(path_msg);
   }
 
 };
