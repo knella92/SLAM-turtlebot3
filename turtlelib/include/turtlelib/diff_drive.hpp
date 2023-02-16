@@ -4,6 +4,7 @@
 /// \brief Kinematics of Differential Drive robots
 
 #include "turtlelib/rigid2d.hpp"
+#include <vector>
 
 
 namespace turtlelib
@@ -103,10 +104,27 @@ namespace turtlelib
 
             /// \brief updates robot's wheel positions (radians)
             /// \param dphi_l - change in left wheel position
-            /// @param dphi_r - change in right wheel position
+            /// \param dphi_r - change in right wheel position
             void update_wheel_pose(double dphi_l, double dphi_r);
 
     };
+
+    /// \brief find angle given distance from center point
+    /// \param dx - distance from center in x direction
+    /// \param dy - distance from center in y direction
+    /// \return - angle in radians
+    double find_angle(double dx, double dy);
+
+    /// \brief determines whether there is a collision between robot and external environment,
+    /// and returns new body configuration accordingly
+    /// \param q - body configuration of robot
+    /// \param collision_radius - collision radius of robot
+    /// \param obstacles_x - vector of obstacle x positions
+    /// \param obstacles_y - vector of obstacle y positions
+    /// \param obstacles_r - radius of obstdacles
+    /// \return new body configuration of robot
+    Config collision_detection(Config q, double collision_radius, std::vector<double> obstacles_x, std::vector<double> obstacles_y, double obstacles_r);
+
 
 }
 

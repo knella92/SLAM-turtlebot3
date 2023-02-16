@@ -59,4 +59,58 @@ namespace turtlelib
         phi_r += dphi_r;
     }
 
+    double find_angle(double dx, double dy)
+    {
+        double radians{};
+        double mag = sqrt(std::pow(dx,2) + std::pow(dy,2));
+        if(dy > 0){
+            radians = acos(dx/mag);
+        }
+        else if (dx > 0 && dy < 0){
+            radians = asin(dy/mag);
+        }
+        else if (dx < 0 && dy < 0){
+            radians = -acos(dx/mag);
+        }
+        else if (dx > 0 && almost_equal(dy, 0.0)){
+            radians = 0.0;
+        }
+        else if (almost_equal(dx,0.0) && dy > 0){
+            radians = PI/2;
+        }
+        else if (almost_equal(dy,0.0) && dx < 0){
+            radians = PI;
+        }
+        else if (almost_equal(dx,0.0) && dy < 0){
+            radians = 3*PI/2.0;
+        }
+        return radians;
+    }
+
+    Config collision_detection(Config q, double collision_radius, std::vector<double> obstacles_x, std::vector<double> obstacles_y, double obstacles_r)
+    {
+        double R{collision_radius + obstacles_r};
+        double xp{}; double yp{};
+        double dx{}; double dy{}; double angle{};
+        double dr{};
+        for(int i = 0; i < (int) obstacles_x.size(); i++)
+        {   
+            dx = q.x - obstacles_x.at(i);
+            dy = q.y - obstacles_y.at(i);
+            dr = sqrt(std::pow(dx,2) + std::pow(dy,2));
+            if(dr < R)
+            {   
+                angle = find_angle(dx, dy);
+                xp = obstacles_x.at(i) + R*cos(angle);
+                yp = obstacles_y.at(i) + R*sin(angle);
+                q.x = xp;
+                q.y = yp;
+                break;
+            }
+            else{;}
+        }
+
+        return q;
+    }
+
 }

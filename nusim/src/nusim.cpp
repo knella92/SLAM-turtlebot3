@@ -89,12 +89,7 @@ public:
     wx.setRPY(0.0, 0.0, 0.0);
     wy.setRPY(0.0, 0.0, turtlelib::PI / 2.0);
     orient = {tf2::toMsg(wy), tf2::toMsg(wy), tf2::toMsg(wx), tf2::toMsg(wx)};
-    // test for determining whether obstacles/x and obstacles/y are equal in length
-    const std::vector<double> obstacles_x = get_parameter("obstacles/x").as_double_array();
-    const std::vector<double> obstacles_y = get_parameter("obstacles/y").as_double_array();
-    if (obstacles_x.size() != obstacles_y.size()) {
-      rclcpp::shutdown();
-    }
+
 
     // turtlebot parameters
     declare_parameter("wheel_radius", 0.0);
@@ -102,11 +97,13 @@ public:
     declare_parameter("motor_cmd_max", 0);
     declare_parameter("motor_cmd_per_rad_sec", 0.0);
     declare_parameter("encoder_ticks_per_rad", 0.0);
+    declare_parameter("collision_radius", 0.0);
     motor_cmd_per_rad_sec = get_parameter("motor_cmd_per_rad_sec").as_double();
     encoder_ticks_per_rad = get_parameter("encoder_ticks_per_rad").as_double();
     motor_cmd_max = get_parameter("motor_cmd_max").as_int();
     const auto radius = get_parameter("wheel_radius").as_double();
     const auto track_width = get_parameter("track_width").as_double();
+    collision_radius = get_parameter("collision_radius").as_double();
     turtlelib::Config q{x0, y0, theta0};
     turtlelib::DiffDrive tbot{track_width, radius, q};
     tbot3 = tbot;
@@ -167,6 +164,7 @@ public:
 
 private:
   size_t count_;
+  double collision_radius{};
   int rate{};
   int prev_time = get_clock()->now().nanoseconds(); int current_time{};
   double x0{}; double y0{}; double theta0{}; double x{}; double y{}; double theta{};
@@ -284,13 +282,12 @@ private:
     const auto dphi_r = (u_r * (1+n_i(generator))/rate);
     tbot3.update_wheel_pose(dphi_l, dphi_r);
     
+    tbot3.q = collision_detection(tbot3.q, collision_radius, obstacles_x, obstacles_y, obstacles_r);
 
     // update body configuration of robot
     x = tbot3.q.x;
     y = tbot3.q.y;
     theta = tbot3.q.theta;
-
-
   }
 
 

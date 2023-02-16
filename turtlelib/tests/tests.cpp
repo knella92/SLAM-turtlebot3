@@ -13,6 +13,7 @@ using turtlelib::Twist2D;
 using turtlelib::Vector2D;
 using turtlelib::DiffDrive;
 using turtlelib::Wheel_Vel;
+using turtlelib::Config;
 using std::stringstream;
 using Catch::Matchers::WithinAbs;
 using Catch::Matchers::WithinRel;
@@ -176,6 +177,16 @@ TEST_CASE("Rotation", "[quadrant 3]"){
 TEST_CASE("Rotation", "[quadrant 4]"){
     Transform2D T{{1.0,5.0},-PI/4.0};
     CHECK_THAT(T.rotation(), WithinRel(-PI/4.0));
+}
+
+TEST_CASE("Rotation", "[theta = 0]"){
+    Transform2D T{{1.0,5.0}, 0.0};
+    CHECK_THAT(T.rotation(), WithinAbs(0.0, zero_margin));
+}
+
+TEST_CASE("Rotation", "[theta = pi]"){
+    Transform2D T{{1.0,5.0}, 3*PI};
+    CHECK_THAT(T.rotation(), WithinRel(PI));
 }
 
 
@@ -382,3 +393,34 @@ TEMPLATE_TEST_CASE("forward Kinematics", "[forward]", Twist2D, Transform2D){
         CHECK_THROWS(bot.inverse_kin(Vb));
 }
 }
+
+TEMPLATE_TEST_CASE("find angle", "[find angle]", Config){ 
+    double radians{};
+    double dx{};
+    double dy{};
+
+    SECTION("pi/4"){
+        dx = .038*cos(PI/4);
+        dy = .038*sin(PI/4);
+        radians = turtlelib::find_angle(dx,dy);
+        CHECK_THAT(radians, WithinRel(PI/4,.0001));
+    }
+}
+
+
+
+// TEMPLATE_TEST_CASE("collision_detection", "[collision_detection]", Config){
+//     std::vector<double> obstacles_x = {-0.6, 0.7, 0.5};
+//     std::vector<double> obstacles_y = {-0.8, -0.7, 0.9};
+//     double obstacles_r = 0.038;
+//     double collision_radius = 0.11;
+//     Config q{0.0,0.0,0.0}; Config q_new{0.0,0.0,0.0};
+
+//     SECTION("quadrant 1 (radius away = 0.1)"){
+//         q.x = -0.575;
+//         q.y = -0.775;
+//         q_new = collision_detection(q,collision_radius, obstacles_x, obstacles_y, obstacles_r);
+//         CHECK_THAT(q_new.x, WithinRel(-.495,.0001));
+//         CHECK_THAT(q_new.y, WithinRel(-.695, 0.0001));
+//     }
+// }

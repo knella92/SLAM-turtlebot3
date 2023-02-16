@@ -188,6 +188,18 @@ namespace turtlelib
         else if (t00 < 0 && t10 < 0){
             radians = -acos(t00);
         }
+        else if (almost_equal(t00,1.0) && almost_equal(t10, 0.0)){
+            radians = 0.0;
+        }
+        else if (almost_equal(t00,-1.0) && almost_equal(t10, 0.0)){
+            radians = PI;
+        }
+        else if (almost_equal(t00,0.0) && almost_equal(t10, 1.0)){
+            radians = PI/2.0;
+        }
+        else if (almost_equal(t00,0.0) && almost_equal(t10, -1.0)){
+            radians = 3*PI/2.0;
+        }
 
         return radians;
     }
