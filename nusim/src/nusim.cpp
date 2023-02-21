@@ -121,7 +121,7 @@ public:
 
     // sensor parameters
     declare_parameter("basic_sensor_variance", 0.0);
-    declare_parameter("max_range",5.0);
+    declare_parameter("max_range",1.0);
     const auto basic_sensor_variance = get_parameter("basic_sensor_variance").as_double();
     std::normal_distribution<double> sv(0.0,sqrt(basic_sensor_variance));
     sens_var = sv;
@@ -357,7 +357,7 @@ private:
       obst.pose.position.y = obstacles_y.at(i) + sens_var;
       if(sensor_ind == 1)
       {
-        if(sqrt(std::pow(obst.pose.position.x,2) + std::pow(obst.pose.position.y, 2)) > max_range)
+        if(sqrt(std::pow(tbot3.q.x - obst.pose.position.x,2) + std::pow(tbot3.q.y - obst.pose.position.y, 2)) > max_range)
         {
           obst.action = visualization_msgs::msg::Marker::DELETE;
         }

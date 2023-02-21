@@ -409,18 +409,18 @@ TEMPLATE_TEST_CASE("find angle", "[find angle]", Config){
 
 
 
-// TEMPLATE_TEST_CASE("collision_detection", "[collision_detection]", Config){
-//     std::vector<double> obstacles_x = {-0.6, 0.7, 0.5};
-//     std::vector<double> obstacles_y = {-0.8, -0.7, 0.9};
-//     double obstacles_r = 0.038;
-//     double collision_radius = 0.11;
-//     Config q{0.0,0.0,0.0}; Config q_new{0.0,0.0,0.0};
+TEMPLATE_TEST_CASE("collision_detection", "[collision_detection]", Config){
+    std::vector<double> obstacles_x = {-0.6, 0.7, 0.5};
+    std::vector<double> obstacles_y = {-0.8, -0.7, 0.9};
+    double obstacles_r = 0.038;
+    double collision_radius = 0.11;
+    Config q{0.0,0.0,0.0}; Config q_new{0.0,0.0,0.0};
 
-//     SECTION("quadrant 1 (radius away = 0.1)"){
-//         q.x = -0.575;
-//         q.y = -0.775;
-//         q_new = collision_detection(q,collision_radius, obstacles_x, obstacles_y, obstacles_r);
-//         CHECK_THAT(q_new.x, WithinRel(-.495,.0001));
-//         CHECK_THAT(q_new.y, WithinRel(-.695, 0.0001));
-//     }
-// }
+    SECTION("quadrant 1 (radius away = 0.1)"){
+        q.x = -0.575;
+        q.y = -0.775;
+        q_new = collision_detection(q,collision_radius, obstacles_x, obstacles_y, obstacles_r);
+        CHECK_THAT(q_new.x, WithinRel(-.495,.0001));
+        CHECK_THAT(q_new.y, WithinRel(-.695, 0.0001));
+    }
+}
