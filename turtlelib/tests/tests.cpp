@@ -324,6 +324,30 @@ TEMPLATE_TEST_CASE("forward Kinematics", "[forward]", Twist2D, Transform2D){
         CHECK_THAT(Vb.v.y, WithinRel(0, 0.0001));
     }
 
+    SECTION("one revolution forward"){
+        bot.forward_kin(2*PI, 2*PI);
+        CHECK_THAT(bot.q.x, WithinAbs(0.2073, 0.0001));
+    }
+
+    SECTION("max speed at 200 Hz for 1 timer callback"){
+        const auto phidot_l = 265/41.667;
+        const auto phidot_r = 265/41.667;
+        bot.forward_kin(phidot_l/200, phidot_r/200);
+        CHECK_THAT(bot.q.x, WithinAbs(0.00105, 0.0001));
+    }
+
+    SECTION("max speed at 200 Hz for 1 second"){
+        const auto phidot_l = 265/41.667;
+        const auto phidot_r = 265/41.667;
+        bot.forward_kin(phidot_l, phidot_r);
+        CHECK_THAT(bot.q.x, WithinAbs(0.20987, 0.0001));
+    }
+
+    SECTION("17 revolutions forward"){
+        bot.forward_kin(17*2*PI, 17*2*PI);
+        CHECK_THAT(bot.q.x, WithinAbs(3.5249, 0.0001));
+    }
+
     SECTION("pure translation"){
         Vb.w = 0.0;
         Vb.v = {-52.0,0.0};

@@ -87,7 +87,7 @@ private:
   void vel_callback(const geometry_msgs::msg::Twist & msg)
   {
     // convert to Twist2D for inverse kinematics function
-    turtlelib::Twist2D Vb{0.0, {0.0, 0.0}};
+    turtlelib::Twist2D Vb{};
     Vb.v.x = msg.linear.x;
     Vb.v.y = msg.linear.y;
     Vb.w = msg.angular.z;

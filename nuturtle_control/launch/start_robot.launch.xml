@@ -1,9 +1,9 @@
 <launch>
 
-    <arg name="body_id" description="Name of the body frame" default="none"/>
+    <arg name="body_id" description="Name of the body frame" default="blue/base_footprint"/>
     <arg name="odom_id" description="Name of the odometry frame" default="odom"/>
-    <arg name="wheel_left" description="Name of the left wheel frame" default="none"/>
-    <arg name="wheel_right" description="Name of the right wheel frame" default="none"/>
+    <arg name="wheel_left" description="Name of the left wheel frame" default="blue/wheel_left_joint"/>
+    <arg name="wheel_right" description="Name of the right wheel frame" default="blue/wheel_right_joint"/>
 
     <arg name="cmd_src" description="Source of cmd_vel commands. Valid choices are: ['circle', 'teleop', 'none']" default="none"/>
     <arg name="robot" description="Valid choices are: ['nusim', 'localhost', 'none']" default="nusim"/>

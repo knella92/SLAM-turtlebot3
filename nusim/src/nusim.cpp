@@ -147,6 +147,7 @@ public:
 private:
   size_t count_;
   int rate;
+  int i{};
   double dt{};
   int prev_time = get_clock()->now().nanoseconds();
   int current_time{};
@@ -184,6 +185,7 @@ private:
     message.data = count_;
     publisher_->publish(message);
 
+    latching();
 
     // create and send transform between world and red robot
     tf2::Quaternion q;
@@ -210,6 +212,7 @@ private:
     sens_msg.left_encoder = tbot3.phi_l * encoder_ticks_per_rad;
     sens_msg.right_encoder = tbot3.phi_r * encoder_ticks_per_rad;
     sens_publisher_->publish(sens_msg);
+
   }
 
   /// \brief Reset service
@@ -302,16 +305,22 @@ private:
 
   void cmd_callback(const nuturtlebot_msgs::msg::WheelCommands & msg)
   {
-
     phidot_l = msg.left_velocity / motor_cmd_per_rad_sec;
     phidot_r = msg.right_velocity / motor_cmd_per_rad_sec;
-    tbot3.forward_kin(phidot_l / rate, phidot_r / rate);
 
-    // update position of robot
-    x = tbot3.q.x;
-    y = tbot3.q.y;
-    theta = tbot3.q.theta;
+    i = 0;
+  }
 
+  void latching()
+  {
+    if (i < 4) {
+      tbot3.forward_kin(phidot_l / rate, phidot_r / rate);
+      // update position of robot
+      x = tbot3.q.x;
+      y = tbot3.q.y;
+      theta = tbot3.q.theta;
+      i++;
+    }
   }
 
 };
