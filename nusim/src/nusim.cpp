@@ -164,9 +164,11 @@ public:
 
 private:
   size_t count_;
-  double collision_radius{};
-  int rate{};
-  int prev_time = get_clock()->now().nanoseconds(); int current_time{};
+  int rate;
+  int i{};
+  double dt{};
+  int prev_time = get_clock()->now().nanoseconds();
+  int current_time{};
   double x0{}; double y0{}; double theta0{}; double x{}; double y{}; double theta{};
   double phidot_l{}; double phidot_r{};
   double motor_cmd_per_rad_sec{}; double encoder_ticks_per_rad{}; int motor_cmd_max{};
@@ -209,6 +211,7 @@ private:
     message.data = count_;
     publisher_->publish(message);
 
+    latching();
 
     // create and send transform between world and red robot
     tf2::Quaternion q;
@@ -229,32 +232,6 @@ private:
     sens_msg.left_encoder = tbot3.phi_l * encoder_ticks_per_rad;
     sens_msg.right_encoder = tbot3.phi_r * encoder_ticks_per_rad;
     sens_publisher_->publish(sens_msg);
-
-
-    // publish obstacles and walls (each time callback)
-    visualization_msgs::msg::MarkerArray obstacles = add_obstacles(0, 0.0, "red");
-    visualization_msgs::msg::MarkerArray walls = add_walls();
-    obst_publisher_->publish(obstacles);
-    wall_publisher_->publish(walls);
-
-    // publish path
-    auto path_msg = nav_msgs::msg::Path();
-    auto pose_msg = geometry_msgs::msg::PoseStamped();
-    pose_msg.header.stamp = get_clock()->now();
-    pose_msg.header.frame_id = "nusim/world";
-    pose_msg.pose.position.x = x;
-    pose_msg.pose.position.y = y;
-    pose_msg.pose.orientation = quat;
-    path_msg.poses.push_back(pose_msg);
-    path_msg.header.stamp = pose_msg.header.stamp;
-    path_msg.header.frame_id = pose_msg.header.frame_id;
-    path_publisher_->publish(path_msg);
-
-    if(std::fmod(count_, 5) == 0)
-    {
-      visualization_msgs::msg::MarkerArray sensor_obstacles = add_obstacles(1, sens_var(generator), "yellow");
-      fake_sensor_publisher_->publish(sensor_obstacles);
-    }
 
   }
 
@@ -401,6 +378,26 @@ private:
     return all_walls;
   }
 
+
+  void cmd_callback(const nuturtlebot_msgs::msg::WheelCommands & msg)
+  {
+    phidot_l = msg.left_velocity / motor_cmd_per_rad_sec;
+    phidot_r = msg.right_velocity / motor_cmd_per_rad_sec;
+
+    i = 0;
+  }
+
+  void latching()
+  {
+    if (i < 4) {
+      tbot3.forward_kin(phidot_l / rate, phidot_r / rate);
+      // update position of robot
+      x = tbot3.q.x;
+      y = tbot3.q.y;
+      theta = tbot3.q.theta;
+      i++;
+    }
+  }
 
 };
 
