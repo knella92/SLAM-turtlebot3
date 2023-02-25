@@ -185,7 +185,7 @@ private:
   double wall_thickness{};
   double phi_lp{0.0}; double phi_rp{0.0};
   double input_noise{}; double slip_fraction;
-  double max_range{};
+  double max_range{}; double collision_radius();
   turtlelib::DiffDrive tbot3{0.0, 0.0};
 
   // initialize publishers, subscribers, timer, services
@@ -233,6 +233,11 @@ private:
     sens_msg.right_encoder = tbot3.phi_r * encoder_ticks_per_rad;
     sens_publisher_->publish(sens_msg);
 
+    add_obstacles(0, "red");
+    if(std::fmod(count_/5, 0))
+    {
+      add_obstacles(1, "yellow");
+    }
   }
 
 
@@ -254,17 +259,12 @@ private:
     }
 
     tbot3.forward_kin(v_l / rate, v_r / rate);
-
-    const auto dphi_l = (u_l * (1+n_i(generator))/rate);
-    const auto dphi_r = (u_r * (1+n_i(generator))/rate);
+    const auto dphi_l = (v_l * (1+n_i(generator))/rate);
+    const auto dphi_r = (v_r * (1+n_i(generator))/rate);
     tbot3.update_wheel_pose(dphi_l, dphi_r);
-    
-    tbot3.q = collision_detection(tbot3.q, collision_radius, obstacles_x, obstacles_y, obstacles_r);
+    i = 0;
 
-    // update body configuration of robot
-    x = tbot3.q.x;
-    y = tbot3.q.y;
-    theta = tbot3.q.theta;
+    tbot3.q = collision_detection(tbot3.q, collision_radius, obstacles_x, obstacles_y, obstacles_r);
   }
 
 
@@ -305,7 +305,7 @@ private:
 
   /// \brief Adds obstacles to MarkerArray for publishing in timer_callback()
   /// \return MarkerArray
-  visualization_msgs::msg::MarkerArray add_obstacles(int sensor_ind, double sens_var, std::string color)
+  visualization_msgs::msg::MarkerArray add_obstacles(int sensor_ind, std::string color)
   {
     visualization_msgs::msg::MarkerArray all_obst;
 
@@ -376,15 +376,6 @@ private:
     }
 
     return all_walls;
-  }
-
-
-  void cmd_callback(const nuturtlebot_msgs::msg::WheelCommands & msg)
-  {
-    phidot_l = msg.left_velocity / motor_cmd_per_rad_sec;
-    phidot_r = msg.right_velocity / motor_cmd_per_rad_sec;
-
-    i = 0;
   }
 
   void latching()
