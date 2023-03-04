@@ -115,13 +115,22 @@ namespace turtlelib
     /// \return - angle in radians
     double find_angle(double dx, double dy);
 
+    /// \brief determine if obstacle is within range
+    /// \param q - body configuration of robot
+    /// \param range - range of potential intersection
+    /// \param obstacle_x - x position of obstacle in question
+    /// \param obstacle_y - y position of obstacle in question
+    /// \param R - combined radius (range + obstacle)
+    /// \return - boolean true if obstacle is within intersection range
+    bool within_range(Config q, double obstacle_x, double obstacle_y, double R);
+
     /// \brief determines whether there is a collision between robot and external environment,
     /// and returns new body configuration accordingly
     /// \param q - body configuration of robot
     /// \param collision_radius - collision radius of robot
     /// \param obstacles_x - vector of obstacle x positions
     /// \param obstacles_y - vector of obstacle y positions
-    /// \param obstacles_r - radius of obstdacles
+    /// \param obstacles_r - radius of obstacles
     /// \return new body configuration of robot
     Config collision_detection(Config q, double collision_radius, std::vector<double> obstacles_x, std::vector<double> obstacles_y, double obstacles_r);
 

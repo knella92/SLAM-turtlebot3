@@ -87,22 +87,34 @@ namespace turtlelib
         return radians;
     }
 
+    bool within_range(Config q, double obstacle_x, double obstacle_y, double R)
+    {
+        const double dx{q.x - obstacle_x};
+        const double dy{q.y - obstacle_y};
+        const auto dr = sqrt(std::pow(dx,2) + std::pow(dy,2));
+        if(dr<R)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     Config collision_detection(Config q, double collision_radius, std::vector<double> obstacles_x, std::vector<double> obstacles_y, double obstacles_r)
     {
-        double R{collision_radius + obstacles_r};
-        double xp{}; double yp{};
-        double dx{}; double dy{}; double angle{};
-        double dr{};
+        const auto R{collision_radius + obstacles_r};
         for(int i = 0; i < (int) obstacles_x.size(); i++)
         {   
-            dx = q.x - obstacles_x.at(i);
-            dy = q.y - obstacles_y.at(i);
-            dr = sqrt(std::pow(dx,2) + std::pow(dy,2));
-            if(dr < R)
+
+            if(within_range(q, obstacles_x.at(i), obstacles_y.at(i), R) == true)
             {   
-                angle = find_angle(dx, dy);
-                xp = obstacles_x.at(i) + R*cos(angle);
-                yp = obstacles_y.at(i) + R*sin(angle);
+                const auto dx = q.x - obstacles_x.at(i);
+                const auto dy = q.y - obstacles_y.at(i);
+                const auto angle = find_angle(dx, dy);
+                const auto xp = obstacles_x.at(i) + R*cos(angle);
+                const auto yp = obstacles_y.at(i) + R*sin(angle);
                 q.x = xp;
                 q.y = yp;
                 break;
@@ -112,5 +124,17 @@ namespace turtlelib
 
         return q;
     }
+
+    // double range(Config q, double range_max, std::vector<double> obstacles_x, std::vector<double> obstacles_y, double obstacles_r)
+    // {
+    //     double ix{}; double iy{};
+
+    //     for(int i = 0; i < (int) obstacles_x.size(); i++)
+    //     {   
+    //         if(within_range(q, range_max, obstacles_x.at(i), obstacles_y.at(i), obstacles_r) == true)
+    //         {
+    //             const auto 
+    //         }
+    // }
 
 }

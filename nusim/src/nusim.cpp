@@ -126,6 +126,17 @@ public:
     sens_var = sv;
     max_range = get_parameter("max_range").as_double();
 
+    // Laser scan parameters
+    declare_parameter("angle_increment", 0.01745329238474369);
+    declare_parameter("range_min",0.11999999731779099);
+    declare_parameter("range_max", 3.5);
+    //declare_parameter("sample_N", )
+    //declare_parameter("resolution", )
+    angle_increment = get_parameter("angle_increment").as_double();
+    range_min = get_parameter("range_min").as_double();
+    range_max = get_parameter("range_max").as_double();
+
+
     // saves rate parameter as an int
     rate = get_parameter("rate").as_int();
     const int64_t t = 1000 / rate; // implicit conversion of 1000 / rate to int64_t to use as time in ms
@@ -138,6 +149,7 @@ public:
     wall_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/walls", 10);
     path_publisher_ = create_publisher<nav_msgs::msg::Path>("~/path", 10);
     fake_sensor_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/fake_sensor", 10);
+    laser_scan_publisher_ = create_publisher<sensor_msgs::msg::LaserScan>("~/laser_scan", 10);
     cmd_subscriber_ = create_subscription<nuturtlebot_msgs::msg::WheelCommands>(
       "red/wheel_cmd", 10, std::bind(
         &SimNode::cmd_callback, this,
@@ -167,8 +179,10 @@ private:
   int rate{}; int sens_rate{};
   int i{};
   double dt{};
+  double range_min{}; double range_max{}; double angle_increment{}; double sample_N{}; double resolution{};
   int prev_time = get_clock()->now().nanoseconds();
   int current_time{};
+  double angle_increment{};
   double x0{}; double y0{}; double theta0{}; double x{}; double y{}; double theta{};
   double phidot_l{}; double phidot_r{};
   double motor_cmd_per_rad_sec{}; double encoder_ticks_per_rad{}; int motor_cmd_max{};
@@ -194,6 +208,7 @@ private:
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr obst_publisher_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr wall_publisher_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr fake_sensor_publisher_;
+  rclcpp::Publisher<sensor_msgs::msg::LaserScan>::SharedPtr laser_scan_publisher_;
   rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr path_publisher_;
   rclcpp::Subscription<nuturtlebot_msgs::msg::WheelCommands>::SharedPtr cmd_subscriber_;
   rclcpp::Service<nusim::srv::Reset>::SharedPtr reset_service_;
@@ -232,6 +247,7 @@ private:
     sens_msg.right_encoder = tbot3.phi_r * encoder_ticks_per_rad;
     sens_publisher_->publish(sens_msg);
 
+    // publishing of environment
     visualization_msgs::msg::MarkerArray red_obst = add_obstacles(0, "red");
     obst_publisher_->publish(red_obst);
     visualization_msgs::msg::MarkerArray red_walls = add_walls();
@@ -240,6 +256,9 @@ private:
     {
       visualization_msgs::msg::MarkerArray sens_obst = add_obstacles(1, "yellow");
       fake_sensor_publisher_->publish(sens_obst);
+
+      sensor_msgs::msg::LaserScan fake_lidar = lidar();
+      laser_scan_publisher->publish(fake_lidar);
     }
   }
 
@@ -310,7 +329,7 @@ private:
   /// \return MarkerArray
   visualization_msgs::msg::MarkerArray add_obstacles(int sensor_ind, std::string color)
   {
-    visualization_msgs::msg::MarkerArray all_obst;
+    visualization_msgs::msg::MarkerArray all_obst{};
 
     const int size_x = obstacles_x.size();
     rclcpp::Time stamp = get_clock()->now();
@@ -358,7 +377,7 @@ private:
 
   visualization_msgs::msg::MarkerArray add_walls()
   {
-    visualization_msgs::msg::MarkerArray all_walls;
+    visualization_msgs::msg::MarkerArray all_walls{};
     rclcpp::Time stamp = get_clock()->now();
     for (int i = 0; i < 4; ++i) {
       visualization_msgs::msg::Marker walls;
@@ -401,6 +420,33 @@ private:
     static std::mt19937 mt{rd()};
     return mt;
   }
+
+  sensor_msgs::msg::LaserScan lidar()
+  {
+    sensor_msgs::msg::LaserScan msg{};
+    msg.header.stamp = get_clock()->now();
+    msg.header.frame_id = "base_scan";
+    msg.angle_min = 0.0;
+    msg.angle_max = 6.2657318115234375;
+    msg.angle_increment = angle_increment;
+    msg.time_increment = 0.0005574136157520115;
+    msg.scan_time = 0.20066890120506287;
+    msg.range_min = range_min;
+    msg.range_max = range_max;
+
+  }
+
+  double range()
+  {
+    //use tbot3.q.theta + angle_increment
+    double ranges[360]{};
+    for(int i = 0; i < 360; i++)
+    {
+      const auto max_x = tbot3.q.x + 
+
+      ranges[i] = 
+    }
+  }  
 
 };
 
