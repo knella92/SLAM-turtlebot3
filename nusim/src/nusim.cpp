@@ -112,8 +112,7 @@ public:
     declare_parameter("input_noise", 0.0);
     declare_parameter("slip_fraction", 0.0);
     const auto input_noise = get_parameter("input_noise").as_double();
-    const auto stddv = sqrt(input_noise);
-    std::normal_distribution<double> w(0.0, stddv);
+    std::normal_distribution<double> w(0.0, input_noise);
     w_i = w;
     slip_fraction = get_parameter("slip_fraction").as_double();
     std::uniform_real_distribution<double> distr(-slip_fraction, slip_fraction);
@@ -123,13 +122,14 @@ public:
     declare_parameter("basic_sensor_variance", 0.0);
     declare_parameter("max_range",1.0);
     const auto basic_sensor_variance = get_parameter("basic_sensor_variance").as_double();
-    std::normal_distribution<double> sv(0.0,sqrt(basic_sensor_variance));
+    std::normal_distribution<double> sv(0.0,basic_sensor_variance);
     sens_var = sv;
     max_range = get_parameter("max_range").as_double();
 
     // saves rate parameter as an int
     rate = get_parameter("rate").as_int();
-    const int64_t t = 1000 / rate; // implicit conversion of 1000/rate to int64_t to use as time in ms
+    const int64_t t = 1000 / rate; // implicit conversion of 1000 / rate to int64_t to use as time in ms
+    sens_rate = rate/5;
 
     // initialize publishers and timer
     publisher_ = create_publisher<std_msgs::msg::UInt64>("~/timestep", 10);
@@ -164,7 +164,7 @@ public:
 
 private:
   size_t count_;
-  int rate;
+  int rate{}; int sens_rate{};
   int i{};
   double dt{};
   int prev_time = get_clock()->now().nanoseconds();
@@ -179,13 +179,12 @@ private:
   std::normal_distribution<double> w_i{};
   std::normal_distribution<double> sens_var{};
   std::uniform_real_distribution<double> n_i{};
-  std::default_random_engine generator;
   double obstacles_r{};
   double arena_x{}; double arena_y{};
   double wall_thickness{};
   double phi_lp{0.0}; double phi_rp{0.0};
   double input_noise{}; double slip_fraction;
-  double max_range{}; double collision_radius();
+  double max_range{}; double collision_radius{};
   turtlelib::DiffDrive tbot3{0.0, 0.0};
 
   // initialize publishers, subscribers, timer, services
@@ -233,10 +232,14 @@ private:
     sens_msg.right_encoder = tbot3.phi_r * encoder_ticks_per_rad;
     sens_publisher_->publish(sens_msg);
 
-    add_obstacles(0, "red");
-    if(std::fmod(count_/5, 0))
+    visualization_msgs::msg::MarkerArray red_obst = add_obstacles(0, "red");
+    obst_publisher_->publish(red_obst);
+    visualization_msgs::msg::MarkerArray red_walls = add_walls();
+    wall_publisher_->publish(red_walls);
+    if(std::fmod(count_/sens_rate, 0))
     {
-      add_obstacles(1, "yellow");
+      visualization_msgs::msg::MarkerArray sens_obst = add_obstacles(1, "yellow");
+      fake_sensor_publisher_->publish(sens_obst);
     }
   }
 
@@ -254,13 +257,13 @@ private:
     }
     else
     {
-      v_l = u_l + w_i(generator);
-      v_r = u_r + w_i(generator);
+      v_l = u_l + w_i(get_random());
+      v_r = u_r + w_i(get_random());
     }
 
     tbot3.forward_kin(v_l / rate, v_r / rate);
-    const auto dphi_l = (v_l * (1+n_i(generator))/rate);
-    const auto dphi_r = (v_r * (1+n_i(generator))/rate);
+    const auto dphi_l = (v_l * (1+n_i(get_random()))/rate);
+    const auto dphi_r = (v_r * (1+n_i(get_random()))/rate);
     tbot3.update_wheel_pose(dphi_l, dphi_r);
     i = 0;
 
@@ -330,8 +333,8 @@ private:
       }
       obst.color.a = 1.0;
       obst.id = i;
-      obst.pose.position.x = obstacles_x.at(i) + sens_var;
-      obst.pose.position.y = obstacles_y.at(i) + sens_var;
+      obst.pose.position.x = obstacles_x.at(i) + sens_var(get_random());
+      obst.pose.position.y = obstacles_y.at(i) + sens_var(get_random());
       if(sensor_ind == 1)
       {
         if(sqrt(std::pow(tbot3.q.x - obst.pose.position.x,2) + std::pow(tbot3.q.y - obst.pose.position.y, 2)) > max_range)
@@ -388,6 +391,15 @@ private:
       theta = tbot3.q.theta;
       i++;
     }
+  }
+
+  /// \brief random number generator
+  /// \return reference to pseudo-random number generator object
+  std::mt19937 & get_random()
+  {
+    static std::random_device rd{};
+    static std::mt19937 mt{rd()};
+    return mt;
   }
 
 };
