@@ -1,6 +1,7 @@
 #include "turtlelib/diff_drive.hpp"
 #include <cmath>
 #include <stdexcept>
+#include <iostream>
 
 namespace turtlelib
 {
@@ -87,28 +88,16 @@ namespace turtlelib
         return radians;
     }
 
-    bool within_range(Config q, double obstacle_x, double obstacle_y, double R)
-    {
-        const double dx{q.x - obstacle_x};
-        const double dy{q.y - obstacle_y};
-        const auto dr = sqrt(std::pow(dx,2) + std::pow(dy,2));
-        if(dr<R)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
 
     Config collision_detection(Config q, double collision_radius, std::vector<double> obstacles_x, std::vector<double> obstacles_y, double obstacles_r)
     {
         const auto R{collision_radius + obstacles_r};
         for(int i = 0; i < (int) obstacles_x.size(); i++)
         {   
-
-            if(within_range(q, obstacles_x.at(i), obstacles_y.at(i), R) == true)
+        const double dx{q.x - obstacles_x.at(i)};
+        const double dy{q.y - obstacles_y.at(i)};
+        const auto dr = sqrt(std::pow(dx,2) + std::pow(dy,2));
+            if(dr<R)
             {   
                 const auto dx = q.x - obstacles_x.at(i);
                 const auto dy = q.y - obstacles_y.at(i);
@@ -125,16 +114,189 @@ namespace turtlelib
         return q;
     }
 
-    // double range(Config q, double range_max, std::vector<double> obstacles_x, std::vector<double> obstacles_y, double obstacles_r)
-    // {
-    //     double ix{}; double iy{};
+    bool check_direction(Config q, double ix, double iy, double max_x, double max_y)
+    {
+        double check1{};
+        double check2{};
+        if(almost_equal(max_y,q.y))
+        {
+            check2 = 0.0;
+        }
+        else
+        {
+            check2 = (iy - q.y)/(max_y - q.y);
+        }
+        
+        if(almost_equal(max_x, q.x))
+        {
+            check1 = 0.0;
+        }
+        else
+        {
+            check1 = (ix - q.x)/(max_x - q.x);
+            
+        }
 
-    //     for(int i = 0; i < (int) obstacles_x.size(); i++)
-    //     {   
-    //         if(within_range(q, range_max, obstacles_x.at(i), obstacles_y.at(i), obstacles_r) == true)
-    //         {
-    //             const auto 
-    //         }
-    // }
+        if(check1 >= 0.0 && check2 >= 0.0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
+    double range_obstacles(Config q, double range_max, std::vector<double> obstacles_x, std::vector<double> obstacles_y, double obstacles_r, double angle)
+    {
+        double ranges;
+        bool exists{false};
+        double sx{0.0}; double sy{0.0};
+        const auto max_x = q.x + range_max*cos(angle + q.theta);
+        const auto max_y = q.y + range_max*sin(angle + q.theta);
+        const auto max_range = sqrt(std::pow(range_max*cos(angle + q.theta), 2.0)+ std::pow(range_max*sin(angle + q.theta), 2.0));
+        const auto m = (max_y - q.y) / (max_x - q.x);
+        // checking for obstacles
+
+        for(int j = 0; j < (int) obstacles_x.size(); j++)
+        {   
+            double ix{}; double iy{};
+            double ix_1{}; double iy_1{};
+            if(almost_equal(max_x, q.x))
+            {
+                ix = q.x;
+                const auto b = -2*obstacles_y.at(j);
+                const auto c = std::pow(obstacles_y.at(j), 2.0) + ix*ix - 2*ix*obstacles_x.at(j) + std::pow(obstacles_x.at(j), 2.0) - std::pow(obstacles_r, 2.0);
+                const auto det = b*b - 4*c;
+                if(det < 0.0)
+                {
+                    ranges = 0.0;
+                    // std::cout << "no solution\n";
+                    continue;
+                }
+                else if(almost_equal(det,0.0))
+                {
+                    // std::cout << "one solution\n";
+                    iy = -b/2.0;
+                }
+                else if(det > 0.0)
+                {
+                    // std::cout << "two solutions\n";
+                    iy = (-b + sqrt(det))/2.0;
+                    ix_1 = ix;
+                    iy_1 = (-b - sqrt(det))/2.0;
+
+                    if(sqrt(std::pow(ix-q.x, 2.0) + std::pow(iy-q.y, 2.0)) < sqrt(std::pow(ix_1-q.x, 2.0) + std::pow(iy_1-q.y, 2.0))){;}
+                    else
+                    {
+                        ix = ix_1;
+                        iy = iy_1;
+                    }
+                }
+            }
+
+            else
+            {
+                const auto alpha = q.y - m*q.x - obstacles_y.at(j);
+                const auto a = 1 + m*m;
+                const auto b = 2*(alpha*m - obstacles_x.at(j));
+                const auto c = std::pow(obstacles_x.at(j), 2.0) + alpha*alpha - std::pow(obstacles_r, 2.0);
+                const auto det = b*b - 4*a*c;
+                if(det < 0.0)
+                {
+                    ranges = 0.0;
+                    // std::cout << "no solution\n";
+                    continue;
+                }
+                else if(almost_equal(det,0.0))
+                {
+                    // std::cout << "one solution\n"; //<< ' ' << b << ' ' << a << ' ' << c << std::endl;
+                    ix = -b / (2*a);
+                    iy = m*(ix - q.x) + q.y;
+                }
+                else if(det > 0.0)
+                {
+                    // std::cout << "two solutions\n";
+                    ix = (-b + sqrt(det))/(2*a);
+                    iy = m*(ix - q.x) + q.y;
+                    ix_1 = (-b - sqrt(det))/(2*a);
+                    iy_1 = m*(ix_1 - q.x) + q.y;
+
+                    if(sqrt(std::pow(ix-q.x, 2.0) + std::pow(iy-q.y, 2.0)) < sqrt(std::pow(ix_1-q.x, 2.0) + std::pow(iy_1-q.y, 2.0))){;}
+                    else
+                    {
+                        ix = ix_1;
+                        iy = iy_1;
+                    }
+                }
+            }
+
+            const auto range = sqrt(std::pow(ix-q.x, 2.0) + std::pow(iy-q.y, 2.0));
+            // std::cout << range << '\n';
+            if(range < max_range && check_direction(q, ix, iy, max_x, max_y) == true)
+            {
+                if(exists == false)
+                {
+                    ranges = range;
+                    exists = true;
+                    sx = ix;
+                    sy = iy;
+
+                }
+                else
+                {
+                    const auto s_range = sqrt(std::pow(sx-q.x, 2.0) + std::pow(sy-q.y, 2.0));
+                    if(range < s_range)
+                    {
+                        ranges = range;
+                        sx = ix;
+                        sy = iy;
+                    }
+                    else
+                    {
+                        ranges = s_range;
+                    }
+                }
+            }
+            else
+            {
+                if(exists == true){;}
+                else
+                {
+                    ranges = 0.0;
+                }
+            }
+        }
+        return ranges;
+    }
+    
 }
+
+        // // checking for walls
+        // // vertical walls
+        // if(ranges == 0.0)
+        // {
+        //             const auto max_x = q.x + abs(range_max*cos(q.theta + angle));
+        //             const auto max_y = q.y + range_max*sin(angle + q.theta);
+        //             const auto m = (max_y - q.y) / (max_x - q.x);
+        //     for(int i = 0; int i < 4; i++)
+        //     {
+        //         if(int i < 2)
+        //         {
+
+        //             if(max_x > x_pos.at(i))
+        //             {
+        //                 ix = x_pos;
+        //                 iy = m*(ix - q.x) + q.y;
+        //             }
+        //             else
+        //             {
+        //                 ranges = 0.0;
+        //             }
+        //         }
+        //         else
+        //         {
+
+        //         }
+        //     }
+        // }

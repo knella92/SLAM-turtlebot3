@@ -418,7 +418,7 @@ TEMPLATE_TEST_CASE("forward Kinematics", "[forward]", Twist2D, Transform2D){
 }
 }
 
-TEMPLATE_TEST_CASE("find angle", "[find angle]", Config){ 
+TEMPLATE_TEST_CASE("find angle", "[find angle]", double){ 
     double radians{};
     double dx{};
     double dy{};
@@ -444,5 +444,107 @@ TEMPLATE_TEST_CASE("collision_detection", "[collision_detection]", Config){
         q_new = collision_detection(q,collision_radius, obstacles_x, obstacles_y, obstacles_r);
         CHECK_THAT(q_new.x, WithinAbs(-.495,.01));
         CHECK_THAT(q_new.y, WithinAbs(-.695, 0.01));
+    }
+}
+
+TEMPLATE_TEST_CASE("check_direction", "[check direction]", Config, double){
+    double ix{};
+    double iy{};
+    bool check{};
+    double max_x{}; double max_y{};
+    Config q{0.0,0.0,0.0};
+
+    SECTION("angle = 0, dy = 0"){
+        q.x = 0.0;
+        q.y = 0.9;
+        ix = 0.462;
+        iy = 0.9;
+        max_x = 3.5; max_y = 0.9;
+        check = check_direction(q, ix, iy, max_x, max_y);
+        CHECK(check == true);
+    }
+
+    SECTION("angle = -PI, dy = 0"){
+        q.x = 0.0;
+        q.y = 0.9;
+        ix = 0.462;
+        iy = 0.9;
+        max_x = -3.5; max_y = 0.9;
+        check = check_direction(q, ix, iy, max_x, max_y);
+        CHECK(check == false);
+    }
+
+    SECTION("angle = 0, dx = 0"){
+        q.x = 0.5;
+        q.y = 0.7;
+        ix = 0.5;
+        iy = 0.9-.038;
+        max_x = 0.5; max_y = 3.5+0.9;
+        check = check_direction(q, ix, iy, max_x, max_y);
+        CHECK(check == true);
+    }
+}
+
+TEMPLATE_TEST_CASE("obstacle_range", "[range of obstacles]", double){
+    std::vector<double> obstacles_x = {-0.6, 0.7, 0.5};
+    std::vector<double> obstacles_y = {-0.8, -0.7, 0.9};
+    double obstacles_r = 0.038;
+    double range{}; double angle{};
+    double range_max = 3.5;
+    //double angle_increment = 0.01745329238474369;
+    Config q{0.0,0.0,0.0};
+
+    SECTION("angle = 0, dy = 0"){
+        q.x = 0.0;
+        q.y = 0.9;
+        q.theta = 0.0;
+        angle = 0.0;
+        range = range_obstacles(q, range_max, obstacles_x, obstacles_y, obstacles_r, angle);
+        CHECK_THAT(range, WithinAbs(0.462,.01));
+    }
+
+    SECTION("angle = pi/4, dy = 0"){
+        q.x = 0.0;
+        q.y = 0.9;
+        q.theta = -PI/4;
+        angle = PI/4;
+        range = range_obstacles(q, range_max, obstacles_x, obstacles_y, obstacles_r, angle);
+        CHECK_THAT(range, WithinAbs(0.462,.01));
+    }
+
+   SECTION("angle = -pi, dy = 0"){
+        q.x = 0.0;
+        q.y = 0.9;
+        q.theta = 0.0;
+        angle = -PI;
+        range = range_obstacles(q, range_max, obstacles_x, obstacles_y, obstacles_r, angle);
+        CHECK_THAT(range, WithinAbs(0.0,.01));
+    }
+
+    SECTION("angle = pi/2, dx = 0"){
+        q.x = 0.5;
+        q.y = 0.7;
+        q.theta = 0.0;
+        angle = PI/2;
+        range = range_obstacles(q, range_max, obstacles_x, obstacles_y, obstacles_r, angle);
+        CHECK_THAT(range, WithinAbs(0.9-.038 - 0.7,.01));
+    }
+
+    SECTION("angle = -pi/2, dx = 0"){
+        q.x = 0.5;
+        q.y = 1.1;
+        q.theta = 0.0;
+        angle = -PI/2;
+        range = range_obstacles(q, range_max, obstacles_x, obstacles_y, obstacles_r, angle);
+        CHECK_THAT(range, WithinAbs(q.y - (0.9+obstacles_r),.01));
+    }
+
+    SECTION("angle = pi/4"){
+        q.x = 0.162;
+        q.y = 0.6;
+        q.theta = 0.0;
+        angle = PI/4;
+        range = range_obstacles(q, range_max, obstacles_x, obstacles_y, obstacles_r, angle);
+        CHECK_THAT(range, WithinAbs(0.424264,.01));
     }
 }

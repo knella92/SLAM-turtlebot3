@@ -115,15 +115,6 @@ namespace turtlelib
     /// \return - angle in radians
     double find_angle(double dx, double dy);
 
-    /// \brief determine if obstacle is within range
-    /// \param q - body configuration of robot
-    /// \param range - range of potential intersection
-    /// \param obstacle_x - x position of obstacle in question
-    /// \param obstacle_y - y position of obstacle in question
-    /// \param R - combined radius (range + obstacle)
-    /// \return - boolean true if obstacle is within intersection range
-    bool within_range(Config q, double obstacle_x, double obstacle_y, double R);
-
     /// \brief determines whether there is a collision between robot and external environment,
     /// and returns new body configuration accordingly
     /// \param q - body configuration of robot
@@ -133,6 +124,25 @@ namespace turtlelib
     /// \param obstacles_r - radius of obstacles
     /// \return new body configuration of robot
     Config collision_detection(Config q, double collision_radius, std::vector<double> obstacles_x, std::vector<double> obstacles_y, double obstacles_r);
+
+    /// \brief checks if intersection point is in the same direction of the specified lidar angle
+    /// \param q - body configuration of robot
+    /// \param ix - intersection x
+    /// \param iy - intersection y
+    /// \param max_x - maximum x (range)
+    /// \param max_y - maximum y (range)
+    /// \return - true or false 
+    bool check_direction(Config q, double ix, double iy, double max_x, double max_y);
+
+    /// \brief returns lidar range (distances)
+    /// \param q - body configuration of robot
+    /// \param range_max - max range of lidar
+    /// \param obstacles_x - vector of obstacle x positions
+    /// \param obstacles_y - vector of obstacle y positions
+    /// \param obstacles_r - obstacle radius
+    /// \param angle - lidar angle
+    /// \return - lidar range
+    double range_obstacles(Config q, double range_max, std::vector<double> obstacles_x, std::vector<double> obstacles_y, double obstacles_r, double angle);
 
 
 }
