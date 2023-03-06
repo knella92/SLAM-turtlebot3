@@ -150,7 +150,7 @@ public:
     wall_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/walls", 10);
     path_publisher_ = create_publisher<nav_msgs::msg::Path>("~/path", 10);
     fake_sensor_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/fake_sensor", 10);
-    laser_scan_publisher_ = create_publisher<sensor_msgs::msg::LaserScan>("~/laser_scan", 10);
+    laser_scan_publisher_ = create_publisher<sensor_msgs::msg::LaserScan>("red/base_scan", 10);
     cmd_subscriber_ = create_subscription<nuturtlebot_msgs::msg::WheelCommands>(
       "red/wheel_cmd", 10, std::bind(
         &SimNode::cmd_callback, this,
@@ -425,11 +425,11 @@ private:
   {
     sensor_msgs::msg::LaserScan msg{};
     msg.header.stamp = get_clock()->now();
-    msg.header.frame_id = "base_scan";
+    msg.header.frame_id = "red/base_scan";
     msg.angle_min = 0.0;
     msg.angle_max = 6.2657318115234375;
     msg.angle_increment = angle_increment;
-    msg.time_increment = 0.0005574136157520115;
+    //msg.time_increment = 0.0005574136157520115;
     msg.scan_time = 0.20066890120506287;
     msg.range_min = range_min;
     msg.range_max = range_max;
@@ -437,11 +437,12 @@ private:
     std::vector<float> ranges{};
     for(int i = 0; i < 360; i++)
     {
-      ranges.at(i) = turtlelib::range_obstacles(tbot3.q, range_max, obstacles_x, obstacles_y, obstacles_r, i*angle_increment);
-      if(ranges.at(i) == 0.0)
+      auto range = turtlelib::range_obstacles(tbot3.q, range_max, obstacles_x, obstacles_y, obstacles_r, i*angle_increment);
+      if(range == 0.0)
       {
-        ranges.at(i) = turtlelib::range_walls(tbot3.q, range_max, arena_x, arena_y, i*angle_increment);
+        range = turtlelib::range_walls(tbot3.q, range_max, arena_x, arena_y, i*angle_increment);
       }
+      ranges.push_back(range);
     }
     msg.ranges = ranges;
     return msg;

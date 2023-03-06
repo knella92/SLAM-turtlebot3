@@ -148,12 +148,12 @@ namespace turtlelib
 
     double range_obstacles(Config q, double range_max, std::vector<double> obstacles_x, std::vector<double> obstacles_y, double obstacles_r, double angle)
     {
-        double ranges;
+        double ranges{0.0};
         bool exists{false};
         double sx{}; double sy{};
         const auto max_x = q.x + range_max*cos(angle + q.theta);
         const auto max_y = q.y + range_max*sin(angle + q.theta);
-        const auto max_range = sqrt(std::pow(range_max*cos(angle + q.theta), 2.0)+ std::pow(range_max*sin(angle + q.theta), 2.0));
+        const auto max_range = sqrt(std::pow(range_max*cos(angle + q.theta), 2.0) + std::pow(range_max*sin(angle + q.theta), 2.0));
         const auto m = (max_y - q.y) / (max_x - q.x);
 
         for(int j = 0; j < (int) obstacles_x.size(); j++)
@@ -170,18 +170,14 @@ namespace turtlelib
                 const auto det = b*b - 4*c;
                 if(det < 0.0)
                 {
-                    ranges = 0.0;
-                    // std::cout << "no solution\n";
                     continue;
                 }
                 else if(almost_equal(det,0.0))
                 {
-                    // std::cout << "one solution\n";
                     iy = -b/2.0;
                 }
                 else if(det > 0.0)
                 {
-                    // std::cout << "two solutions\n";
                     iy = (-b + sqrt(det))/2.0;
                     ix_1 = ix;
                     iy_1 = (-b - sqrt(det))/2.0;
@@ -204,7 +200,6 @@ namespace turtlelib
                 const auto det = b*b - 4*a*c;
                 if(det < 0.0)
                 {
-                    ranges = 0.0;
                     // std::cout << "no solution\n";
                     continue;
                 }
@@ -235,6 +230,7 @@ namespace turtlelib
             const auto range = sqrt(std::pow(ix-q.x, 2.0) + std::pow(iy-q.y, 2.0));
             if(range < max_range && check_direction(q, ix, iy, max_x, max_y) == true)
             {
+                // std::cout << "hit check_direction\n";
                 if(exists == false)
                 {
                     ranges = range;
@@ -265,7 +261,7 @@ namespace turtlelib
                 if(exists == true){;}
                 else
                 {
-                    ranges = 0.0;
+                    continue;
                 }
             }
         }
@@ -316,8 +312,7 @@ namespace turtlelib
                         if(check_direction(q, ix, iy, max_x, max_y))
                         {
                             if(exists == false)
-                            {
-                                
+                            { 
                                 exists = true;
                                 ranges = sqrt(std::pow(ix-q.x, 2.0) + std::pow(iy-q.y, 2.0));
                             }
@@ -334,11 +329,11 @@ namespace turtlelib
                         
                     }
                 }
-                else
+                else // walls along y axis
                 {
                     if(abs(max_y) > abs(y_pos.at(i)))
                     {
-                        iy = x_pos.at(i);
+                        iy = y_pos.at(i);
                         ix = (iy - q.y + m*q.x)/m;
                         if(check_direction(q, ix, iy, max_x, max_y))
                         {

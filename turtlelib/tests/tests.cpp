@@ -503,6 +503,15 @@ TEMPLATE_TEST_CASE("obstacle_range", "[range of obstacles]", double){
         CHECK_THAT(range, WithinAbs(0.462,.01));
     }
 
+    SECTION("angle = 5.1247, dy = 0"){
+        q.x = 0.0;
+        q.y = 0.9;
+        q.theta = 0.0;
+        angle = 5.124799;
+        range = range_obstacles(q, range_max, obstacles_x, obstacles_y, obstacles_r, angle);
+        CHECK_THAT(range, WithinAbs(1.7084, .01));
+    }
+
     SECTION("angle = pi/4, dy = 0"){
         q.x = 0.0;
         q.y = 0.9;
@@ -593,11 +602,20 @@ TEMPLATE_TEST_CASE("wall_range", "[range of walls]", double){
         CHECK_THAT(range, WithinAbs(2.8,.01));
     }
 
-    SECTION("angle = -pi/2, dx = 0"){
+    SECTION("angle = pi/2, dx = 0"){
+        q.x = -0.5;
+        q.y = 0.7;
+        q.theta = 0.0;
+        angle = PI/2;
+        range = range_walls(q, range_max, arena_x, arena_y, angle);
+        CHECK_THAT(range, WithinAbs(2.8,.01));
+    }
+
+    SECTION("angle = 3pi/2, dx = 0"){
         q.x = 0.5;
         q.y = 0.0;
         q.theta = 0.0;
-        angle = -PI/2;
+        angle = 3*PI/2;
         range = range_walls(q, range_max, arena_x, arena_y, angle);
         CHECK_THAT(range, WithinAbs(3.5,.01));
     }
