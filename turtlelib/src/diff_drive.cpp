@@ -134,7 +134,6 @@ namespace turtlelib
         else
         {
             check1 = (ix - q.x)/(max_x - q.x);
-            
         }
 
         if(check1 >= 0.0 && check2 >= 0.0)
@@ -151,17 +150,18 @@ namespace turtlelib
     {
         double ranges;
         bool exists{false};
-        double sx{0.0}; double sy{0.0};
+        double sx{}; double sy{};
         const auto max_x = q.x + range_max*cos(angle + q.theta);
         const auto max_y = q.y + range_max*sin(angle + q.theta);
         const auto max_range = sqrt(std::pow(range_max*cos(angle + q.theta), 2.0)+ std::pow(range_max*sin(angle + q.theta), 2.0));
         const auto m = (max_y - q.y) / (max_x - q.x);
-        // checking for obstacles
 
         for(int j = 0; j < (int) obstacles_x.size(); j++)
         {   
             double ix{}; double iy{};
             double ix_1{}; double iy_1{};
+
+            // if slope is vertical (infinite)
             if(almost_equal(max_x, q.x))
             {
                 ix = q.x;
@@ -231,8 +231,8 @@ namespace turtlelib
                 }
             }
 
+            //check if range is within the max_range ray (magnitude and direction)
             const auto range = sqrt(std::pow(ix-q.x, 2.0) + std::pow(iy-q.y, 2.0));
-            // std::cout << range << '\n';
             if(range < max_range && check_direction(q, ix, iy, max_x, max_y) == true)
             {
                 if(exists == false)
@@ -245,6 +245,7 @@ namespace turtlelib
                 }
                 else
                 {
+                    // if a value was calculated for a different obstacle, compare to this obstacle and pick closest
                     const auto s_range = sqrt(std::pow(sx-q.x, 2.0) + std::pow(sy-q.y, 2.0));
                     if(range < s_range)
                     {
@@ -258,6 +259,7 @@ namespace turtlelib
                     }
                 }
             }
+            // if not within range, set to zero
             else
             {
                 if(exists == true){;}
@@ -270,33 +272,97 @@ namespace turtlelib
         return ranges;
     }
     
+
+    double range_walls(Config q, double range_max, double arena_x, double arena_y, double angle)
+    {
+        // checking for walls
+        std::vector<double> x_pos = {arena_x/2.0, -arena_x/2.0, 0.0, 0.0};
+        std::vector<double> y_pos = {0.0, 0.0, arena_y/2.0, -arena_y/2.0};
+
+        double ranges{0.0};
+        const auto max_x = q.x + range_max*cos(q.theta + angle);
+        const auto max_y = q.y + range_max*sin(angle + q.theta);
+        const auto m = (max_y - q.y) / (max_x - q.x);
+        bool exists{false};
+        
+        for(int i = 0; i < 4; i++)
+        {
+            if(almost_equal(max_x, q.x))
+            {
+                if(x_pos.at(i) == 0.0) // walls along y axis
+                {
+                    if(abs(max_y) >= abs(y_pos.at(i)))
+                    {   
+                        if(max_y > 0 && y_pos.at(i) > 0)
+                        {
+                            ranges = y_pos.at(i) - q.y;
+                        }
+                        else if(max_y < 0 && y_pos.at(i) < 0)
+                        {
+                            ranges = q.y - y_pos.at(i);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                double ix{}; double iy{};
+                if(x_pos.at(i) != 0.0) // walls along y axis
+                {
+                    if(abs(max_x) > abs(x_pos.at(i)))
+                    {   
+                        ix = x_pos.at(i);
+                        iy = m*(ix - q.x) + q.y;
+                        if(check_direction(q, ix, iy, max_x, max_y))
+                        {
+                            if(exists == false)
+                            {
+                                
+                                exists = true;
+                                ranges = sqrt(std::pow(ix-q.x, 2.0) + std::pow(iy-q.y, 2.0));
+                            }
+                            else
+                            {
+                                const auto s_ranges = ranges;
+                                ranges = sqrt(std::pow(ix-q.x, 2.0) + std::pow(iy-q.y, 2.0));
+                                if(s_ranges < ranges)
+                                {
+                                    ranges = s_ranges;
+                                }
+                            }
+                        }
+                        
+                    }
+                }
+                else
+                {
+                    if(abs(max_y) > abs(y_pos.at(i)))
+                    {
+                        iy = x_pos.at(i);
+                        ix = (iy - q.y + m*q.x)/m;
+                        if(check_direction(q, ix, iy, max_x, max_y))
+                        {
+                            if(exists == false)
+                            {
+                                exists = true;
+                                ranges = sqrt(std::pow(ix-q.x, 2.0) + std::pow(iy-q.y, 2.0));
+                            }
+                            else
+                            {
+                                const auto s_ranges = ranges;
+                                ranges = sqrt(std::pow(ix-q.x, 2.0) + std::pow(iy-q.y, 2.0));
+                                if(s_ranges < ranges)
+                                {
+                                    ranges = s_ranges;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return ranges;
+    }
+
+
 }
-
-        // // checking for walls
-        // // vertical walls
-        // if(ranges == 0.0)
-        // {
-        //             const auto max_x = q.x + abs(range_max*cos(q.theta + angle));
-        //             const auto max_y = q.y + range_max*sin(angle + q.theta);
-        //             const auto m = (max_y - q.y) / (max_x - q.x);
-        //     for(int i = 0; int i < 4; i++)
-        //     {
-        //         if(int i < 2)
-        //         {
-
-        //             if(max_x > x_pos.at(i))
-        //             {
-        //                 ix = x_pos;
-        //                 iy = m*(ix - q.x) + q.y;
-        //             }
-        //             else
-        //             {
-        //                 ranges = 0.0;
-        //             }
-        //         }
-        //         else
-        //         {
-
-        //         }
-        //     }
-        // }

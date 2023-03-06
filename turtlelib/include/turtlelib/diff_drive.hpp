@@ -134,7 +134,7 @@ namespace turtlelib
     /// \return - true or false 
     bool check_direction(Config q, double ix, double iy, double max_x, double max_y);
 
-    /// \brief returns lidar range (distances)
+    /// \brief returns lidar range (distances) of obstacles
     /// \param q - body configuration of robot
     /// \param range_max - max range of lidar
     /// \param obstacles_x - vector of obstacle x positions
@@ -144,6 +144,14 @@ namespace turtlelib
     /// \return - lidar range
     double range_obstacles(Config q, double range_max, std::vector<double> obstacles_x, std::vector<double> obstacles_y, double obstacles_r, double angle);
 
+    /// \brief returns lidar range (distances) of walls
+    /// \param q - body configuration of robot
+    /// \param range_max - max range of lidar
+    /// \param arena_x - width of arena
+    /// \param arena_y - length of arena
+    /// \param angle - lidar angle
+    /// \return - lidar range
+    double range_walls(Config q, double range_max, double arena_x, double arena_y, double angle);
 
 }
 

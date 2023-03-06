@@ -516,7 +516,7 @@ TEMPLATE_TEST_CASE("obstacle_range", "[range of obstacles]", double){
         q.x = 0.0;
         q.y = 0.9;
         q.theta = 0.0;
-        angle = -PI;
+        angle = PI;
         range = range_obstacles(q, range_max, obstacles_x, obstacles_y, obstacles_r, angle);
         CHECK_THAT(range, WithinAbs(0.0,.01));
     }
@@ -546,5 +546,77 @@ TEMPLATE_TEST_CASE("obstacle_range", "[range of obstacles]", double){
         angle = PI/4;
         range = range_obstacles(q, range_max, obstacles_x, obstacles_y, obstacles_r, angle);
         CHECK_THAT(range, WithinAbs(0.424264,.01));
+    }
+}
+
+TEMPLATE_TEST_CASE("wall_range", "[range of walls]", double){
+    double arena_x = 5.0;
+    double arena_y = 7.0;
+    double range{}; double angle{};
+    double range_max = 3.5;
+    //double angle_increment = 0.01745329238474369;
+    Config q{0.0,0.0,0.0};
+
+    SECTION("angle = 0, dy = 0"){
+        q.x = 1.0;
+        q.y = 0.9;
+        q.theta = 0.0;
+        angle = 0.0;
+        range = range_walls(q, range_max, arena_x, arena_y, angle);
+        CHECK_THAT(range, WithinAbs(1.5,.01));
+    }
+
+    SECTION("angle = pi/4, dy = 0"){
+        q.x = 1.0;
+        q.y = 0.9;
+        q.theta = -PI/4;
+        angle = PI/4;
+        range = range_walls(q, range_max, arena_x, arena_y, angle);
+        CHECK_THAT(range, WithinAbs(1.5,.01));
+    }
+
+   SECTION("angle = pi, dy = 0"){
+        q.x = -1.0;
+        q.y = 0.9;
+        q.theta = 0.0;
+        angle = PI;
+        range = range_walls(q, range_max, arena_x, arena_y, angle);
+        CHECK_THAT(range, WithinAbs(1.5,.01));
+    }
+
+    SECTION("angle = pi/2, dx = 0"){
+        q.x = 0.5;
+        q.y = 0.7;
+        q.theta = 0.0;
+        angle = PI/2;
+        range = range_walls(q, range_max, arena_x, arena_y, angle);
+        CHECK_THAT(range, WithinAbs(2.8,.01));
+    }
+
+    SECTION("angle = -pi/2, dx = 0"){
+        q.x = 0.5;
+        q.y = 0.0;
+        q.theta = 0.0;
+        angle = -PI/2;
+        range = range_walls(q, range_max, arena_x, arena_y, angle);
+        CHECK_THAT(range, WithinAbs(3.5,.01));
+    }
+
+    SECTION("angle = pi/4"){
+        q.x = 0.73223;
+        q.y = 1.2322;
+        q.theta = 0.0;
+        angle = PI/4;
+        range = range_walls(q, range_max, arena_x, arena_y, angle);
+        CHECK_THAT(range, WithinAbs(2.5,.01));
+    }
+
+    SECTION("angle = pi/4 - past two walls"){
+        q.x = 1.934;
+        q.y = 2.9343;
+        q.theta = 0.0;
+        angle = PI/4;
+        range = range_walls(q, range_max, arena_x, arena_y, angle);
+        CHECK_THAT(range, WithinAbs(0.8,.01));
     }
 }

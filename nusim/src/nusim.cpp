@@ -41,6 +41,7 @@
 #include "nuturtlebot_msgs/msg/sensor_data.hpp"
 #include "turtlelib/diff_drive.hpp"
 #include "nav_msgs/msg/path.hpp"
+#include "sensor_msgs/msg/laser_scan.hpp"
 
 
 using namespace std::chrono_literals;
@@ -182,7 +183,6 @@ private:
   double range_min{}; double range_max{}; double angle_increment{}; double sample_N{}; double resolution{};
   int prev_time = get_clock()->now().nanoseconds();
   int current_time{};
-  double angle_increment{};
   double x0{}; double y0{}; double theta0{}; double x{}; double y{}; double theta{};
   double phidot_l{}; double phidot_r{};
   double motor_cmd_per_rad_sec{}; double encoder_ticks_per_rad{}; int motor_cmd_max{};
@@ -258,7 +258,7 @@ private:
       fake_sensor_publisher_->publish(sens_obst);
 
       sensor_msgs::msg::LaserScan fake_lidar = lidar();
-      laser_scan_publisher->publish(fake_lidar);
+      laser_scan_publisher_->publish(fake_lidar);
     }
   }
 
@@ -434,19 +434,18 @@ private:
     msg.range_min = range_min;
     msg.range_max = range_max;
 
-  }
-
-  double range()
-  {
-    //use tbot3.q.theta + angle_increment
-    double ranges[360]{};
+    std::vector<float> ranges{};
     for(int i = 0; i < 360; i++)
     {
-      const auto max_x = tbot3.q.x + 
-
-      ranges[i] = 
+      ranges.at(i) = turtlelib::range_obstacles(tbot3.q, range_max, obstacles_x, obstacles_y, obstacles_r, i*angle_increment);
+      if(ranges.at(i) == 0.0)
+      {
+        ranges.at(i) = turtlelib::range_walls(tbot3.q, range_max, arena_x, arena_y, i*angle_increment);
+      }
     }
-  }  
+    msg.ranges = ranges;
+    return msg;
+  }
 
 };
 
