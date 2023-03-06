@@ -121,7 +121,7 @@ public:
 
     // sensor parameters
     declare_parameter("basic_sensor_variance", 0.0);
-    declare_parameter("max_range",1.0);
+    declare_parameter("max_range",0.0);
     const auto basic_sensor_variance = get_parameter("basic_sensor_variance").as_double();
     std::normal_distribution<double> sv(0.0,basic_sensor_variance);
     sens_var = sv;
@@ -352,8 +352,8 @@ private:
       }
       obst.color.a = 1.0;
       obst.id = i;
-      obst.pose.position.x = obstacles_x.at(i) + sens_var(get_random());
-      obst.pose.position.y = obstacles_y.at(i) + sens_var(get_random());
+      obst.pose.position.x = obstacles_x.at(i);
+      obst.pose.position.y = obstacles_y.at(i);
       if(sensor_ind == 1)
       {
         if(sqrt(std::pow(tbot3.q.x - obst.pose.position.x,2) + std::pow(tbot3.q.y - obst.pose.position.y, 2)) > max_range)
@@ -362,6 +362,8 @@ private:
         }
         else{
           obst.action = visualization_msgs::msg::Marker::ADD;
+          obst.pose.position.x += sens_var(get_random());
+          obst.pose.position.y += sens_var(get_random());
         }
       }
       else
@@ -442,6 +444,7 @@ private:
       {
         range = turtlelib::range_walls(tbot3.q, range_max, arena_x, arena_y, i*angle_increment);
       }
+      range += sens_var(get_random());
       ranges.push_back(range);
     }
     msg.ranges = ranges;
