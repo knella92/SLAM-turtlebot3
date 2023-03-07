@@ -10,3 +10,7 @@
     basic_sensor_variance: 0.01
     slip_fraction: 0.001
     max_range: 1.5
+    body_id: "blue/base_footprint"
+    odom_id: "odom"
+    wheel_left: "blue/wheel_left_joint"
+    wheel_right: "blue/wheel_right_joint"

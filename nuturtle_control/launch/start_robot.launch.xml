@@ -1,10 +1,5 @@
 <launch>
 
-    <arg name="body_id" description="Name of the body frame" default="blue/base_footprint"/>
-    <arg name="odom_id" description="Name of the odometry frame" default="odom"/>
-    <arg name="wheel_left" description="Name of the left wheel frame" default="blue/wheel_left_joint"/>
-    <arg name="wheel_right" description="Name of the right wheel frame" default="blue/wheel_right_joint"/>
-
     <arg name="cmd_src" description="Source of cmd_vel commands. Valid choices are: ['circle', 'teleop', 'none']" default="none"/>
     <arg name="robot" description="Valid choices are: ['nusim', 'localhost', 'none']" default="nusim"/>
     <arg name="use_rviz" description="Launch rviz with robot model, tf frames, and odometry" default="false"/>
@@ -23,10 +18,6 @@
 
     <node pkg='nuturtle_control' exec='odometry' name='odometry' output='screen'>
         <param from="$(find-pkg-share nuturtle_description)/config/diff_params.yaml"/>
-        <param name="body_id" value="blue/base_footprint"/>
-        <param name="odom_id" value="$(var odom_id)"/>
-        <param name="wheel_left" value="blue/wheel_left_joint"/>
-        <param name="wheel_right" value="blue/wheel_right_joint"/>
         <remap from="joint_states" to="blue/joint_states"/>
     </node>
 

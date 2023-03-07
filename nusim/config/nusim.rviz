@@ -181,7 +181,7 @@ Visualization Manager:
       Enabled: true
       Name: FakeSensor
       Namespaces:
-        {}
+        "": true
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -198,8 +198,8 @@ Visualization Manager:
       Axis: Z
       Channel Name: intensity
       Class: rviz_default_plugins/LaserScan
-      Color: 255; 255; 255
-      Color Transformer: Intensity
+      Color: 224; 27; 36
+      Color Transformer: FlatColor
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
@@ -306,4 +306,4 @@ Window Geometry:
     collapsed: false
   Width: 1920
   X: 2560
-  Y: 155
+  Y: 0

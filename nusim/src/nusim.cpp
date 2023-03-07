@@ -240,6 +240,8 @@ private:
     t.transform.rotation = quat;
     redbot_broadcaster_->sendTransform(t);
 
+    publish_path(quat);
+
     // publish sensor message for odometry
     auto sens_msg = nuturtlebot_msgs::msg::SensorData();
     sens_msg.stamp = get_clock()->now();
@@ -412,6 +414,21 @@ private:
       theta = tbot3.q.theta;
       i++;
     }
+  }
+
+  void publish_path(geometry_msgs::msg::Quaternion quat)
+  {
+    auto path_msg = nav_msgs::msg::Path();
+    auto pose_msg = geometry_msgs::msg::PoseStamped();
+    pose_msg.header.stamp = get_clock()->now();
+    pose_msg.header.frame_id = "nusim/world";
+    pose_msg.pose.position.x = tbot3.q.x;
+    pose_msg.pose.position.y = tbot3.q.y;
+    pose_msg.pose.orientation = quat;
+    path_msg.poses.push_back(pose_msg);
+    path_msg.header.stamp = pose_msg.header.stamp;
+    path_msg.header.frame_id = pose_msg.header.frame_id;
+    path_publisher_->publish(path_msg);
   }
 
   /// \brief random number generator
