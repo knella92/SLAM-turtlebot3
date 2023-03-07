@@ -262,13 +262,13 @@ private:
     sens_publisher_->publish(sens_msg);
 
     // publishing of environment
-    visualization_msgs::msg::MarkerArray red_obst = add_obstacles(0, "red", "nusim/world");
+    visualization_msgs::msg::MarkerArray red_obst = add_obstacles(0, "red");
     obst_publisher_->publish(red_obst);
-    visualization_msgs::msg::MarkerArray red_walls = add_walls("nusim/world");
+    visualization_msgs::msg::MarkerArray red_walls = add_walls();
     wall_publisher_->publish(red_walls);
     if(std::fmod(count_/sens_rate, 0))
     {
-      visualization_msgs::msg::MarkerArray sens_obst = add_obstacles(1, "yellow", "nusim/world");
+      visualization_msgs::msg::MarkerArray sens_obst = add_obstacles(1, "yellow");
       fake_sensor_publisher_->publish(sens_obst);
 
       sensor_msgs::msg::LaserScan fake_lidar = lidar();
@@ -278,15 +278,10 @@ private:
 
   void draw_only_callback()
   {
-    auto message = std_msgs::msg::UInt64();
-    count_++;
-    message.data = count_;
-    publisher_->publish(message);
-
     // publishing of environment
-    visualization_msgs::msg::MarkerArray red_obst = add_obstacles(0, "red", "odom");
+    visualization_msgs::msg::MarkerArray red_obst = add_obstacles(0, "red");
     obst_publisher_->publish(red_obst);
-    visualization_msgs::msg::MarkerArray red_walls = add_walls("odom");
+    visualization_msgs::msg::MarkerArray red_walls = add_walls();
     wall_publisher_->publish(red_walls);
   }
 
@@ -355,7 +350,7 @@ private:
 
   /// \brief Adds obstacles to MarkerArray for publishing in timer_callback()
   /// \return MarkerArray
-  visualization_msgs::msg::MarkerArray add_obstacles(int sensor_ind, std::string color, std::string frame_id)
+  visualization_msgs::msg::MarkerArray add_obstacles(int sensor_ind, std::string color)
   {
     visualization_msgs::msg::MarkerArray all_obst{};
 
@@ -363,7 +358,7 @@ private:
     rclcpp::Time stamp = get_clock()->now();
     for (int i = 0; i < size_x; ++i) {
       visualization_msgs::msg::Marker obst;
-      obst.header.frame_id = frame_id;
+      obst.header.frame_id = "nusim/world";
       obst.header.stamp = stamp;
       obst.type = visualization_msgs::msg::Marker::CYLINDER;
       obst.scale.x = obstacles_r;
@@ -405,13 +400,13 @@ private:
   }
 
 
-  visualization_msgs::msg::MarkerArray add_walls(std::string frame_id)
+  visualization_msgs::msg::MarkerArray add_walls()
   {
     visualization_msgs::msg::MarkerArray all_walls{};
     rclcpp::Time stamp = get_clock()->now();
     for (int i = 0; i < 4; ++i) {
       visualization_msgs::msg::Marker walls;
-      walls.header.frame_id = frame_id;
+      walls.header.frame_id = "nusim/world";
       walls.header.stamp = stamp;
       walls.type = visualization_msgs::msg::Marker::CUBE;
       walls.scale.x = length.at(i);

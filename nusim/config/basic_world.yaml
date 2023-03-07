@@ -1,4 +1,4 @@
-nusim:
+/**:
   ros__parameters:
     obstacles/x: [-0.6, 0.7, 0.5]
     obstacles/y: [-0.8, -0.7, 0.9]
