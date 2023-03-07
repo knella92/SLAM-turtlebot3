@@ -137,6 +137,9 @@ public:
     range_min = get_parameter("range_min").as_double();
     range_max = get_parameter("range_max").as_double();
 
+    //draw only parameter
+    declare_parameter("draw_only", false);
+    const auto draw_only = get_parameter("draw_only").as_bool();
 
     // saves rate parameter as an int
     rate = get_parameter("rate").as_int();
@@ -144,35 +147,44 @@ public:
     sens_rate = rate/5;
 
     // initialize publishers and timer
-    publisher_ = create_publisher<std_msgs::msg::UInt64>("~/timestep", 10);
-    sens_publisher_ = create_publisher<nuturtlebot_msgs::msg::SensorData>("red/sensor_data", 10);
-    obst_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/obstacles", 10);
-    wall_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/walls", 10);
-    path_publisher_ = create_publisher<nav_msgs::msg::Path>("~/path", 10);
-    fake_sensor_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/fake_sensor", 10);
-    laser_scan_publisher_ = create_publisher<sensor_msgs::msg::LaserScan>("red/base_scan", 10);
-    cmd_subscriber_ = create_subscription<nuturtlebot_msgs::msg::WheelCommands>(
-      "red/wheel_cmd", 10, std::bind(
-        &SimNode::cmd_callback, this,
-        std::placeholders::
-        _1));
+    if(draw_only)
+    {
+      timer_ = create_wall_timer(
+      std::chrono::duration<int64_t, std::milli>(t), std::bind(&SimNode::draw_only_callback, this));
+      obst_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/obstacles", 10);
+      wall_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/walls", 10);
+    }
+    else
+    {
+      publisher_ = create_publisher<std_msgs::msg::UInt64>("~/timestep", 10);
+      sens_publisher_ = create_publisher<nuturtlebot_msgs::msg::SensorData>("red/sensor_data", 10);
+      obst_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/obstacles", 10);
+      wall_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/walls", 10);
+      path_publisher_ = create_publisher<nav_msgs::msg::Path>("~/path", 10);
+      fake_sensor_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/fake_sensor", 10);
+      laser_scan_publisher_ = create_publisher<sensor_msgs::msg::LaserScan>("red/base_scan", 10);
+      cmd_subscriber_ = create_subscription<nuturtlebot_msgs::msg::WheelCommands>(
+        "red/wheel_cmd", 10, std::bind(
+          &SimNode::cmd_callback, this,
+          std::placeholders::
+          _1));
 
-    timer_ = create_wall_timer(
-      std::chrono::duration<int64_t, std::milli>(t), std::bind(&SimNode::timer_callback, this));
+      timer_ = create_wall_timer(
+        std::chrono::duration<int64_t, std::milli>(t), std::bind(&SimNode::timer_callback, this));
 
-    //intializes services
-    reset_service_ =
-      create_service<nusim::srv::Reset>(
-      "~/reset",
-      std::bind(&SimNode::reset, this, std::placeholders::_1, std::placeholders::_2));
-    tele_service_ =
-      create_service<nusim::srv::Teleport>(
-      "~/teleport",
-      std::bind(&SimNode::teleport, this, std::placeholders::_1, std::placeholders::_2));
+      //intializes services
+      reset_service_ =
+        create_service<nusim::srv::Reset>(
+        "~/reset",
+        std::bind(&SimNode::reset, this, std::placeholders::_1, std::placeholders::_2));
+      tele_service_ =
+        create_service<nusim::srv::Teleport>(
+        "~/teleport",
+        std::bind(&SimNode::teleport, this, std::placeholders::_1, std::placeholders::_2));
 
-    // initializes braodcaster
-    redbot_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
-
+      // initializes braodcaster
+      redbot_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
+    }
   }
 
 private:
@@ -250,18 +262,32 @@ private:
     sens_publisher_->publish(sens_msg);
 
     // publishing of environment
-    visualization_msgs::msg::MarkerArray red_obst = add_obstacles(0, "red");
+    visualization_msgs::msg::MarkerArray red_obst = add_obstacles(0, "red", "nusim/world");
     obst_publisher_->publish(red_obst);
-    visualization_msgs::msg::MarkerArray red_walls = add_walls();
+    visualization_msgs::msg::MarkerArray red_walls = add_walls("nusim/world");
     wall_publisher_->publish(red_walls);
     if(std::fmod(count_/sens_rate, 0))
     {
-      visualization_msgs::msg::MarkerArray sens_obst = add_obstacles(1, "yellow");
+      visualization_msgs::msg::MarkerArray sens_obst = add_obstacles(1, "yellow", "nusim/world");
       fake_sensor_publisher_->publish(sens_obst);
 
       sensor_msgs::msg::LaserScan fake_lidar = lidar();
       laser_scan_publisher_->publish(fake_lidar);
     }
+  }
+
+  void draw_only_callback()
+  {
+    auto message = std_msgs::msg::UInt64();
+    count_++;
+    message.data = count_;
+    publisher_->publish(message);
+
+    // publishing of environment
+    visualization_msgs::msg::MarkerArray red_obst = add_obstacles(0, "red", "odom");
+    obst_publisher_->publish(red_obst);
+    visualization_msgs::msg::MarkerArray red_walls = add_walls("odom");
+    wall_publisher_->publish(red_walls);
   }
 
 
@@ -329,7 +355,7 @@ private:
 
   /// \brief Adds obstacles to MarkerArray for publishing in timer_callback()
   /// \return MarkerArray
-  visualization_msgs::msg::MarkerArray add_obstacles(int sensor_ind, std::string color)
+  visualization_msgs::msg::MarkerArray add_obstacles(int sensor_ind, std::string color, std::string frame_id)
   {
     visualization_msgs::msg::MarkerArray all_obst{};
 
@@ -337,7 +363,7 @@ private:
     rclcpp::Time stamp = get_clock()->now();
     for (int i = 0; i < size_x; ++i) {
       visualization_msgs::msg::Marker obst;
-      obst.header.frame_id = "nusim/world";
+      obst.header.frame_id = frame_id;
       obst.header.stamp = stamp;
       obst.type = visualization_msgs::msg::Marker::CYLINDER;
       obst.scale.x = obstacles_r;
@@ -379,13 +405,13 @@ private:
   }
 
 
-  visualization_msgs::msg::MarkerArray add_walls()
+  visualization_msgs::msg::MarkerArray add_walls(std::string frame_id)
   {
     visualization_msgs::msg::MarkerArray all_walls{};
     rclcpp::Time stamp = get_clock()->now();
     for (int i = 0; i < 4; ++i) {
       visualization_msgs::msg::Marker walls;
-      walls.header.frame_id = "nusim/world";
+      walls.header.frame_id = frame_id;
       walls.header.stamp = stamp;
       walls.type = visualization_msgs::msg::Marker::CUBE;
       walls.scale.x = length.at(i);
