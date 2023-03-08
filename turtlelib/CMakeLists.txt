@@ -2,8 +2,10 @@ cmake_minimum_required(VERSION 3.9)
 project(turtlelib)
 include(CTest)
 
+find_package(Armadillo)
+
 # create the turtlelib library
-add_library(turtlelib src/rigid2d.cpp src/diff_drive.cpp)
+add_library(turtlelib src/rigid2d.cpp src/diff_drive.cpp src/slam.cpp)
 # The add_library function just added turtlelib as a "target"
 # A "target" is a name that CMake uses to refer to some type of output
 # In this case it is a library but it could also be an executable or some other items
@@ -12,6 +14,7 @@ add_library(turtlelib src/rigid2d.cpp src/diff_drive.cpp)
 # By adding include/ to the include path, this means that files in e.g., include/turtlelib
 # can be included with #include"turtlelib/file.hpp"
 # CMake also has the ability to generate doxygen documentation
+
 
 target_include_directories(turtlelib
     PUBLIC 

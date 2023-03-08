@@ -1,0 +1,14 @@
+<launch>
+
+    <arg name="robot" description="Valid choices are: ['nusim', 'localhost', 'none']" default="nusim"/>
+    <arg name="cmd_src" description="Source of cmd_vel commands. Valid choices are: ['circle', 'teleop', 'none']" default="none"/>
+
+
+
+
+
+
+
+
+
+</launch>
