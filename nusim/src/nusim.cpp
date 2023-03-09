@@ -292,7 +292,6 @@ private:
   {
     const auto u_l = msg.left_velocity / motor_cmd_per_rad_sec;
     const auto u_r = msg.right_velocity / motor_cmd_per_rad_sec;
-    // double v_l{}; double v_r{};
     
     if(turtlelib::almost_equal(u_l,0.0) && turtlelib::almost_equal(u_r, 0.0))
     {
@@ -307,14 +306,6 @@ private:
 
     i = 0;
     latching();
-
-    // tbot3.forward_kin(v_l / rate, v_r / rate);
-    // const auto dphi_l = (v_l * (1+n_i(get_random()))/rate);
-    // const auto dphi_r = (v_r * (1+n_i(get_random()))/rate);
-    // tbot3.update_wheel_pose(dphi_l, dphi_r);
-    // i = 0;
-
-    // tbot3.q = collision_detection(tbot3.q, collision_radius, obstacles_x, obstacles_y, obstacles_r);
   }
 
 
@@ -379,15 +370,16 @@ private:
         {
           obst.action = visualization_msgs::msg::Marker::DELETE;
         }
-        else{
-          obst.color.g = 0.917;
-          obst.action = visualization_msgs::msg::Marker::ADD;
+        else
+        {
           turtlelib::Transform2D T_wr{{tbot3.q.x, tbot3.q.y}, tbot3.q.theta};
           turtlelib::Transform2D T_wo{{obstacles_x.at(i), obstacles_y.at(i)}, 0.0};
           turtlelib::Transform2D T_ro = T_wr.inv() * T_wo;
 
           obst.pose.position.x = T_ro.translation().x + sens_var(get_random());
           obst.pose.position.y = T_ro.translation().y + sens_var(get_random());
+          obst.color.g = 0.917;
+          obst.action = visualization_msgs::msg::Marker::ADD;
         }
       }
       else
