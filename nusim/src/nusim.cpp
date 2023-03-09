@@ -196,6 +196,7 @@ private:
   int prev_time = get_clock()->now().nanoseconds();
   int current_time{};
   double x0{}; double y0{}; double theta0{}; double x{}; double y{}; double theta{};
+  double v_l{}; double v_r{};
   double phidot_l{}; double phidot_r{};
   double motor_cmd_per_rad_sec{}; double encoder_ticks_per_rad{}; int motor_cmd_max{};
   std::vector<double> obstacles_x{};
@@ -262,13 +263,14 @@ private:
     sens_publisher_->publish(sens_msg);
 
     // publishing of environment
-    visualization_msgs::msg::MarkerArray red_obst = add_obstacles(0, "red");
+    visualization_msgs::msg::MarkerArray red_obst = add_obstacles(0, "nusim/world");
     obst_publisher_->publish(red_obst);
     visualization_msgs::msg::MarkerArray red_walls = add_walls();
     wall_publisher_->publish(red_walls);
     if(std::fmod(count_/sens_rate, 0))
     {
-      visualization_msgs::msg::MarkerArray sens_obst = add_obstacles(1, "yellow");
+      // visualization_msgs::msg::MarkerArray sens_obst = add_obstacles(1, "nusim/world");
+      visualization_msgs::msg::MarkerArray sens_obst = add_obstacles(1, "red/base_footprint");
       fake_sensor_publisher_->publish(sens_obst);
 
       sensor_msgs::msg::LaserScan fake_lidar = lidar();
@@ -290,7 +292,6 @@ private:
   {
     const auto u_l = msg.left_velocity / motor_cmd_per_rad_sec;
     const auto u_r = msg.right_velocity / motor_cmd_per_rad_sec;
-    double v_l{}; double v_r{};
     
     if(turtlelib::almost_equal(u_l,0.0) && turtlelib::almost_equal(u_r, 0.0))
     {
@@ -303,13 +304,8 @@ private:
       v_r = u_r + w_i(get_random());
     }
 
-    tbot3.forward_kin(v_l / rate, v_r / rate);
-    const auto dphi_l = (v_l * (1+n_i(get_random()))/rate);
-    const auto dphi_r = (v_r * (1+n_i(get_random()))/rate);
-    tbot3.update_wheel_pose(dphi_l, dphi_r);
     i = 0;
-
-    tbot3.q = collision_detection(tbot3.q, collision_radius, obstacles_x, obstacles_y, obstacles_r);
+    latching();
   }
 
 
@@ -350,7 +346,7 @@ private:
 
   /// \brief Adds obstacles to MarkerArray for publishing in timer_callback()
   /// \return MarkerArray
-  visualization_msgs::msg::MarkerArray add_obstacles(int sensor_ind, std::string color)
+  visualization_msgs::msg::MarkerArray add_obstacles(int sensor_ind, std::string frame_id)
   {
     visualization_msgs::msg::MarkerArray all_obst{};
 
@@ -358,40 +354,39 @@ private:
     rclcpp::Time stamp = get_clock()->now();
     for (int i = 0; i < size_x; ++i) {
       visualization_msgs::msg::Marker obst;
-      obst.header.frame_id = "nusim/world";
+      obst.header.frame_id = frame_id;
       obst.header.stamp = stamp;
       obst.type = visualization_msgs::msg::Marker::CYLINDER;
       obst.scale.x = obstacles_r;
       obst.scale.y = obstacles_r;
       obst.scale.z = 0.25;
-      if(color == "red")
-      {
-        obst.color.r = 1.0;
-      }
-      else if(color == "yellow")
-      {
-        obst.color.r = 1.0;
-        obst.color.g = 0.917;
-      }
+      obst.color.r = 1.0;
       obst.color.a = 1.0;
       obst.id = i;
-      obst.pose.position.x = obstacles_x.at(i);
-      obst.pose.position.y = obstacles_y.at(i);
+
       if(sensor_ind == 1)
       {
         if(sqrt(std::pow(tbot3.q.x - obst.pose.position.x,2) + std::pow(tbot3.q.y - obst.pose.position.y, 2)) > max_range)
         {
           obst.action = visualization_msgs::msg::Marker::DELETE;
         }
-        else{
+        else
+        {
+          turtlelib::Transform2D T_wr{{tbot3.q.x, tbot3.q.y}, tbot3.q.theta};
+          turtlelib::Transform2D T_wo{{obstacles_x.at(i), obstacles_y.at(i)}, 0.0};
+          turtlelib::Transform2D T_ro = T_wr.inv() * T_wo;
+
+          obst.pose.position.x = T_ro.translation().x + sens_var(get_random());
+          obst.pose.position.y = T_ro.translation().y + sens_var(get_random());
+          obst.color.g = 0.917;
           obst.action = visualization_msgs::msg::Marker::ADD;
-          obst.pose.position.x += sens_var(get_random());
-          obst.pose.position.y += sens_var(get_random());
         }
       }
       else
       {
         obst.action = visualization_msgs::msg::Marker::ADD;
+        obst.pose.position.x = obstacles_x.at(i);
+        obst.pose.position.y = obstacles_y.at(i);
       }
       all_obst.markers.push_back(obst);
     }
@@ -428,7 +423,11 @@ private:
   void latching()
   {
     if (i < 4) {
-      tbot3.forward_kin(phidot_l / rate, phidot_r / rate);
+      tbot3.forward_kin(v_l / rate, v_r / rate);
+      const auto dphi_l = (v_l * (1+n_i(get_random()))/rate);
+      const auto dphi_r = (v_r * (1+n_i(get_random()))/rate);
+      tbot3.update_wheel_pose(dphi_l, dphi_r);
+      tbot3.q = collision_detection(tbot3.q, collision_radius, obstacles_x, obstacles_y, obstacles_r);
       // update position of robot
       x = tbot3.q.x;
       y = tbot3.q.y;
