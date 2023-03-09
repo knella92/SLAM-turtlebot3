@@ -273,8 +273,7 @@ private:
       visualization_msgs::msg::MarkerArray sens_obst = add_obstacles(1, "red/base_footprint");
       fake_sensor_publisher_->publish(sens_obst);
 
-      sensor_msgs::msg::LaserScan fake_lidar = lidar();
-      laser_scan_publisher_->publish(fake_lidar);
+      lidar();
     }
   }
 
@@ -366,18 +365,18 @@ private:
 
       if(sensor_ind == 1)
       {
-        if(sqrt(std::pow(tbot3.q.x - obst.pose.position.x,2) + std::pow(tbot3.q.y - obst.pose.position.y, 2)) > max_range)
+        turtlelib::Transform2D T_wr{{tbot3.q.x, tbot3.q.y}, tbot3.q.theta};
+        turtlelib::Transform2D T_wo{{obstacles_x.at(i), obstacles_y.at(i)}, 0.0};
+        turtlelib::Transform2D T_ro = T_wr.inv() * T_wo;
+        obst.pose.position.x = T_ro.translation().x + sens_var(get_random());
+        obst.pose.position.y = T_ro.translation().y + sens_var(get_random());
+
+        if(sqrt(std::pow(obst.pose.position.x,2) + std::pow(obst.pose.position.y, 2)) > max_range)
         {
           obst.action = visualization_msgs::msg::Marker::DELETE;
         }
         else
         {
-          turtlelib::Transform2D T_wr{{tbot3.q.x, tbot3.q.y}, tbot3.q.theta};
-          turtlelib::Transform2D T_wo{{obstacles_x.at(i), obstacles_y.at(i)}, 0.0};
-          turtlelib::Transform2D T_ro = T_wr.inv() * T_wo;
-
-          obst.pose.position.x = T_ro.translation().x + sens_var(get_random());
-          obst.pose.position.y = T_ro.translation().y + sens_var(get_random());
           obst.color.g = 0.917;
           obst.action = visualization_msgs::msg::Marker::ADD;
         }
@@ -460,7 +459,7 @@ private:
     return mt;
   }
 
-  sensor_msgs::msg::LaserScan lidar()
+  void lidar()
   {
     sensor_msgs::msg::LaserScan msg{};
     msg.header.stamp = get_clock()->now();
@@ -485,9 +484,11 @@ private:
       ranges.push_back(range);
     }
     msg.ranges = ranges;
-    return msg;
+
+    laser_scan_publisher_->publish(msg);
   }
 
+  
 };
 
 int main(int argc, char * argv[])
