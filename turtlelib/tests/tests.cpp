@@ -3,9 +3,11 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include "turtlelib/rigid2d.hpp"
 #include "turtlelib/diff_drive.hpp"
+#include "turtlelib/ekf.hpp"
 #include <sstream>
 #include <string>
 #include <cmath>
+#include <armadillo>
 
 using turtlelib::PI;
 using turtlelib::Transform2D;
@@ -637,4 +639,38 @@ TEMPLATE_TEST_CASE("wall_range", "[range of walls]", double){
         range = range_walls(q, range_max, arena_x, arena_y, angle);
         CHECK_THAT(range, WithinAbs(0.8,.01));
     }
+}
+
+TEMPLATE_TEST_CASE("ekf prediction step", "[ekf prediction]", double)
+{
+    Config q_0{0.0,0.0,0.0};
+    std::vector<double> m_0 = {1.0,0.0};
+    double Q{1.0};
+    int n = (int) m_0.size() / 2;
+    turtlelib::EKF f{q_0, n, Q};
+    f.initialization(0,(m_0.at(0) - q_0.x),(m_0.at(1) - q_0.y));
+
+    SECTION("all zeros"){
+        arma::mat A_c;
+        f.prediction(q_0);
+
+        CHECK_THAT(f.zeta_est(3), WithinAbs(1.0,.01));
+        //CHECK_THAT(A_c(0,0), WithinAbs(1.0,.01));
+
+    }
+
+    SECTION("correction"){
+        Config q{0.5, 0.0, 0.0};
+        f.prediction(q);
+        int index = 0;
+        double x = 0.5;
+        double y = 0.0;
+        f.correction(index,x,y);
+
+        CHECK_THAT(f.zeta_est(3), WithinAbs(1.0, .01));
+        CHECK_THAT(f.zeta_est(4), WithinAbs(0.0, .01));
+    }
+
+    
+
 }

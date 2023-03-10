@@ -1,6 +1,6 @@
 #ifndef DIFFDRIVE_INCLUDE_GUARD_HPP
 #define DIFFDRIVE_INCLUDE_GUARD_HPP
-/// \file
+/// \file   diff_drive.hpp
 /// \brief Kinematics of Differential Drive robots
 
 #include "turtlelib/rigid2d.hpp"

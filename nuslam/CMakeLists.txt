@@ -7,8 +7,43 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(std_msgs REQUIRED)
+# find_package(rosidl_default_generators REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(visualization_msgs REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
+find_package(nuturtlebot_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(turtlelib REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(Armadillo REQUIRED)
+find_package(nuturtle_control REQUIRED)
 
+add_executable(nuslam src/slam.cpp)
+target_link_libraries(nuslam turtlelib::turtlelib)
+ament_target_dependencies(
+  nuslam
+  rclcpp
+  std_msgs
+  geometry_msgs
+  visualization_msgs
+  tf2
+  tf2_ros
+  tf2_geometry_msgs
+  nuturtlebot_msgs
+  sensor_msgs
+  nav_msgs
+  nuturtle_control)
 
+  install(
+    DIRECTORY launch config
+    DESTINATION share/${PROJECT_NAME})
+  install(
+    TARGETS nuslam
+    DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

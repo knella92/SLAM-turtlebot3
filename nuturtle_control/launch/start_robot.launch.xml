@@ -22,7 +22,7 @@
             <remap from="joint_states" to="blue/joint_states"/>
         </node>
 
-        <node pkg='nuturtle_control' exec='odometry' name='odometry' output='screen'>
+        <node pkg='nuslam' exec='nuslam' name='slam' output='screen'>
             <param from="$(find-pkg-share nuturtle_description)/config/diff_params.yaml"/>
             <remap from="joint_states" to="blue/joint_states"/>
         </node>

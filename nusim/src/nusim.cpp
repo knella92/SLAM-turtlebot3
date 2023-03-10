@@ -272,6 +272,7 @@ private:
       // visualization_msgs::msg::MarkerArray sens_obst = add_obstacles(1, "nusim/world");
       visualization_msgs::msg::MarkerArray sens_obst = add_obstacles(1, "red/base_footprint");
       fake_sensor_publisher_->publish(sens_obst);
+      RCLCPP_INFO_STREAM(get_logger(), "fake_sensor size: " << sizeof(sens_obst.markers));
 
       lidar();
     }
@@ -304,7 +305,6 @@ private:
     }
 
     i = 0;
-    latching();
   }
 
 
@@ -352,6 +352,7 @@ private:
     const int size_x = obstacles_x.size();
     rclcpp::Time stamp = get_clock()->now();
     for (int i = 0; i < size_x; ++i) {
+      
       visualization_msgs::msg::Marker obst;
       obst.header.frame_id = frame_id;
       obst.header.stamp = stamp;
@@ -365,6 +366,7 @@ private:
 
       if(sensor_ind == 1)
       {
+        RCLCPP_INFO_STREAM(get_logger(), "fake sensor publisher id: " << obst.id);
         turtlelib::Transform2D T_wr{{tbot3.q.x, tbot3.q.y}, tbot3.q.theta};
         turtlelib::Transform2D T_wo{{obstacles_x.at(i), obstacles_y.at(i)}, 0.0};
         turtlelib::Transform2D T_ro = T_wr.inv() * T_wo;
@@ -379,6 +381,7 @@ private:
         {
           obst.color.g = 0.917;
           obst.action = visualization_msgs::msg::Marker::ADD;
+          
         }
       }
       else
@@ -421,7 +424,7 @@ private:
 
   void latching()
   {
-    if (i < 4) {
+    if (i < 15) {
       tbot3.forward_kin(v_l / rate, v_r / rate);
       const auto dphi_l = (v_l * (1+n_i(get_random()))/rate);
       const auto dphi_r = (v_r * (1+n_i(get_random()))/rate);

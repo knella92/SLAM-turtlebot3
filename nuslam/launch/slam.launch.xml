@@ -2,13 +2,13 @@
 
     <arg name="robot" description="Valid choices are: ['nusim', 'localhost', 'none']" default="nusim"/>
     <arg name="cmd_src" description="Source of cmd_vel commands. Valid choices are: ['circle', 'teleop', 'none']" default="none"/>
+    <arg name="use_rviz" description="Launch rviz with robot model, tf frames, and odometry" default="false"/>
 
-
-
-
-
-
-
+    <include file="$(find-pkg-share nuturtle_control)/launch/start_robot.launch.xml">
+        <arg name='cmd_src' value= "$(var cmd_src)"/>
+        <arg name='robot' value="$(var robot)"/>
+        <arg name="use_rviz" value="$(var use_rviz)"/>
+    </include>
 
 
 </launch>

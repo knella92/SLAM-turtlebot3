@@ -2,10 +2,10 @@ cmake_minimum_required(VERSION 3.9)
 project(turtlelib)
 include(CTest)
 
-find_package(Armadillo)
+find_package(Armadillo REQUIRED)
 
 # create the turtlelib library
-add_library(turtlelib src/rigid2d.cpp src/diff_drive.cpp src/slam.cpp)
+add_library(turtlelib src/rigid2d.cpp src/diff_drive.cpp src/ekf.cpp)
 # The add_library function just added turtlelib as a "target"
 # A "target" is a name that CMake uses to refer to some type of output
 # In this case it is a library but it could also be an executable or some other items
@@ -35,6 +35,8 @@ target_compile_options(turtlelib PUBLIC -Wall -Wextra -Wpedantic)
 # can be compiled once and used
 add_executable(frame_main src/frame_main.cpp src/rigid2d.cpp src/diff_drive.cpp)
 target_link_libraries(frame_main turtlelib)
+target_link_libraries(turtlelib ${ARMADILLO_LIBRARIES})
+include_directories(${ARMADILLO_INCLUDE_DIRS})
 
 install(
     DIRECTORY include/

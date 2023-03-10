@@ -1,4 +1,4 @@
-/// \odometry.cpp
+/// \slam.cpp
 /// \brief Defines and launches odometry node to update and publish/broadcast joint positions and velocities
 ///
 /// PARAMETERS:
@@ -24,20 +24,22 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "turtlelib/diff_drive.hpp"
+#include "turtlelib/ekf.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "nuturtle_control/srv/initial_pose.hpp"
 #include "nav_msgs/msg/odometry.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
+#include "visualization_msgs/msg/marker_array.hpp"
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_ros/transform_broadcaster.h"
 #include "nav_msgs/msg/path.hpp"
 
 
-class OdomNode : public rclcpp::Node
+class SlamNode : public rclcpp::Node
 {
 public:
-  OdomNode()
-  : Node("odometry")
+  SlamNode()
+  : Node("slam")
   {
 
     //declare initial parameters
@@ -49,6 +51,7 @@ public:
     declare_parameter("track_width", 0.0);
     declare_parameter("input_noise", 0.0);
     declare_parameter("slip_fraction", 0.0);
+    declare_parameter("process_covariance", 1.0);
 
     // if these are not specified, shutdown the node
     if (get_parameter("body_id").as_string() == "none") {
@@ -68,22 +71,30 @@ public:
     wheel_right = get_parameter("wheel_right").as_string();
     const auto radius = get_parameter("wheel_radius").as_double();
     const auto depth = get_parameter("track_width").as_double();
+    process_covariance = get_parameter("process_covariance").as_double();
 
     turtlelib::DiffDrive tbot{depth, radius};
     tbot3 = tbot;
+    turtlelib::EKF bkf{tbot3.q, max_obstacles, process_covariance};
+    basic_kalman = bkf;
 
 
     // initialize publisher, subscriber, and service
     odom_publisher_ = create_publisher<nav_msgs::msg::Odometry>("/odom", 10);
     path_publisher_ = create_publisher<nav_msgs::msg::Path>("/path", 10);
+    slam_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/slam_map", 10);
     js_subscriber_ = create_subscription<sensor_msgs::msg::JointState>(
       "/joint_states", 10, std::bind(
-        &OdomNode::js_callback, this,
+        &SlamNode::js_callback, this,
+        std::placeholders::_1));
+    fake_sensor_subscriber_ = create_subscription<visualization_msgs::msg::MarkerArray>(
+      "nusim/fake_sensor", 10, std::bind(
+        &SlamNode::sensor_callback, this,
         std::placeholders::_1));
     initialp_service_ =
       create_service<nuturtle_control::srv::InitialPose>(
       "/initial_pose",
-      std::bind(&OdomNode::initial_pose, this, std::placeholders::_1, std::placeholders::_2));
+      std::bind(&SlamNode::initial_pose, this, std::placeholders::_1, std::placeholders::_2));
 
     // initializes braodcaster
     tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
@@ -92,10 +103,15 @@ public:
 
 private:
   turtlelib::DiffDrive tbot3{0.0, 0.0};
+  double process_covariance{};
+  int max_obstacles{6};
+  turtlelib::EKF basic_kalman{tbot3.q, 1, 0.0};
   std::string body_id, odom_id, wheel_left, wheel_right;
   rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_publisher_;
   rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr path_publisher_;
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr slam_publisher_;
   rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr js_subscriber_;
+  rclcpp::Subscription<visualization_msgs::msg::MarkerArray>::SharedPtr fake_sensor_subscriber_;
   std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
   rclcpp::Service<nuturtle_control::srv::InitialPose>::SharedPtr initialp_service_;
 
@@ -104,6 +120,7 @@ private:
     turtlelib::Twist2D Vb = tbot3.forward_kin(
       msg.position[0] - tbot3.phi_l,
       msg.position[1] - tbot3.phi_r);
+    //updating wheel pose with new wheel angles
     tbot3.phi_l = msg.position[0];
     tbot3.phi_r = msg.position[1];
     tf2::Quaternion q;
@@ -161,12 +178,75 @@ private:
     path_publisher_->publish(path_msg);
   }
 
+  void sensor_callback(const visualization_msgs::msg::MarkerArray & msg)
+  {
+    RCLCPP_INFO(get_logger(), "Predicting");
+    basic_kalman.prediction(tbot3.q);
+    for(int i{0}; i < 1; i++)
+    {
+      RCLCPP_INFO_STREAM(get_logger(), "Marker ID = " << msg.markers[i].id);
+    }
+
+    for(int i{0}; i < 1; i++)
+    {
+      if(msg.markers[i].action == visualization_msgs::msg::Marker::ADD)
+      {
+        // z_t for extended
+        // const auto r = sqrt(std::pow(msg.at(i).pose.position.x, 2.0) + std::pow(msg.at(i).pose.position.y, 2.0));
+        // const auto phi = turtlelib::find_angle(msg.at(i).pose.position.x, msg.at(i).pose.position.y);
+
+        if(basic_kalman.izd.at(i) == false)
+        {
+          //basic
+          RCLCPP_INFO(get_logger(), "Initializing");
+          basic_kalman.initialization(msg.markers[i].id, msg.markers[i].pose.position.x, msg.markers[i].pose.position.y);
+          basic_kalman.izd.at(i) = true;
+        }
+        if(basic_kalman.izd.at(i) == true)
+        {
+          basic_kalman.correction(msg.markers[i].id, msg.markers[i].pose.position.x, msg.markers[i].pose.position.y);
+          RCLCPP_INFO(get_logger(), "publishing");
+          slam_publisher_->publish(add_obstacles(msg));
+        }
+      }
+    }
+
+    
+  }
+
+  visualization_msgs::msg::MarkerArray add_obstacles(visualization_msgs::msg::MarkerArray msg)
+  {
+    visualization_msgs::msg::MarkerArray all_obst{};
+    rclcpp::Time stamp = get_clock()->now();
+    for (int i = 0; i < 1; ++i)
+    {
+      visualization_msgs::msg::Marker obst;
+      obst.header.frame_id = "nusim/world";
+      obst.header.stamp = stamp;
+      obst.type = visualization_msgs::msg::Marker::CYLINDER;
+      obst.scale.x = msg.markers[i].scale.x;
+      obst.scale.y = msg.markers[i].scale.y;
+      obst.scale.z = msg.markers[i].scale.z;
+      obst.color.r = 1.0;
+      obst.color.a = 1.0;
+      obst.color.g = 0.917;
+      obst.id = i;
+      obst.pose.position.x = basic_kalman.zeta_est(3+2*i);
+      obst.pose.position.y = basic_kalman.zeta_est(4+2*i);  
+      obst.action = visualization_msgs::msg::Marker::ADD;
+
+      all_obst.markers.push_back(obst);
+    }
+
+    return all_obst;
+  }
+
 };
 
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<OdomNode>());
+  rclcpp::spin(std::make_shared<SlamNode>());
   rclcpp::shutdown();
   return 0;
 }
