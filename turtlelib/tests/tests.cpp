@@ -645,10 +645,14 @@ TEMPLATE_TEST_CASE("ekf prediction step", "[ekf prediction]", double)
 {
     Config q_0{0.0,0.0,0.0};
     std::vector<double> m_0 = {1.0,0.0};
+    double dx = m_0.at(0) - q_0.x;
+    double dy = m_0.at(1) - q_0.y;
+    double r = sqrt(std::pow(dx, 2) + std::pow(dy, 2));
+    double phi = turtlelib::find_angle(dx,dy);
     double Q{1.0};
     int n = (int) m_0.size() / 2;
     turtlelib::EKF f{q_0, n, Q};
-    f.initialization(0,(m_0.at(0) - q_0.x),(m_0.at(1) - q_0.y));
+    f.initialization(0,r,phi);
 
     SECTION("all zeros"){
         arma::mat A_c;

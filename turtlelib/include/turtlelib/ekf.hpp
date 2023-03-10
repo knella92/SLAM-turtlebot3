@@ -68,10 +68,10 @@ namespace turtlelib
             void prediction(Config q); // currently only for 1D, basic filter
 
 
-            void initialization(double index, double x, double y);
+            void initialization(double index, double dx, double dy);
 
 
-            void correction(double index, double x, double y);
+            void correction(double index, double dx, double dy);
 
     };
 

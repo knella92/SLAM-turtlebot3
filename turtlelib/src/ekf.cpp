@@ -34,16 +34,19 @@ namespace turtlelib
 
     void EKF::prediction(Config q)
     {   
-        //zeta_prev = zeta_est;
         sigma_prev = sigma_est;
+
+        arma::mat A(3,3);
+        A(1,0) = -(q.y - zeta_est(2));
+        A(2,0) = q.x - zeta_est(1);
+        A_c.submat(0,0, 2,2) = A;
 
         zeta_est(0) = q.theta;
         zeta_est(1) = q.x;
-        std::cout << q.x << std::endl;
         zeta_est(2) = q.y;
 
         //constant A because basic kalman filter, plus our situation is like that
-        A_c = 1.0*A_c;
+        
 
         Q_bar.submat( 0,0, 2,2 ) = Q;
 
@@ -51,25 +54,29 @@ namespace turtlelib
     }
 
 
-    void EKF::initialization(double index, double x, double y)
+    void EKF::initialization(double index, double dx, double dy)
     {
         int m_index = 3 + 2*index;
+        double r = sqrt(std::pow(dx, 2) + std::pow(dy, 2));
+        double phi = turtlelib::find_angle(dx,dy);
 
         //extended
-        // zeta_est(m_index) = zeta_est(1) + r*cos(phi + zeta_est(0));
-        // zeta_est(m_index+1) = zeta_est(2) + r*cos(phi + zeta_est(0));
+        zeta_est(m_index) = zeta_est(1) + r*cos(phi + zeta_est(0));
+        zeta_est(m_index+1) = zeta_est(2) + r*sin(phi + zeta_est(0));
 
         //basic
-        zeta_est(m_index) = zeta_est(1) + x;
-        zeta_est(m_index + 1) = zeta_est(2) + y;
+        // zeta_est(m_index) = zeta_est(1) + x;
+        // zeta_est(m_index + 1) = zeta_est(2) + y;
     }
 
-    void EKF::correction(double index, double x, double y)
+    void EKF::correction(double index, double dx, double dy)
     {
         int m_index = 3 + 2*index;
-        arma::vec z_real = {x, y};
-        std::cout << z_real(0) << std::endl;
-        //basic, one obstacle
+        double r = sqrt(std::pow(dx, 2) + std::pow(dy, 2));
+        double phi = turtlelib::find_angle(dx,dy);
+        arma::vec z_real = {r, phi};
+        // std::cout << z_real(0) << std::endl;
+        //extended, one obstacle
         //theoretical measurement (based on estimate)
             //depends on obstacle in question
         arma::vec z_theor = {zeta_est(m_index) - zeta_est(1), zeta_est(m_index+1) - zeta_est(2)};
