@@ -33,7 +33,7 @@
     </node>
 
     <group if="$(eval '\'$(var use_rviz)\' == \'true\'')">
-        <node pkg='rviz2' exec='rviz2' output='screen' args='-d $(find-pkg-share nuturtle_control)/config/config.rviz'
+        <node pkg='rviz2' exec='rviz2' output='screen' args='-d $(find-pkg-share nuslam)/config/slam_map.rviz'
             if="$(eval '\'$(var robot)\' == \'nusim\'')">
         </node>
         <node pkg='rviz2' exec='rviz2' output='screen' args='-d $(find-pkg-share nuturtle_control)/config/no_robot.rviz'

@@ -4,6 +4,7 @@
 /// \brief Two-dimensional rigid body transformations.
 
 #include<iosfwd> // contains forward definitions for iostream objects
+#include<cmath>
 
 namespace turtlelib
 {
@@ -22,7 +23,7 @@ namespace turtlelib
     constexpr bool almost_equal(double d1, double d2, double epsilon=1.0e-12)
     {
        double diff{d1-d2};
-        if(diff < epsilon && diff > -1*epsilon){
+        if(std::abs(diff) < epsilon){
             return true;
         }
         else{

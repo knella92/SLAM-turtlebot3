@@ -287,50 +287,8 @@ namespace turtlelib
 
     double normalize_angle(double rad)
     {
-        const double quot = rad/(2.0*PI);
-        double rem{}, x{};
-        (quot > 0) ? (rem = quot - floor(quot)) : (rem = quot - ceil(quot));
-        if (rem > 0)
-        {
-            std::cout<<"over 0\n";
-            if (rem > 0.5)
-            {
-                x = rem - 0.5;
-                rad = -1.0*PI + x*2.0*PI;
-            }
-            else if (rem < 0.5)
-            {
-                rad = rem*2.0*PI;
-            }
-            else
-            {
-                rad = PI;
-            }
-            return rad;
-        }
-        else if (rem < 0)
-        {
-            std::cout<<"under 0\n";
-            if (rem > -0.5)
-            {
-                rad = rem*2.0*PI;
-            }
-            else if (x < -0.5)
-            {
-                x = rem + 1.0;
-                rad = x*2.0*PI;
-            }
-            else
-            {
-                rad = PI;
-            }
-            return rad;
-        }
-        else
-        {
-            rad = 0;
-            return rad;
-        }
+        double deg = rad2deg(rad); // 180
+        return deg2rad(remainder(deg, 360.0));
     }
 
 

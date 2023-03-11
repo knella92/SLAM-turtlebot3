@@ -272,7 +272,6 @@ private:
       // visualization_msgs::msg::MarkerArray sens_obst = add_obstacles(1, "nusim/world");
       visualization_msgs::msg::MarkerArray sens_obst = add_obstacles(1, "red/base_footprint");
       fake_sensor_publisher_->publish(sens_obst);
-      RCLCPP_INFO_STREAM(get_logger(), "fake_sensor size: " << sizeof(sens_obst.markers));
 
       lidar();
     }
@@ -366,7 +365,7 @@ private:
 
       if(sensor_ind == 1)
       {
-        RCLCPP_INFO_STREAM(get_logger(), "fake sensor publisher id: " << obst.id);
+        
         turtlelib::Transform2D T_wr{{tbot3.q.x, tbot3.q.y}, tbot3.q.theta};
         turtlelib::Transform2D T_wo{{obstacles_x.at(i), obstacles_y.at(i)}, 0.0};
         turtlelib::Transform2D T_ro = T_wr.inv() * T_wo;
@@ -381,7 +380,7 @@ private:
         {
           obst.color.g = 0.917;
           obst.action = visualization_msgs::msg::Marker::ADD;
-          
+          // RCLCPP_INFO_STREAM(get_logger(), "obst.pose.position.x: " << obst.pose.position.x);
         }
       }
       else

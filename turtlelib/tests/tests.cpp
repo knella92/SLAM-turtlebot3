@@ -32,6 +32,12 @@ TEMPLATE_TEST_CASE("Normalize rotation angle", "[normalize]", double){
         CHECK_THAT(rad2, WithinRel(PI));
     }
 
+    SECTION("rad = 3PI"){
+        rad1 = 3*PI;
+        rad2 = turtlelib::normalize_angle(rad1);
+        CHECK_THAT(rad2, WithinRel(PI));
+    }
+
     SECTION("rad = -PI"){
         rad1 = -1.0*PI;
         rad2 = turtlelib::normalize_angle(rad1);
@@ -61,6 +67,19 @@ TEMPLATE_TEST_CASE("Normalize rotation angle", "[normalize]", double){
         rad2 = turtlelib::normalize_angle(rad1);
         CHECK_THAT(rad2, WithinRel(-1.0/2.0 * PI));
     }
+
+    SECTION("rad = -5*PI/2"){
+        rad1 = -3.5;
+        rad2 = turtlelib::normalize_angle(rad1);
+        CHECK_THAT(rad2, WithinAbs(2.7831, .0001));
+    }
+
+    SECTION("rad = -3PI"){
+        rad1 = -3*PI;
+        rad2 = turtlelib::normalize_angle(rad1);
+        CHECK_THAT(rad2, WithinAbs(PI, .0001));
+    }
+
 }
 
 
@@ -431,6 +450,41 @@ TEMPLATE_TEST_CASE("find angle", "[find angle]", double){
         radians = turtlelib::find_angle(dx,dy);
         CHECK_THAT(radians, WithinRel(PI/4,.0001));
     }
+
+    SECTION("0"){
+        dx = 5.0;
+        dy = 0.0;
+        radians = turtlelib::find_angle(dx,dy);
+        CHECK_THAT(radians, WithinAbs(0.0,.0001));
+    }
+
+    SECTION("PI"){
+        dx = -5.0;
+        dy = 0.0;
+        radians = turtlelib::find_angle(dx,dy);
+        CHECK_THAT(radians, WithinAbs(PI,.0001));
+    }
+
+    SECTION("2nd quad"){
+        dx = -1.56;
+        dy = 2.434;
+        radians = turtlelib::find_angle(dx,dy);
+        CHECK_THAT(radians, WithinAbs(2.1407,.0001));
+    }
+
+    SECTION("3rd quad"){
+        dx = -1.56;
+        dy = -2.434;
+        radians = turtlelib::find_angle(dx,dy);
+        CHECK_THAT(radians, WithinAbs(-2.1407,.0001));
+    }
+
+    SECTION("4th quad"){
+        dx = 1.56;
+        dy = -2.434;
+        radians = turtlelib::find_angle(dx,dy);
+        CHECK_THAT(radians, WithinAbs(-1.0008,.0001));
+    }
 }
 
 TEMPLATE_TEST_CASE("collision_detection", "[collision_detection]", Config){
@@ -675,6 +729,192 @@ TEMPLATE_TEST_CASE("ekf prediction step", "[ekf prediction]", double)
         CHECK_THAT(f.zeta_est(4), WithinAbs(0.0, .01));
     }
 
+    SECTION("correction, theta = PI/4"){
+        Config q{0.0, 0.0, PI/4};
+        f.prediction(q);
+        int index = 0;
+        Transform2D T_wr{{q.x,q.y}, q.theta};
+        Transform2D T_wo{{m_0.at(0), m_0.at(1)}, 0.0};
+        Transform2D T_ro = T_wr.inv() * T_wo;
+        double x = T_ro.translation().x;
+        double y = T_ro.translation().y;
+        f.correction(index,x,y);
+
+        CHECK_THAT(f.zeta_est(3), WithinAbs(1.0, .01));
+        CHECK_THAT(f.zeta_est(4), WithinAbs(0.0, .01));
+    }
+
+    SECTION("correction, theta = -PI/4"){
+        Config q{0.0, 0.0, -PI/4};
+        f.prediction(q);
+        int index = 0;
+        Transform2D T_wr{{q.x,q.y}, q.theta};
+        Transform2D T_wo{{m_0.at(0), m_0.at(1)}, 0.0};
+        Transform2D T_ro = T_wr.inv() * T_wo;
+        double x = T_ro.translation().x;
+        double y = T_ro.translation().y;
+        f.correction(index,x,y);
+
+        CHECK_THAT(f.zeta_est(3), WithinAbs(1.0, .01));
+        CHECK_THAT(f.zeta_est(4), WithinAbs(0.0, .01));
+    }
+
+    SECTION("correction, x = 0.5, theta = -PI/4"){
+        Config q{0.5, 0.0, -PI/4};
+        f.prediction(q);
+        int index = 0;
+        Transform2D T_wr{{q.x,q.y}, q.theta};
+        Transform2D T_wo{{m_0.at(0), m_0.at(1)}, 0.0};
+        Transform2D T_ro = T_wr.inv() * T_wo;
+        double x = T_ro.translation().x;
+        double y = T_ro.translation().y;
+        f.correction(index,x,y);
+
+        CHECK_THAT(f.zeta_est(3), WithinAbs(1.0, .01));
+        CHECK_THAT(f.zeta_est(4), WithinAbs(0.0, .01));
+    }
+
+    SECTION("correction, theta = PI"){
+        Config q{0.0, 0.0, PI};
+        f.prediction(q);
+        int index = 0;
+        Transform2D T_wr{{q.x,q.y}, q.theta};
+        Transform2D T_wo{{m_0.at(0), m_0.at(1)}, 0.0};
+        Transform2D T_ro = T_wr.inv() * T_wo;
+        double x = T_ro.translation().x;
+        double y = T_ro.translation().y;
+        f.correction(index,x,y);
+
+        CHECK_THAT(f.zeta_est(3), WithinAbs(1.0, .01));
+        CHECK_THAT(f.zeta_est(4), WithinAbs(0.0, .01));
+    }
+
+    SECTION("correction, theta = 3PI"){
+        Config q{0.0, 0.0, 3*PI};
+        f.prediction(q);
+        int index = 0;
+        Transform2D T_wr{{q.x,q.y}, q.theta};
+        Transform2D T_wo{{m_0.at(0), m_0.at(1)}, 0.0};
+        Transform2D T_ro = T_wr.inv() * T_wo;
+        double x = T_ro.translation().x;
+        double y = T_ro.translation().y;
+        f.correction(index,x,y);
+
+        CHECK_THAT(f.zeta_est(3), WithinAbs(1.0, .01));
+        CHECK_THAT(f.zeta_est(4), WithinAbs(0.0, .01));
+    }
+
+    SECTION("correction, x = 0.5, theta = -PI"){
+        Config q{0.5, 0.0, -PI};
+        f.prediction(q);
+        int index = 0;
+        Transform2D T_wr{{q.x,q.y}, q.theta};
+        Transform2D T_wo{{m_0.at(0), m_0.at(1)}, 0.0};
+        Transform2D T_ro = T_wr.inv() * T_wo;
+        double x = T_ro.translation().x;
+        double y = T_ro.translation().y;
+        f.correction(index,x,y);
+
+        CHECK_THAT(f.zeta_est(3), WithinAbs(1.0, .01));
+        CHECK_THAT(f.zeta_est(4), WithinAbs(0.0, .01));
+    }
+
+    SECTION("correction, x = 0.5, theta = -3.5"){
+        Config q{0.0, 0.0, -3.5};
+        f.prediction(q);
+        int index = 0;
+        Transform2D T_wr{{q.x,q.y}, q.theta};
+        Transform2D T_wo{{m_0.at(0), m_0.at(1)}, 0.0};
+        Transform2D T_ro = T_wr.inv() * T_wo;
+        double x = T_ro.translation().x;
+        double y = T_ro.translation().y;
+        f.correction(index,x,y);
+
+        CHECK_THAT(f.zeta_est(3), WithinAbs(1.0, .01));
+        CHECK_THAT(f.zeta_est(4), WithinAbs(0.0, .01));
+    }
+
+    SECTION("correction, x = 0.5, theta = -3PI"){
+        Config q{0.0, 0.0, -5*PI};
+        f.prediction(q);
+        int index = 0;
+        Transform2D T_wr{{q.x,q.y}, q.theta};
+        Transform2D T_wo{{m_0.at(0), m_0.at(1)}, 0.0};
+        Transform2D T_ro = T_wr.inv() * T_wo;
+        double x = T_ro.translation().x;
+        double y = T_ro.translation().y;
+        f.correction(index,x,y);
+
+        CHECK_THAT(f.zeta_est(3), WithinAbs(1.0, .01));
+        CHECK_THAT(f.zeta_est(4), WithinAbs(0.0, .01));
+    }
+
+    SECTION("multiple, x = 0.5, theta = 0->pi/3"){
+
+        int index = 0;
+
+        Config q{0.0, 0.0, 0.0};
+        Transform2D T_wr{{q.x,q.y}, q.theta};
+        Transform2D T_wo{{m_0.at(0), m_0.at(1)}, 0.0};
+        Transform2D T_ro = T_wr.inv() * T_wo;
+        double x = T_ro.translation().x;
+        double y = T_ro.translation().y;
+        f.prediction(q);
+        f.correction(index,x,y);
+        while(q.theta<-3*PI)
+        {
+            q.theta += -0.1;
+            Transform2D T_wr{{q.x,q.y}, q.theta};
+            Transform2D T_wo{{m_0.at(0), m_0.at(1)}, 0.0};
+            Transform2D T_ro = T_wr.inv() * T_wo;
+            x = T_ro.translation().x;
+            y = T_ro.translation().y;
+            
+        }
+
+        CHECK_THAT(f.zeta_est(3), WithinAbs(1.0, .01));
+        CHECK_THAT(f.zeta_est(4), WithinAbs(0.0, .01));
+    }
+
+    SECTION("multiple, x=0->, theta = 0->pi/3"){
+
+        int index = 0;
+
+        Config q{0.6, -0.3, 0.0};
+        Transform2D T_wr{{q.x,q.y}, q.theta};
+        Transform2D T_wo{{m_0.at(0), m_0.at(1)}, 0.0};
+        Transform2D T_ro = T_wr.inv() * T_wo;
+        double x = T_ro.translation().x;
+        double y = T_ro.translation().y;
+        f.prediction(q);
+        f.correction(index,x,y);
+        while(q.theta>-20*PI)
+        {
+            q.theta -= 0.01;
+            // q.x += 0.01;
+            // q.y += 0.02;
+            Transform2D T_wr{{q.x,q.y}, q.theta};
+            Transform2D T_wo{{m_0.at(0), m_0.at(1)}, 0.0};
+            Transform2D T_ro = T_wr.inv() * T_wo;
+            x = T_ro.translation().x;
+            y = T_ro.translation().y;
+            
+        }
+
+        CHECK_THAT(f.zeta_est(3), WithinAbs(1.0, .01));
+        CHECK_THAT(f.zeta_est(4), WithinAbs(0.0, .01));
+    }
     
 
+}
+
+TEST_CASE("fake_sensor position test")
+{
+    Transform2D T_wr{{0.0, 0.0}, PI/2};;
+    Transform2D T_wo{{1.0, 0.0}, 0.0};
+    Transform2D T_ro = T_wr.inv() * T_wo;
+    Transform2D T_revert{{0.0,0.0}, -T_ro.rotation()};
+    T_revert *=T_ro;
+
+    CHECK_THAT(T_revert.translation().x, WithinAbs(1.0, .01));
 }

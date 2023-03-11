@@ -7,6 +7,6 @@
     arena/y_length: 7.0
     wall/thickness: 0.038
     rate: 100
-    x0: -0.6
-    y0: 0.8
-    theta0: 1.57
+    x0: 0.0
+    y0: 0.0
+    theta0: 0.0

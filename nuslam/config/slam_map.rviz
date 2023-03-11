@@ -6,8 +6,8 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /FakeSensor1
         - /FakeSensor1/Topic1
-        - /SLAM1
       Splitter Ratio: 0.5
     Tree Height: 1239
   - Class: rviz_common/Selection
@@ -319,7 +319,7 @@ Visualization Manager:
         Value: /path
       Value: true
     - Class: rviz_default_plugins/MarkerArray
-      Enabled: false
+      Enabled: true
       Name: FakeSensor
       Namespaces:
         {}
@@ -328,8 +328,8 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /nusim/fake_sensor
-      Value: false
+        Value: /slam/slam_map
+      Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -363,18 +363,6 @@ Visualization Manager:
         Value: /red/base_scan
       Use Fixed Frame: true
       Use rainbow: false
-      Value: true
-    - Class: rviz_default_plugins/MarkerArray
-      Enabled: true
-      Name: SLAM
-      Namespaces:
-        {}
-      Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /slam/slam_map
       Value: true
   Enabled: true
   Global Options:

@@ -75,8 +75,8 @@ public:
 
     turtlelib::DiffDrive tbot{depth, radius};
     tbot3 = tbot;
-    turtlelib::EKF bkf{tbot3.q, max_obstacles, process_covariance};
-    basic_kalman = bkf;
+    turtlelib::EKF ekf{tbot3.q, max_obstacles, process_covariance};
+    extended_kalman = ekf;
 
 
     // initialize publisher, subscriber, and service
@@ -105,7 +105,7 @@ private:
   turtlelib::DiffDrive tbot3{0.0, 0.0};
   double process_covariance{};
   int max_obstacles{6};
-  turtlelib::EKF basic_kalman{tbot3.q, 1, 0.0};
+  turtlelib::EKF extended_kalman{tbot3.q, 1, 0.0};
   std::string body_id, odom_id, wheel_left, wheel_right;
   rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_publisher_;
   rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr path_publisher_;
@@ -138,6 +138,7 @@ private:
     odom.twist.twist.linear.y = Vb.v.y;
     odom.twist.twist.angular.z = Vb.w;
     odom_publisher_->publish(odom);
+
 
     geometry_msgs::msg::TransformStamped t;
     t.header.stamp = get_clock()->now();
@@ -180,12 +181,7 @@ private:
 
   void sensor_callback(const visualization_msgs::msg::MarkerArray & msg)
   {
-    RCLCPP_INFO(get_logger(), "Predicting");
-    basic_kalman.prediction(tbot3.q);
-    for(int i{0}; i < 1; i++)
-    {
-      RCLCPP_INFO_STREAM(get_logger(), "Marker ID = " << msg.markers[i].id);
-    }
+    extended_kalman.prediction(tbot3.q);
 
     for(int i{0}; i < 1; i++)
     {
@@ -194,18 +190,21 @@ private:
         // z_t for extended
         // const auto r = sqrt(std::pow(msg.at(i).pose.position.x, 2.0) + std::pow(msg.at(i).pose.position.y, 2.0));
         // const auto phi = turtlelib::find_angle(msg.at(i).pose.position.x, msg.at(i).pose.position.y);
-
-        if(basic_kalman.izd.at(i) == false)
+        
+        if(extended_kalman.izd.at(i) == false)
         {
           //basic
-          RCLCPP_INFO(get_logger(), "Initializing");
-          basic_kalman.initialization(msg.markers[i].id, msg.markers[i].pose.position.x, msg.markers[i].pose.position.y);
-          basic_kalman.izd.at(i) = true;
+
+          RCLCPP_INFO_STREAM(get_logger(), "bt y: " << tbot3.q.y);
+          extended_kalman.initialization(msg.markers[i].id, msg.markers[i].pose.position.x, msg.markers[i].pose.position.y);
+          extended_kalman.izd.at(i) = true;
         }
-        if(basic_kalman.izd.at(i) == true)
+        if(extended_kalman.izd.at(i) == true)
         {
-          basic_kalman.correction(msg.markers[i].id, msg.markers[i].pose.position.x, msg.markers[i].pose.position.y);
-          RCLCPP_INFO(get_logger(), "publishing");
+          // if(msg.markers[i].pose.position.y > 0)
+          // {RCLCPP_INFO_STREAM(get_logger(), "marker y distance: " << msg.markers[i].pose.position.y);}
+          extended_kalman.correction(msg.markers[i].id, msg.markers[i].pose.position.x, msg.markers[i].pose.position.y);
+          // RCLCPP_INFO(get_logger(), "publishing");
           slam_publisher_->publish(add_obstacles(msg));
         }
       }
@@ -231,8 +230,8 @@ private:
       obst.color.a = 1.0;
       obst.color.g = 0.917;
       obst.id = i;
-      obst.pose.position.x = basic_kalman.zeta_est(3+2*i);
-      obst.pose.position.y = basic_kalman.zeta_est(4+2*i);  
+      obst.pose.position.x = extended_kalman.zeta_est(3+(2*i));
+      obst.pose.position.y = extended_kalman.zeta_est(4+(2*i));  
       obst.action = visualization_msgs::msg::Marker::ADD;
 
       all_obst.markers.push_back(obst);

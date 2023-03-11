@@ -58,7 +58,7 @@ namespace turtlelib
     {
         int m_index = 3 + 2*index;
         double r = sqrt(std::pow(dx, 2) + std::pow(dy, 2));
-        double phi = turtlelib::find_angle(dx,dy);
+        double phi = find_angle(dx,dy);
 
         //extended
         zeta_est(m_index) = zeta_est(1) + r*cos(phi + zeta_est(0));
@@ -73,17 +73,53 @@ namespace turtlelib
     {
         int m_index = 3 + 2*index;
         double r = sqrt(std::pow(dx, 2) + std::pow(dy, 2));
-        double phi = turtlelib::find_angle(dx,dy);
+        double phi = find_angle(dx,dy); 
+        // std::cout << phi << std::endl;
         arma::vec z_real = {r, phi};
-        // std::cout << z_real(0) << std::endl;
         //extended, one obstacle
         //theoretical measurement (based on estimate)
             //depends on obstacle in question
-        arma::vec z_theor = {zeta_est(m_index) - zeta_est(1), zeta_est(m_index+1) - zeta_est(2)};
-        std::cout << zeta_est(1) << std::endl;
+        // arma::vec z_theor = {zeta_est(m_index) - zeta_est(1), zeta_est(m_index+1) - zeta_est(2)};
+        double delta_x = zeta_est(m_index) - zeta_est(1);
+        double delta_y = zeta_est(m_index+1) - zeta_est(2);
+        double d = delta_x*delta_x + delta_y*delta_y;
+        double theta_est{};
+
+        if(zeta_est(0) < 0 && zeta_est(0) >= -PI)
+        {
+            theta_est = zeta_est(0);
+        }
+        else if(zeta_est(0) < -PI && almost_equal(normalize_angle(zeta_est(0)),PI))
+        {
+            std::cout << "edge-case" << std::endl;
+            theta_est = -PI;
+        }
+        else{ 
+            theta_est = normalize_angle(zeta_est(0));
+        
+        }
+        arma::vec z_theor = {sqrt(d), normalize_angle(find_angle(delta_x, delta_y) - theta_est)};
+        // std::cout << zeta_est(1) << std::endl;
         // H matrix
-        arma::mat H(2,3+2*n);
-        H.submat( 0,m_index, 1,m_index+1) = {{1.0, 0.0}, {0.0, 1.0}};
+        arma::mat H(2, 3+2*n);
+
+        arma::mat h_1 = {{0.0, -delta_x/sqrt(d), -delta_y/sqrt(d)},
+                         {-1.0, delta_y/d, -delta_x/d}};
+
+        arma::mat h_2 = {{delta_x/sqrt(d), delta_y/sqrt(d)},
+                         {-delta_y/d, delta_x/d}};
+
+        H.submat(0,0, 1,2) = h_1;
+
+        if(index == 0)
+        {
+            // std::cout << arma::size(h_2) << std::endl;
+            H.submat(0,3, 1,4) = h_2;
+        }
+        else
+        {
+            H.submat(0,3+2*index,   1,(3+2*index+1)) = h_2;
+        }
 
         arma::mat R;
         R.eye(2,2);
