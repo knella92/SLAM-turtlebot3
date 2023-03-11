@@ -13,8 +13,8 @@
     </include>
 
     <node pkg='nusim' exec='nusim' name='nusim' output='screen'>
-        <param from="$(find-pkg-share nusim)/$(var config_file)"/>
-        <!-- <param from="$(find-pkg-share nuslam)/config/1D_basic.yaml"/> -->
+        <!-- <param from="$(find-pkg-share nusim)/$(var config_file)"/> -->
+        <param from="$(find-pkg-share nuslam)/config/1D_basic.yaml"/>
         <param from="$(find-pkg-share nuturtle_description)/config/diff_params.yaml"/>
     </node>
 

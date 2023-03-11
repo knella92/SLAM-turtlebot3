@@ -51,7 +51,7 @@ public:
     declare_parameter("track_width", 0.0);
     declare_parameter("input_noise", 0.0);
     declare_parameter("slip_fraction", 0.0);
-    declare_parameter("process_covariance", 0.0001);
+    declare_parameter("process_covariance", 0.01);
 
     // if these are not specified, shutdown the node
     if (get_parameter("body_id").as_string() == "none") {
@@ -75,7 +75,7 @@ public:
 
     turtlelib::DiffDrive tbot{depth, radius};
     tbot3 = tbot;
-    turtlelib::EKF ekf{tbot3.q, max_obstacles, process_covariance, 0.01};
+    turtlelib::EKF ekf{tbot3.q, max_obstacles, process_covariance, 0.001};
     extended_kalman = ekf;
 
 
@@ -98,6 +98,7 @@ public:
 
     // initializes braodcaster
     tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
+    tf_green_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
   }
 
@@ -114,6 +115,7 @@ private:
   rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr js_subscriber_;
   rclcpp::Subscription<visualization_msgs::msg::MarkerArray>::SharedPtr fake_sensor_subscriber_;
   std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+  std::unique_ptr<tf2_ros::TransformBroadcaster> tf_green_broadcaster_;
   rclcpp::Service<nuturtle_control::srv::InitialPose>::SharedPtr initialp_service_;
 
   void js_callback(const sensor_msgs::msg::JointState & msg)
@@ -121,6 +123,7 @@ private:
     turtlelib::Twist2D Vb = tbot3.forward_kin(
       msg.position[0] - tbot3.phi_l,
       msg.position[1] - tbot3.phi_r);
+
     //updating wheel pose with new wheel angles
     tbot3.phi_l = msg.position[0];
     tbot3.phi_r = msg.position[1];
@@ -149,6 +152,19 @@ private:
     t.transform.translation.y = tbot3.q.y;
     t.transform.rotation = quat;
     tf_broadcaster_->sendTransform(t);
+
+
+    tf2::Quaternion q_green;
+    q_green.setRPY(0.0, 0.0, extended_kalman.zeta_est(0));
+    geometry_msgs::msg::Quaternion quat_green = tf2::toMsg(q_green);
+    geometry_msgs::msg::TransformStamped t_green;
+    t_green.header.stamp = get_clock()->now();
+    t_green.header.frame_id = "green/odom";
+    t_green.child_frame_id = "green/base_footprint";
+    t_green.transform.translation.x = extended_kalman.zeta_est(1);
+    t_green.transform.translation.y = extended_kalman.zeta_est(2);
+    t_green.transform.rotation = quat_green;
+    tf_green_broadcaster_->sendTransform(t_green);
 
     publish_path(quat);
 
@@ -223,19 +239,14 @@ private:
         obst.scale.x = msg.markers[i].scale.x;
         obst.scale.y = msg.markers[i].scale.y;
         obst.scale.z = msg.markers[i].scale.z;
-        obst.color.r = 1.0;
         obst.color.a = 1.0;
-        obst.color.g = 0.917;
+        obst.color.g = 1.0;
         obst.id = i;
         obst.pose.position.x = extended_kalman.zeta_est(3+(2*i));
         obst.pose.position.y = extended_kalman.zeta_est(4+(2*i));  
         obst.action = visualization_msgs::msg::Marker::ADD;
 
         all_obst.markers.push_back(obst);
-        // if(i==0)
-        // {
-        //   RCLCPP_INFO_STREAM(get_logger(), "marker 0 y value: " << extended_kalman.zeta_est(4));
-        // }
       }
     }
 
