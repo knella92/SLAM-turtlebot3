@@ -62,7 +62,7 @@ namespace turtlelib
 
     double find_angle(double dx, double dy)
     {
-        double radians{5};
+        double radians{0};
         double mag = sqrt(std::pow(dx,2) + std::pow(dy,2));
         if(dy > 0){
             radians = acos(dx/mag);
@@ -85,6 +85,7 @@ namespace turtlelib
         else if (almost_equal(dx,0.0) && dy < 0){
             radians = 3*PI/2.0;
         }
+        // radians = atan2(dy,dx);
         return radians;
     }
 

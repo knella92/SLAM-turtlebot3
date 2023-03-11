@@ -703,9 +703,9 @@ TEMPLATE_TEST_CASE("ekf prediction step", "[ekf prediction]", double)
     double dy = m_0.at(1) - q_0.y;
     double r = sqrt(std::pow(dx, 2) + std::pow(dy, 2));
     double phi = turtlelib::find_angle(dx,dy);
-    double Q{1.0};
+    double Q{0.01};
     int n = (int) m_0.size() / 2;
-    turtlelib::EKF f{q_0, n, Q};
+    turtlelib::EKF f{q_0, n, Q, 0.01};
     f.initialization(0,r,phi);
 
     SECTION("all zeros"){

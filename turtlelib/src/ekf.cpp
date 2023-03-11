@@ -4,7 +4,7 @@
 namespace turtlelib
 {
 
-    EKF::EKF(Config q_0, int num_obst, double process_cov)
+    EKF::EKF(Config q_0, int num_obst, double process_cov, double r)
     : sigma_est(3+2*num_obst, 3+2*num_obst), n{num_obst}, Q(3,3, arma::fill::eye),
       Q_bar(2*num_obst + 3, 2*num_obst + 3), R(2,2, arma::fill::eye),
       I(3+2*num_obst, 3+2*num_obst, arma::fill::eye), zeta_est(2*num_obst + 3),
@@ -28,6 +28,8 @@ namespace turtlelib
         sigma_est.submat( 3,3, (3+2*n-1),(3+2*n-1) ) = sigma_0m;
 
         Q = process_cov * Q;
+        Q_bar.submat( 0,0, 2,2 ) = Q;
+        R = r*R;
 
     }
 
@@ -45,11 +47,6 @@ namespace turtlelib
         zeta_est(1) = q.x;
         zeta_est(2) = q.y;
 
-        //constant A because basic kalman filter, plus our situation is like that
-        
-
-        Q_bar.submat( 0,0, 2,2 ) = Q;
-
         sigma_est = A_c*sigma_prev*A_c.t() + Q_bar;
     }
 
@@ -58,7 +55,7 @@ namespace turtlelib
     {
         int m_index = 3 + 2*index;
         double r = sqrt(std::pow(dx, 2) + std::pow(dy, 2));
-        double phi = find_angle(dx,dy);
+        double phi = atan2(dy,dx);
 
         //extended
         zeta_est(m_index) = zeta_est(1) + r*cos(phi + zeta_est(0));
@@ -70,7 +67,7 @@ namespace turtlelib
     {
         int m_index = 3 + 2*index;
         double r = sqrt(std::pow(dx, 2) + std::pow(dy, 2));
-        double phi = find_angle(dx,dy); 
+        double phi = atan2(dy,dx); 
 
         arma::vec z_real = {r, phi};
 
@@ -78,21 +75,27 @@ namespace turtlelib
         double delta_x = zeta_est(m_index) - zeta_est(1);
         double delta_y = zeta_est(m_index+1) - zeta_est(2);
         double d = delta_x*delta_x + delta_y*delta_y;
-        double theta_est{};
 
-        if(zeta_est(0) < 0 && zeta_est(0) >= -PI)
-        {
-            theta_est = zeta_est(0);
-        }
-        else if(zeta_est(0) < -PI && almost_equal(normalize_angle(zeta_est(0)),PI))
-        {
-            std::cout << "edge-case" << std::endl;
-            theta_est = -PI;
-        }
-        else{ 
-            theta_est = normalize_angle(zeta_est(0));
-        }
-        arma::vec z_theor = {sqrt(d), normalize_angle(find_angle(delta_x, delta_y) - theta_est)};
+        // double theta_est{};
+        // if(zeta_est(0) < 0 && zeta_est(0) >= -PI)
+        // {
+        //     theta_est = zeta_est(0);
+        // }
+        // else if(zeta_est(0) < -PI && almost_equal(normalize_angle(zeta_est(0)),PI))
+        // {
+        //     theta_est = -PI;
+        // }
+        // else{ 
+            // theta_est = normalize_angle(zeta_est(0));
+        // }
+
+        // phi_theor = normalize_angle(find_angle(delta_y, delta_x) - zeta_est(0));
+        // if(almost_equal(phi_theor, PI, .001))
+        // {
+        //     phi_theor = phi;
+        // }
+
+        arma::vec z_theor = {sqrt(d), normalize_angle(atan2(delta_y, delta_x) - zeta_est(0))};
 
         // H matrix
         arma::mat H(2, 3+2*n);
@@ -111,6 +114,18 @@ namespace turtlelib
         zeta_est = zeta_est + K*(z_real - z_theor);
 
         sigma_est = (I - K*H)*sigma_est;
+
+        // std::cout << "m.y: " << zeta_est(4) << std::endl;
+
+        // if(std::abs(zeta_est(4)) > 0.2)
+        // {
+        //     std::cout << z_real << '\n' << z_theor << std::endl;
+        //     std::cout << atan2(delta_y, delta_x) << '\n' << zeta_est(0) << std::endl;
+        // }
+        // else
+        // {
+        //     std::cout << "hello" << std::endl;
+        // }
         
     }
 }

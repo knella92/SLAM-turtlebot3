@@ -46,6 +46,7 @@ namespace turtlelib
             arma::mat R;
 
             arma::mat I;
+            
 
 
 
@@ -66,7 +67,7 @@ namespace turtlelib
             /// \brief initializes state vector (zeta_0) and system covariance
             /// \param q_0 - initial robot configuration
             /// \param m_0 - vector of obstacle positions
-            EKF(Config q_0, int num_obst, double process_cov); // must be implemented in initial_pose service
+            EKF(Config q_0, int num_obst, double process_cov, double r); // must be implemented in initial_pose service
 
 
             void prediction(Config q); // currently only for 1D, basic filter

@@ -51,7 +51,7 @@ public:
     declare_parameter("track_width", 0.0);
     declare_parameter("input_noise", 0.0);
     declare_parameter("slip_fraction", 0.0);
-    declare_parameter("process_covariance", 1.0);
+    declare_parameter("process_covariance", 0.0001);
 
     // if these are not specified, shutdown the node
     if (get_parameter("body_id").as_string() == "none") {
@@ -75,7 +75,7 @@ public:
 
     turtlelib::DiffDrive tbot{depth, radius};
     tbot3 = tbot;
-    turtlelib::EKF ekf{tbot3.q, max_obstacles, process_covariance};
+    turtlelib::EKF ekf{tbot3.q, max_obstacles, process_covariance, 0.01};
     extended_kalman = ekf;
 
 
@@ -105,7 +105,8 @@ private:
   turtlelib::DiffDrive tbot3{0.0, 0.0};
   double process_covariance{};
   int max_obstacles{6};
-  turtlelib::EKF extended_kalman{tbot3.q, 1, 0.0};
+  turtlelib::EKF extended_kalman{tbot3.q, 1, 0.0, 0.0};
+  bool obstacles_initialized{false};
   std::string body_id, odom_id, wheel_left, wheel_right;
   rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_publisher_;
   rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr path_publisher_;
@@ -183,32 +184,26 @@ private:
   {
     extended_kalman.prediction(tbot3.q);
 
-    for(int i{0}; i < 1; i++)
+    for(int i{0}; i < 3; i++)
     {
       if(msg.markers[i].action == visualization_msgs::msg::Marker::ADD)
       {
-        // z_t for extended
-        // const auto r = sqrt(std::pow(msg.at(i).pose.position.x, 2.0) + std::pow(msg.at(i).pose.position.y, 2.0));
-        // const auto phi = turtlelib::find_angle(msg.at(i).pose.position.x, msg.at(i).pose.position.y);
-        
+
         if(extended_kalman.izd.at(i) == false)
         {
-          //basic
-
-          RCLCPP_INFO_STREAM(get_logger(), "bt y: " << tbot3.q.y);
           extended_kalman.initialization(msg.markers[i].id, msg.markers[i].pose.position.x, msg.markers[i].pose.position.y);
           extended_kalman.izd.at(i) = true;
         }
+        
         if(extended_kalman.izd.at(i) == true)
         {
-          // if(msg.markers[i].pose.position.y > 0)
-          // {RCLCPP_INFO_STREAM(get_logger(), "marker y distance: " << msg.markers[i].pose.position.y);}
           extended_kalman.correction(msg.markers[i].id, msg.markers[i].pose.position.x, msg.markers[i].pose.position.y);
-          // RCLCPP_INFO(get_logger(), "publishing");
-          slam_publisher_->publish(add_obstacles(msg));
         }
       }
+      
     }
+
+    slam_publisher_->publish(add_obstacles(msg));
 
     
   }
@@ -217,24 +212,31 @@ private:
   {
     visualization_msgs::msg::MarkerArray all_obst{};
     rclcpp::Time stamp = get_clock()->now();
-    for (int i = 0; i < 1; ++i)
+    for (int i = 0; i < 3; ++i)
     {
-      visualization_msgs::msg::Marker obst;
-      obst.header.frame_id = "nusim/world";
-      obst.header.stamp = stamp;
-      obst.type = visualization_msgs::msg::Marker::CYLINDER;
-      obst.scale.x = msg.markers[i].scale.x;
-      obst.scale.y = msg.markers[i].scale.y;
-      obst.scale.z = msg.markers[i].scale.z;
-      obst.color.r = 1.0;
-      obst.color.a = 1.0;
-      obst.color.g = 0.917;
-      obst.id = i;
-      obst.pose.position.x = extended_kalman.zeta_est(3+(2*i));
-      obst.pose.position.y = extended_kalman.zeta_est(4+(2*i));  
-      obst.action = visualization_msgs::msg::Marker::ADD;
+      if(extended_kalman.izd.at(i) == true)
+      {
+        visualization_msgs::msg::Marker obst;
+        obst.header.frame_id = "nusim/world";
+        obst.header.stamp = stamp;
+        obst.type = visualization_msgs::msg::Marker::CYLINDER;
+        obst.scale.x = msg.markers[i].scale.x;
+        obst.scale.y = msg.markers[i].scale.y;
+        obst.scale.z = msg.markers[i].scale.z;
+        obst.color.r = 1.0;
+        obst.color.a = 1.0;
+        obst.color.g = 0.917;
+        obst.id = i;
+        obst.pose.position.x = extended_kalman.zeta_est(3+(2*i));
+        obst.pose.position.y = extended_kalman.zeta_est(4+(2*i));  
+        obst.action = visualization_msgs::msg::Marker::ADD;
 
-      all_obst.markers.push_back(obst);
+        all_obst.markers.push_back(obst);
+        // if(i==0)
+        // {
+        //   RCLCPP_INFO_STREAM(get_logger(), "marker 0 y value: " << extended_kalman.zeta_est(4));
+        // }
+      }
     }
 
     return all_obst;
