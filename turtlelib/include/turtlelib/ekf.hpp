@@ -43,6 +43,10 @@ namespace turtlelib
 
             arma::mat Q_bar;
 
+            arma::mat R;
+
+            arma::mat I;
+
 
 
         public:

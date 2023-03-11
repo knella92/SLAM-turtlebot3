@@ -5,10 +5,10 @@ namespace turtlelib
 {
 
     EKF::EKF(Config q_0, int num_obst, double process_cov)
-    : zeta_est(2*num_obst + 3), sigma_est(3+2*num_obst, 3+2*num_obst), n{num_obst}
-     ,Q(3,3, arma::fill::eye), Q_bar(2*num_obst + 3, 2*num_obst + 3)
-     ,A_c(2*num_obst + 3, 2*num_obst + 3, arma::fill::eye)
-
+    : sigma_est(3+2*num_obst, 3+2*num_obst), n{num_obst}, Q(3,3, arma::fill::eye),
+      Q_bar(2*num_obst + 3, 2*num_obst + 3), R(2,2, arma::fill::eye),
+      I(3+2*num_obst, 3+2*num_obst, arma::fill::eye), zeta_est(2*num_obst + 3),
+      A_c(2*num_obst + 3, 2*num_obst + 3, arma::fill::eye)
     {
         for(int i{0}; i < n; i++)
         {
@@ -64,9 +64,6 @@ namespace turtlelib
         zeta_est(m_index) = zeta_est(1) + r*cos(phi + zeta_est(0));
         zeta_est(m_index+1) = zeta_est(2) + r*sin(phi + zeta_est(0));
 
-        //basic
-        // zeta_est(m_index) = zeta_est(1) + x;
-        // zeta_est(m_index + 1) = zeta_est(2) + y;
     }
 
     void EKF::correction(double index, double dx, double dy)
@@ -74,12 +71,10 @@ namespace turtlelib
         int m_index = 3 + 2*index;
         double r = sqrt(std::pow(dx, 2) + std::pow(dy, 2));
         double phi = find_angle(dx,dy); 
-        // std::cout << phi << std::endl;
+
         arma::vec z_real = {r, phi};
-        //extended, one obstacle
+
         //theoretical measurement (based on estimate)
-            //depends on obstacle in question
-        // arma::vec z_theor = {zeta_est(m_index) - zeta_est(1), zeta_est(m_index+1) - zeta_est(2)};
         double delta_x = zeta_est(m_index) - zeta_est(1);
         double delta_y = zeta_est(m_index+1) - zeta_est(2);
         double d = delta_x*delta_x + delta_y*delta_y;
@@ -96,10 +91,9 @@ namespace turtlelib
         }
         else{ 
             theta_est = normalize_angle(zeta_est(0));
-        
         }
         arma::vec z_theor = {sqrt(d), normalize_angle(find_angle(delta_x, delta_y) - theta_est)};
-        // std::cout << zeta_est(1) << std::endl;
+
         // H matrix
         arma::mat H(2, 3+2*n);
 
@@ -110,24 +104,12 @@ namespace turtlelib
                          {-delta_y/d, delta_x/d}};
 
         H.submat(0,0, 1,2) = h_1;
+        H.submat(0,3, 1,4) = h_2;
 
-        if(index == 0)
-        {
-            // std::cout << arma::size(h_2) << std::endl;
-            H.submat(0,3, 1,4) = h_2;
-        }
-        else
-        {
-            H.submat(0,3+2*index,   1,(3+2*index+1)) = h_2;
-        }
-
-        arma::mat R;
-        R.eye(2,2);
         arma::mat K = sigma_est*H.t()*(H*sigma_est*H.t() + R).i();
 
         zeta_est = zeta_est + K*(z_real - z_theor);
-        arma::mat I;
-        I.eye(3+2*n, 3+2*n);
+
         sigma_est = (I - K*H)*sigma_est;
         
     }
