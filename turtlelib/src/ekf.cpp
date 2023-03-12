@@ -7,7 +7,7 @@ namespace turtlelib
     EKF::EKF(Config q_0, int num_obst, double process_cov, double r)
     : sigma_est(3+2*num_obst, 3+2*num_obst), n{num_obst}, Q(3,3, arma::fill::eye),
       Q_bar(2*num_obst + 3, 2*num_obst + 3), R(2,2, arma::fill::eye),
-      I(3+2*num_obst, 3+2*num_obst, arma::fill::eye), zeta_est(2*num_obst + 3),
+      I(3+2*num_obst, 3+2*num_obst, arma::fill::eye), q_prev{q_0}, zeta_est(2*num_obst + 3),
       A_c(2*num_obst + 3, 2*num_obst + 3, arma::fill::eye)
     {
         for(int i{0}; i < n; i++)
@@ -15,10 +15,6 @@ namespace turtlelib
             izd.push_back(false);
         }
         
-        
-        zeta_est(0) = q_0.theta;
-        zeta_est(1) = q_0.x;
-        zeta_est(2) = q_0.y;
 
         arma::mat sigma_0m(2*n, 2*n);
         double d = 1e10;
@@ -36,16 +32,20 @@ namespace turtlelib
 
     void EKF::prediction(Config q)
     {   
+        zeta_prev = zeta_est;
         sigma_prev = sigma_est;
 
+        zeta_est(0) = normalize_angle(zeta_prev(0) + normalize_angle(normalize_angle(q.theta) - normalize_angle(q_prev.theta)));
+        // std::cout<< zeta_est(0)<<std::endl;
+        zeta_est(1) = zeta_prev(1) + q.x - q_prev.x;
+        zeta_est(2) = zeta_prev(2) + q.y - q_prev.y;
+
         arma::mat A(3,3);
-        A(1,0) = -(q.y - zeta_est(2));
-        A(2,0) = q.x - zeta_est(1);
+        A(1,0) = -(q.y - q_prev.y);
+        A(2,0) = q.x - q_prev.x;
         A_c.submat(0,0, 2,2) = A;
 
-        zeta_est(0) = q.theta;
-        zeta_est(1) = q.x;
-        zeta_est(2) = q.y;
+        q_prev = q;
 
         sigma_est = A_c*sigma_prev*A_c.t() + Q_bar;
     }
@@ -58,8 +58,8 @@ namespace turtlelib
         double phi = atan2(dy,dx);
 
         //extended
-        zeta_est(m_index) = zeta_est(1) + r*cos(phi + zeta_est(0));
-        zeta_est(m_index+1) = zeta_est(2) + r*sin(phi + zeta_est(0));
+        zeta_est(m_index) = zeta_est(1) + r*cos(normalize_angle(phi + zeta_est(0)));
+        zeta_est(m_index+1) = zeta_est(2) + r*sin(normalize_angle(phi + zeta_est(0)));
 
     }
 
@@ -67,9 +67,16 @@ namespace turtlelib
     {
         int m_index = 3 + 2*index;
         double r = sqrt(std::pow(dx, 2) + std::pow(dy, 2));
-        double phi = atan2(dy,dx); 
+        double phi = atan2(dy,dx);
 
         arma::vec z_real = {r, phi};
+
+        // if(almost_equal(zeta_est(0),z_real(1)))
+        // {
+        //     z_real(1) *= -1.0;
+        //     std::cout << "equals\n";
+        // }
+        // std::cout<< z_real << std::endl;
 
         //theoretical measurement (based on estimate)
         double delta_x = zeta_est(m_index) - zeta_est(1);
@@ -81,13 +88,15 @@ namespace turtlelib
         // {
         //     theta_est = zeta_est(0);
         // }
-        // else if(zeta_est(0) < -PI && almost_equal(normalize_angle(zeta_est(0)),PI))
+        // if( && almost_equal(normalize_angle(zeta_est(0)),PI))
         // {
         //     theta_est = -PI;
         // }
         // else{ 
-            // theta_est = normalize_angle(zeta_est(0));
+        //     theta_est = normalize_angle(zeta_est(0));
         // }
+
+        // if()
 
         // phi_theor = normalize_angle(find_angle(delta_y, delta_x) - zeta_est(0));
         // if(almost_equal(phi_theor, PI, .001))
@@ -106,6 +115,8 @@ namespace turtlelib
         arma::mat h_2 = {{delta_x/sqrt(d), delta_y/sqrt(d)},
                          {-delta_y/d, delta_x/d}};
 
+        // CHANGE WHEN YOU INTRODUCE MORE OBSTACLES//
+        // ;ALKSLDKJF;LAJS;DKFJ;LASDFLKAJSDFL ASDLKFJA;SLDKFJ;SDKLFJA;LSDKFJAL;SDKJFASDKL;FJALKSDJF//
         H.submat(0,0, 1,2) = h_1;
         H.submat(0,3, 1,4) = h_2;
 
@@ -113,19 +124,15 @@ namespace turtlelib
 
         zeta_est = zeta_est + K*(z_real - z_theor);
 
+        // std::cout << "z_real: " << z_real << " z_theor: " << z_theor <<std::endl;
+
+        // if(std::abs(zeta_est(2) > 0.1))
+        // {
+        //     std::cout << zeta_est(2) << std::endl;
+        // }
+        
+
         sigma_est = (I - K*H)*sigma_est;
-
-        // std::cout << "m.y: " << zeta_est(4) << std::endl;
-
-        // if(std::abs(zeta_est(4)) > 0.2)
-        // {
-        //     std::cout << z_real << '\n' << z_theor << std::endl;
-        //     std::cout << atan2(delta_y, delta_x) << '\n' << zeta_est(0) << std::endl;
-        // }
-        // else
-        // {
-        //     std::cout << "hello" << std::endl;
-        // }
         
     }
 }

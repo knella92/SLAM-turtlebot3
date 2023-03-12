@@ -51,7 +51,7 @@ public:
     declare_parameter("track_width", 0.0);
     declare_parameter("input_noise", 0.0);
     declare_parameter("slip_fraction", 0.0);
-    declare_parameter("process_covariance", 0.01);
+    declare_parameter("process_covariance", 0.0001);
 
     // if these are not specified, shutdown the node
     if (get_parameter("body_id").as_string() == "none") {
@@ -78,10 +78,14 @@ public:
     turtlelib::EKF ekf{tbot3.q, max_obstacles, process_covariance, 0.001};
     extended_kalman = ekf;
 
+    green_path_msg.header.frame_id = odom_id;
+    blue_path_msg.header.frame_id = odom_id;
+
 
     // initialize publisher, subscriber, and service
     odom_publisher_ = create_publisher<nav_msgs::msg::Odometry>("/odom", 10);
-    path_publisher_ = create_publisher<nav_msgs::msg::Path>("/path", 10);
+    blue_path_ = create_publisher<nav_msgs::msg::Path>("blue/path", 10);
+    green_path_ = create_publisher<nav_msgs::msg::Path>("green/path", 10);
     slam_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/slam_map", 10);
     js_subscriber_ = create_subscription<sensor_msgs::msg::JointState>(
       "/joint_states", 10, std::bind(
@@ -104,13 +108,17 @@ public:
 
 private:
   turtlelib::DiffDrive tbot3{0.0, 0.0};
+  int index{0};
   double process_covariance{};
   int max_obstacles{6};
   turtlelib::EKF extended_kalman{tbot3.q, 1, 0.0, 0.0};
   bool obstacles_initialized{false};
+  nav_msgs::msg::Path green_path_msg;
+  nav_msgs::msg::Path blue_path_msg;
   std::string body_id, odom_id, wheel_left, wheel_right;
   rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_publisher_;
-  rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr path_publisher_;
+  rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr blue_path_;
+  rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr green_path_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr slam_publisher_;
   rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr js_subscriber_;
   rclcpp::Subscription<visualization_msgs::msg::MarkerArray>::SharedPtr fake_sensor_subscriber_;
@@ -152,7 +160,7 @@ private:
     t.transform.translation.y = tbot3.q.y;
     t.transform.rotation = quat;
     tf_broadcaster_->sendTransform(t);
-
+    
 
     tf2::Quaternion q_green;
     q_green.setRPY(0.0, 0.0, extended_kalman.zeta_est(0));
@@ -165,9 +173,22 @@ private:
     t_green.transform.translation.y = extended_kalman.zeta_est(2);
     t_green.transform.rotation = quat_green;
     tf_green_broadcaster_->sendTransform(t_green);
-
-    publish_path(quat);
-
+    
+    if(index == 50)
+    {
+      green_path_msg.header.stamp = get_clock()->now();
+      blue_path_msg.header.stamp = get_clock()->now();
+      blue_path_->publish(blue_path_msg);
+      green_path_->publish(green_path_msg);
+      index = 0;
+    }
+    else{
+      green_path_msg.poses.push_back(publish_path(quat_green,"green/base_footprint", extended_kalman.zeta_est(1), extended_kalman.zeta_est(2)));
+      blue_path_msg.poses.push_back(publish_path(quat, "blue/base_footprint", tbot3.q.x, tbot3.q.y));
+      index++;
+    }
+     
+    
   }
 
   void initial_pose(
@@ -181,26 +202,23 @@ private:
 
   }
 
-  void publish_path(geometry_msgs::msg::Quaternion quat)
+  geometry_msgs::msg::PoseStamped publish_path(geometry_msgs::msg::Quaternion quat, std::string frame_id, double x, double y)
   {
-    auto path_msg = nav_msgs::msg::Path();
+    
     auto pose_msg = geometry_msgs::msg::PoseStamped();
     pose_msg.header.stamp = get_clock()->now();
-    pose_msg.header.frame_id = "nusim/world";
-    pose_msg.pose.position.x = tbot3.q.x;
-    pose_msg.pose.position.y = tbot3.q.y;
+    pose_msg.header.frame_id = frame_id;
+    pose_msg.pose.position.x = x;
+    pose_msg.pose.position.y = y;
     pose_msg.pose.orientation = quat;
-    path_msg.poses.push_back(pose_msg);
-    path_msg.header.stamp = pose_msg.header.stamp;
-    path_msg.header.frame_id = pose_msg.header.frame_id;
-    path_publisher_->publish(path_msg);
+    return pose_msg;
   }
 
   void sensor_callback(const visualization_msgs::msg::MarkerArray & msg)
   {
     extended_kalman.prediction(tbot3.q);
 
-    for(int i{0}; i < 3; i++)
+    for(int i{0}; i < 1; i++)
     {
       if(msg.markers[i].action == visualization_msgs::msg::Marker::ADD)
       {
@@ -228,7 +246,7 @@ private:
   {
     visualization_msgs::msg::MarkerArray all_obst{};
     rclcpp::Time stamp = get_clock()->now();
-    for (int i = 0; i < 3; ++i)
+    for (int i = 0; i < 1; ++i)
     {
       if(extended_kalman.izd.at(i) == true)
       {
@@ -245,6 +263,7 @@ private:
         obst.pose.position.x = extended_kalman.zeta_est(3+(2*i));
         obst.pose.position.y = extended_kalman.zeta_est(4+(2*i));  
         obst.action = visualization_msgs::msg::Marker::ADD;
+        // RCLCPP_INFO_STREAM(get_logger(), "green bot y position: " << extended_kalman.zeta_est(2));
 
         all_obst.markers.push_back(obst);
       }

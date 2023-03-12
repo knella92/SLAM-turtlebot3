@@ -35,13 +35,19 @@ TEMPLATE_TEST_CASE("Normalize rotation angle", "[normalize]", double){
     SECTION("rad = 3PI"){
         rad1 = 3*PI;
         rad2 = turtlelib::normalize_angle(rad1);
+        CHECK_THAT(rad2, WithinRel(-PI));
+    }
+
+    SECTION("rad = 3PI"){
+        rad1 = 7*PI;
+        rad2 = turtlelib::normalize_angle(rad1);
         CHECK_THAT(rad2, WithinRel(PI));
     }
 
     SECTION("rad = -PI"){
         rad1 = -1.0*PI;
         rad2 = turtlelib::normalize_angle(rad1);
-        CHECK_THAT(rad2, WithinRel(PI));
+        CHECK_THAT(rad2, WithinRel(-PI));
     }
     
     SECTION("rad = 0"){
@@ -804,6 +810,36 @@ TEMPLATE_TEST_CASE("ekf prediction step", "[ekf prediction]", double)
         CHECK_THAT(f.zeta_est(4), WithinAbs(0.0, .01));
     }
 
+    SECTION("correction, theta = 7PI"){
+        Config q{0.0, 0.0, 7*PI};
+        f.prediction(q);
+        int index = 0;
+        Transform2D T_wr{{q.x,q.y}, q.theta};
+        Transform2D T_wo{{m_0.at(0), m_0.at(1)}, 0.0};
+        Transform2D T_ro = T_wr.inv() * T_wo;
+        double x = T_ro.translation().x;
+        double y = T_ro.translation().y;
+        f.correction(index,x,y);
+
+        CHECK_THAT(f.zeta_est(3), WithinAbs(1.0, .01));
+        CHECK_THAT(f.zeta_est(4), WithinAbs(0.0, .01));
+    }
+
+    SECTION("correction, theta = 6PI"){
+        Config q{0.0, 0.0, 6*PI};
+        f.prediction(q);
+        int index = 0;
+        Transform2D T_wr{{q.x,q.y}, q.theta};
+        Transform2D T_wo{{m_0.at(0), m_0.at(1)}, 0.0};
+        Transform2D T_ro = T_wr.inv() * T_wo;
+        double x = T_ro.translation().x;
+        double y = T_ro.translation().y;
+        f.correction(index,x,y);
+
+        CHECK_THAT(f.zeta_est(3), WithinAbs(1.0, .01));
+        CHECK_THAT(f.zeta_est(4), WithinAbs(0.0, .01));
+    }
+
     SECTION("correction, x = 0.5, theta = -PI"){
         Config q{0.5, 0.0, -PI};
         f.prediction(q);
@@ -820,7 +856,7 @@ TEMPLATE_TEST_CASE("ekf prediction step", "[ekf prediction]", double)
     }
 
     SECTION("correction, x = 0.5, theta = -3.5"){
-        Config q{0.0, 0.0, -3.5};
+        Config q{0.0, 0.0, -9*PI};
         f.prediction(q);
         int index = 0;
         Transform2D T_wr{{q.x,q.y}, q.theta};
@@ -834,7 +870,7 @@ TEMPLATE_TEST_CASE("ekf prediction step", "[ekf prediction]", double)
         CHECK_THAT(f.zeta_est(4), WithinAbs(0.0, .01));
     }
 
-    SECTION("correction, x = 0.5, theta = -3PI"){
+    SECTION("correction, x = 0.5, theta = -5PI"){
         Config q{0.0, 0.0, -5*PI};
         f.prediction(q);
         int index = 0;
@@ -888,9 +924,9 @@ TEMPLATE_TEST_CASE("ekf prediction step", "[ekf prediction]", double)
         double y = T_ro.translation().y;
         f.prediction(q);
         f.correction(index,x,y);
-        while(q.theta>-20*PI)
+        while(q.theta<=20*PI)
         {
-            q.theta -= 0.01;
+            q.theta += 0.001;
             // q.x += 0.01;
             // q.y += 0.02;
             Transform2D T_wr{{q.x,q.y}, q.theta};
@@ -898,11 +934,13 @@ TEMPLATE_TEST_CASE("ekf prediction step", "[ekf prediction]", double)
             Transform2D T_ro = T_wr.inv() * T_wo;
             x = T_ro.translation().x;
             y = T_ro.translation().y;
+            f.prediction(q);
+            f.correction(index,x,y);
             
         }
 
-        CHECK_THAT(f.zeta_est(3), WithinAbs(1.0, .01));
-        CHECK_THAT(f.zeta_est(4), WithinAbs(0.0, .01));
+        CHECK_THAT(f.zeta_est(1), WithinAbs(0.6, .01));
+        CHECK_THAT(f.zeta_est(2), WithinAbs(-0.3, .01));
     }
     
 

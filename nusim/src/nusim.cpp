@@ -146,6 +146,7 @@ public:
     const int64_t t = 1000 / rate; // implicit conversion of 1000 / rate to int64_t to use as time in ms
     sens_rate = rate/5;
 
+    path_msg.header.frame_id = "nusim/world";
     // initialize publishers and timer
     if(draw_only)
     {
@@ -199,6 +200,9 @@ private:
   double v_l{}; double v_r{};
   double phidot_l{}; double phidot_r{};
   double motor_cmd_per_rad_sec{}; double encoder_ticks_per_rad{}; int motor_cmd_max{};
+  int index{};
+  nav_msgs::msg::Path path_msg;
+  
   std::vector<double> obstacles_x{};
   std::vector<double> obstacles_y{};
   std::vector<double> x_pos{}; std::vector<double> y_pos{}; std::vector<double> length{};
@@ -267,14 +271,25 @@ private:
     obst_publisher_->publish(red_obst);
     visualization_msgs::msg::MarkerArray red_walls = add_walls();
     wall_publisher_->publish(red_walls);
-    if(std::fmod(count_/sens_rate, 0))
+    if(count_ % sens_rate == 0)
     {
-      // visualization_msgs::msg::MarkerArray sens_obst = add_obstacles(1, "nusim/world");
       visualization_msgs::msg::MarkerArray sens_obst = add_obstacles(1, "red/base_footprint");
       fake_sensor_publisher_->publish(sens_obst);
 
       lidar();
     }
+
+    if(index == 50)
+    {
+      path_msg.header.stamp = get_clock()->now();
+      path_publisher_->publish(path_msg);
+      index = 0;
+    }
+    else{
+      path_msg.poses.push_back(publish_path(quat));
+      index++;
+    }
+     
   }
 
   void draw_only_callback()
@@ -369,8 +384,8 @@ private:
         turtlelib::Transform2D T_wr{{tbot3.q.x, tbot3.q.y}, tbot3.q.theta};
         turtlelib::Transform2D T_wo{{obstacles_x.at(i), obstacles_y.at(i)}, 0.0};
         turtlelib::Transform2D T_ro = T_wr.inv() * T_wo;
-        obst.pose.position.x = T_ro.translation().x + sens_var(get_random());
-        obst.pose.position.y = T_ro.translation().y + sens_var(get_random());
+        obst.pose.position.x = T_ro.translation().x;// + sens_var(get_random());
+        obst.pose.position.y = T_ro.translation().y;// + sens_var(get_random());
 
         if(sqrt(std::pow(obst.pose.position.x,2) + std::pow(obst.pose.position.y, 2)) > max_range)
         {
@@ -437,19 +452,16 @@ private:
     }
   }
 
-  void publish_path(geometry_msgs::msg::Quaternion quat)
+  geometry_msgs::msg::PoseStamped publish_path(geometry_msgs::msg::Quaternion quat)
   {
-    auto path_msg = nav_msgs::msg::Path();
     auto pose_msg = geometry_msgs::msg::PoseStamped();
     pose_msg.header.stamp = get_clock()->now();
-    pose_msg.header.frame_id = "nusim/world";
+    pose_msg.header.frame_id = "red/base_footprint";
     pose_msg.pose.position.x = tbot3.q.x;
     pose_msg.pose.position.y = tbot3.q.y;
     pose_msg.pose.orientation = quat;
-    path_msg.poses.push_back(pose_msg);
-    path_msg.header.stamp = pose_msg.header.stamp;
-    path_msg.header.frame_id = pose_msg.header.frame_id;
-    path_publisher_->publish(path_msg);
+
+    return pose_msg;
   }
 
   /// \brief random number generator

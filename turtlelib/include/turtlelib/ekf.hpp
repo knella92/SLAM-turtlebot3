@@ -28,7 +28,7 @@ namespace turtlelib
             arma::vec zeta_c;
 
 
-            arma::vec zeta_est_prev;
+            arma::vec zeta_prev;
 
 
             arma::mat sigma_est;
@@ -46,6 +46,8 @@ namespace turtlelib
             arma::mat R;
 
             arma::mat I;
+
+            Config q_prev;
             
 
 
@@ -55,8 +57,6 @@ namespace turtlelib
             arma::vec zeta_est;
 
             arma::mat A_c;
-
-            arma::vec zeta_prev;
 
             std::vector<bool> izd;
 
