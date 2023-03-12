@@ -279,7 +279,7 @@ private:
       lidar();
     }
 
-    if(index == 50)
+    if(index == 100)
     {
       path_msg.header.stamp = get_clock()->now();
       path_publisher_->publish(path_msg);

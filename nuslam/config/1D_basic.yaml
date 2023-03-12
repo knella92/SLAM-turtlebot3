@@ -1,7 +1,7 @@
 /**:
   ros__parameters:
-    obstacles/x: [1.0]
-    obstacles/y: [0.0]
+    obstacles/x: [1.0, -1.0]
+    obstacles/y: [0.0, 0.0]
     obstacles/r: 0.038
     arena/x_length: 5.0
     arena/y_length: 7.0

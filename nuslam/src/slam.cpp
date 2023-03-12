@@ -51,7 +51,7 @@ public:
     declare_parameter("track_width", 0.0);
     declare_parameter("input_noise", 0.0);
     declare_parameter("slip_fraction", 0.0);
-    declare_parameter("process_covariance", 0.0001);
+    declare_parameter("process_covariance", 0.001);
 
     // if these are not specified, shutdown the node
     if (get_parameter("body_id").as_string() == "none") {
@@ -174,7 +174,7 @@ private:
     t_green.transform.rotation = quat_green;
     tf_green_broadcaster_->sendTransform(t_green);
     
-    if(index == 50)
+    if(index == 100)
     {
       green_path_msg.header.stamp = get_clock()->now();
       blue_path_msg.header.stamp = get_clock()->now();
@@ -218,7 +218,7 @@ private:
   {
     extended_kalman.prediction(tbot3.q);
 
-    for(int i{0}; i < 1; i++)
+    for(int i{0}; i < 2; i++)
     {
       if(msg.markers[i].action == visualization_msgs::msg::Marker::ADD)
       {
@@ -227,6 +227,7 @@ private:
         {
           extended_kalman.initialization(msg.markers[i].id, msg.markers[i].pose.position.x, msg.markers[i].pose.position.y);
           extended_kalman.izd.at(i) = true;
+          obstacles_initialized = true;
         }
         
         if(extended_kalman.izd.at(i) == true)
@@ -236,9 +237,10 @@ private:
       }
       
     }
-
-    slam_publisher_->publish(add_obstacles(msg));
-
+    if(obstacles_initialized)
+    {
+      slam_publisher_->publish(add_obstacles(msg));
+    }
     
   }
 
@@ -246,7 +248,7 @@ private:
   {
     visualization_msgs::msg::MarkerArray all_obst{};
     rclcpp::Time stamp = get_clock()->now();
-    for (int i = 0; i < 1; ++i)
+    for (int i = 0; i < max_obstacles; ++i)
     {
       if(extended_kalman.izd.at(i) == true)
       {
