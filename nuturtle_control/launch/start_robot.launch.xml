@@ -26,7 +26,7 @@
             <remap from="joint_states" to="blue/joint_states"/>
         </node>
 
-        <node pkg='nuslam' exec='slam' name='slam' output='screen'
+        <node pkg='nuslam' exec='nuslam' name='slam' output='screen'
             if="$(eval '\'$(var slam)\' == \'true\'')">
             <param from="$(find-pkg-share nuturtle_description)/config/diff_params.yaml"/>
             <remap from="joint_states" to="blue/joint_states"/>

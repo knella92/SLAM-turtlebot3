@@ -15,6 +15,7 @@
 /// PUBLISHES:
 ///     (~/timestep) (UInt64): Timestep of the simulation
 ///     (~/obstacles) (MarkerArray): Location and size of cylindrical obstacles
+///     (~/path): path taken by red robot
 /// SUBSCRIBES:
 ///      none
 /// SERVERS:
@@ -121,15 +122,15 @@ public:
 
     // sensor parameters
     declare_parameter("basic_sensor_variance", 0.0);
-    declare_parameter("max_range",0.0);
+    declare_parameter("max_range", 0.0);
     const auto basic_sensor_variance = get_parameter("basic_sensor_variance").as_double();
-    std::normal_distribution<double> sv(0.0,basic_sensor_variance);
+    std::normal_distribution<double> sv(0.0, basic_sensor_variance);
     sens_var = sv;
     max_range = get_parameter("max_range").as_double();
 
     // Laser scan parameters
     declare_parameter("angle_increment", 0.01745329238474369);
-    declare_parameter("range_min",0.11999999731779099);
+    declare_parameter("range_min", 0.11999999731779099);
     declare_parameter("range_max", 3.5);
     //declare_parameter("sample_N", )
     //declare_parameter("resolution", )
@@ -144,25 +145,24 @@ public:
     // saves rate parameter as an int
     rate = get_parameter("rate").as_int();
     const int64_t t = 1000 / rate; // implicit conversion of 1000 / rate to int64_t to use as time in ms
-    sens_rate = rate/5;
+    sens_rate = rate / 5;
 
     path_msg.header.frame_id = "nusim/world";
     // initialize publishers and timer
-    if(draw_only)
-    {
+    if (draw_only) {
       timer_ = create_wall_timer(
-      std::chrono::duration<int64_t, std::milli>(t), std::bind(&SimNode::draw_only_callback, this));
+        std::chrono::duration<int64_t, std::milli>(t),
+        std::bind(&SimNode::draw_only_callback, this));
       obst_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/obstacles", 10);
       wall_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/walls", 10);
-    }
-    else
-    {
+    } else {
       publisher_ = create_publisher<std_msgs::msg::UInt64>("~/timestep", 10);
       sens_publisher_ = create_publisher<nuturtlebot_msgs::msg::SensorData>("red/sensor_data", 10);
       obst_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/obstacles", 10);
       wall_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/walls", 10);
       path_publisher_ = create_publisher<nav_msgs::msg::Path>("~/path", 10);
-      fake_sensor_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("~/fake_sensor", 10);
+      fake_sensor_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>(
+        "~/fake_sensor", 10);
       laser_scan_publisher_ = create_publisher<sensor_msgs::msg::LaserScan>("red/base_scan", 10);
       cmd_subscriber_ = create_subscription<nuturtlebot_msgs::msg::WheelCommands>(
         "red/wheel_cmd", 10, std::bind(
@@ -193,7 +193,8 @@ private:
   int rate{}; int sens_rate{};
   int i{};
   double dt{};
-  double range_min{}; double range_max{}; double angle_increment{}; double sample_N{}; double resolution{};
+  double range_min{}; double range_max{}; double angle_increment{}; double sample_N{};
+  double resolution{};
   int prev_time = get_clock()->now().nanoseconds();
   int current_time{};
   double x0{}; double y0{}; double theta0{}; double x{}; double y{}; double theta{};
@@ -202,7 +203,7 @@ private:
   double motor_cmd_per_rad_sec{}; double encoder_ticks_per_rad{}; int motor_cmd_max{};
   int index{};
   nav_msgs::msg::Path path_msg;
-  
+
   std::vector<double> obstacles_x{};
   std::vector<double> obstacles_y{};
   std::vector<double> x_pos{}; std::vector<double> y_pos{}; std::vector<double> length{};
@@ -271,25 +272,22 @@ private:
     obst_publisher_->publish(red_obst);
     visualization_msgs::msg::MarkerArray red_walls = add_walls();
     wall_publisher_->publish(red_walls);
-    if(count_ % sens_rate == 0)
-    {
+    if (count_ % sens_rate == 0) {
       visualization_msgs::msg::MarkerArray sens_obst = add_obstacles(1, "red/base_footprint");
       fake_sensor_publisher_->publish(sens_obst);
 
       lidar();
     }
 
-    if(index == 100)
-    {
+    if (index == 100) {
       path_msg.header.stamp = get_clock()->now();
       path_publisher_->publish(path_msg);
       index = 0;
-    }
-    else{
+    } else {
       path_msg.poses.push_back(publish_path(quat));
       index++;
     }
-     
+
   }
 
   void draw_only_callback()
@@ -306,14 +304,11 @@ private:
   {
     const auto u_l = msg.left_velocity / motor_cmd_per_rad_sec;
     const auto u_r = msg.right_velocity / motor_cmd_per_rad_sec;
-    
-    if(turtlelib::almost_equal(u_l,0.0) && turtlelib::almost_equal(u_r, 0.0))
-    {
+
+    if (turtlelib::almost_equal(u_l, 0.0) && turtlelib::almost_equal(u_r, 0.0)) {
       v_l = u_l;
       v_r = u_r;
-    }
-    else
-    {
+    } else {
       v_l = u_l + w_i(get_random());
       v_r = u_r + w_i(get_random());
     }
@@ -366,7 +361,7 @@ private:
     const int size_x = obstacles_x.size();
     rclcpp::Time stamp = get_clock()->now();
     for (int i = 0; i < size_x; ++i) {
-      
+
       visualization_msgs::msg::Marker obst;
       obst.header.frame_id = frame_id;
       obst.header.stamp = stamp;
@@ -378,28 +373,26 @@ private:
       obst.color.a = 1.0;
       obst.id = i;
 
-      if(sensor_ind == 1)
-      {
-        
+      if (sensor_ind == 1) {
+
         turtlelib::Transform2D T_wr{{tbot3.q.x, tbot3.q.y}, tbot3.q.theta};
         turtlelib::Transform2D T_wo{{obstacles_x.at(i), obstacles_y.at(i)}, 0.0};
         turtlelib::Transform2D T_ro = T_wr.inv() * T_wo;
         obst.pose.position.x = T_ro.translation().x + sens_var(get_random());
         obst.pose.position.y = T_ro.translation().y + sens_var(get_random());
 
-        if(sqrt(std::pow(obst.pose.position.x,2) + std::pow(obst.pose.position.y, 2)) > max_range)
+        if (sqrt(
+            std::pow(
+              obst.pose.position.x,
+              2) + std::pow(obst.pose.position.y, 2)) > max_range)
         {
           obst.action = visualization_msgs::msg::Marker::DELETE;
-        }
-        else
-        {
+        } else {
           obst.color.g = 0.917;
           obst.action = visualization_msgs::msg::Marker::ADD;
           // RCLCPP_INFO_STREAM(get_logger(), "obst.pose.position.x: " << obst.pose.position.x);
         }
-      }
-      else
-      {
+      } else {
         obst.action = visualization_msgs::msg::Marker::ADD;
         obst.pose.position.x = obstacles_x.at(i);
         obst.pose.position.y = obstacles_y.at(i);
@@ -440,10 +433,11 @@ private:
   {
     if (i < 15) {
       tbot3.forward_kin(v_l / rate, v_r / rate);
-      const auto dphi_l = (v_l * (1+n_i(get_random()))/rate);
-      const auto dphi_r = (v_r * (1+n_i(get_random()))/rate);
+      const auto dphi_l = (v_l * (1 + n_i(get_random())) / rate);
+      const auto dphi_r = (v_r * (1 + n_i(get_random())) / rate);
       tbot3.update_wheel_pose(dphi_l, dphi_r);
-      tbot3.q = collision_detection(tbot3.q, collision_radius, obstacles_x, obstacles_y, obstacles_r);
+      tbot3.q =
+        collision_detection(tbot3.q, collision_radius, obstacles_x, obstacles_y, obstacles_r);
       // update position of robot
       x = tbot3.q.x;
       y = tbot3.q.y;
@@ -487,12 +481,12 @@ private:
     msg.range_max = range_max;
 
     std::vector<float> ranges{};
-    for(int i = 0; i < 360; i++)
-    {
-      auto range = turtlelib::range_obstacles(tbot3.q, range_max, obstacles_x, obstacles_y, obstacles_r, i*angle_increment);
-      if(range == 0.0)
-      {
-        range = turtlelib::range_walls(tbot3.q, range_max, arena_x, arena_y, i*angle_increment);
+    for (int i = 0; i < 360; i++) {
+      auto range = turtlelib::range_obstacles(
+        tbot3.q, range_max, obstacles_x, obstacles_y,
+        obstacles_r, i * angle_increment);
+      if (range == 0.0) {
+        range = turtlelib::range_walls(tbot3.q, range_max, arena_x, arena_y, i * angle_increment);
       }
       range += sens_var(get_random());
       ranges.push_back(range);
@@ -502,7 +496,7 @@ private:
     laser_scan_publisher_->publish(msg);
   }
 
-  
+
 };
 
 int main(int argc, char * argv[])

@@ -7,6 +7,7 @@ This repository consists of several ROS packages
 - turtlelib - C++ library to define, calculate, and output frame transformations and twists.
 - nusim - Defines and launches nusim node, a simulated environment for the nuturtle.
 - nuturtle_control - Control interface and odometry nodes for turtlebot simulation or real robot
+- nuslam - Apply an Extended Kalman Filter to correct odometry readings from turtlebot simulation or real robot.
 
 Odometry Error:
 dx = 9.09 CM

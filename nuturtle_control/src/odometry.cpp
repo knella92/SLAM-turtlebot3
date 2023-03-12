@@ -135,13 +135,11 @@ private:
     t.transform.rotation = quat;
     tf_broadcaster_->sendTransform(t);
 
-    if(index == 100)
-    {
+    if (index == 100) {
       blue_path_msg.header.stamp = get_clock()->now();
       blue_path_->publish(blue_path_msg);
       index = 0;
-    }
-    else{
+    } else {
       blue_path_msg.poses.push_back(publish_path(quat));
       index++;
     }
@@ -161,7 +159,7 @@ private:
 
   geometry_msgs::msg::PoseStamped publish_path(geometry_msgs::msg::Quaternion quat)
   {
-    
+
     auto pose_msg = geometry_msgs::msg::PoseStamped();
     pose_msg.header.stamp = get_clock()->now();
     pose_msg.header.frame_id = body_id;

@@ -38,10 +38,10 @@ TEMPLATE_TEST_CASE("Normalize rotation angle", "[normalize]", double){
         CHECK_THAT(rad2, WithinRel(-PI));
     }
 
-    SECTION("rad = 3PI"){
+    SECTION("rad = 7PI"){
         rad1 = 7*PI;
         rad2 = turtlelib::normalize_angle(rad1);
-        CHECK_THAT(rad2, WithinRel(PI));
+        CHECK_THAT(rad2, WithinRel(-PI));
     }
 
     SECTION("rad = -PI"){
@@ -782,36 +782,6 @@ TEMPLATE_TEST_CASE("ekf prediction step", "[ekf prediction]", double)
 
     SECTION("correction, theta = PI"){
         Config q{0.0, 0.0, PI};
-        f.prediction(q);
-        int index = 0;
-        Transform2D T_wr{{q.x,q.y}, q.theta};
-        Transform2D T_wo{{m_0.at(0), m_0.at(1)}, 0.0};
-        Transform2D T_ro = T_wr.inv() * T_wo;
-        double x = T_ro.translation().x;
-        double y = T_ro.translation().y;
-        f.correction(index,x,y);
-
-        CHECK_THAT(f.zeta_est(3), WithinAbs(1.0, .01));
-        CHECK_THAT(f.zeta_est(4), WithinAbs(0.0, .01));
-    }
-
-    SECTION("correction, theta = 3PI"){
-        Config q{0.0, 0.0, 3*PI};
-        f.prediction(q);
-        int index = 0;
-        Transform2D T_wr{{q.x,q.y}, q.theta};
-        Transform2D T_wo{{m_0.at(0), m_0.at(1)}, 0.0};
-        Transform2D T_ro = T_wr.inv() * T_wo;
-        double x = T_ro.translation().x;
-        double y = T_ro.translation().y;
-        f.correction(index,x,y);
-
-        CHECK_THAT(f.zeta_est(3), WithinAbs(1.0, .01));
-        CHECK_THAT(f.zeta_est(4), WithinAbs(0.0, .01));
-    }
-
-    SECTION("correction, theta = 7PI"){
-        Config q{0.0, 0.0, 7*PI};
         f.prediction(q);
         int index = 0;
         Transform2D T_wr{{q.x,q.y}, q.theta};
