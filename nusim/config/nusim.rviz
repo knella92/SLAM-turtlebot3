@@ -120,23 +120,23 @@ Visualization Manager:
         nusim/world:
           Value: true
         red/base_footprint:
-          Value: false
+          Value: true
         red/base_link:
-          Value: false
+          Value: true
         red/base_scan:
-          Value: false
+          Value: true
         red/caster_back_link:
-          Value: false
+          Value: true
         red/imu_link:
-          Value: false
+          Value: true
         red/wheel_left_link:
-          Value: false
+          Value: true
         red/wheel_right_link:
-          Value: false
+          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: true
-      Show Axes: true
+      Show Axes: false
       Show Names: false
       Tree:
         nusim/world:
@@ -182,7 +182,7 @@ Visualization Manager:
       Enabled: true
       Name: FakeSensor
       Namespaces:
-        "": true
+        {}
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -240,7 +240,7 @@ Visualization Manager:
         Y: 0
         Z: 0
       Pose Color: 224; 27; 36
-      Pose Style: Arrows
+      Pose Style: None
       Radius: 0.029999999329447746
       Shaft Diameter: 0.019999999552965164
       Shaft Length: 0.10000000149011612
@@ -298,7 +298,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 6.2800116539001465
+      Distance: 4.430591583251953
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1

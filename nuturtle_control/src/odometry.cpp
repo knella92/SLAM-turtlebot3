@@ -71,11 +71,12 @@ public:
 
     turtlelib::DiffDrive tbot{depth, radius};
     tbot3 = tbot;
+    blue_path_msg.header.frame_id = odom_id;
 
 
     // initialize publisher, subscriber, and service
     odom_publisher_ = create_publisher<nav_msgs::msg::Odometry>("/odom", 10);
-    path_publisher_ = create_publisher<nav_msgs::msg::Path>("/path", 10);
+    blue_path_ = create_publisher<nav_msgs::msg::Path>("/path", 10);
     js_subscriber_ = create_subscription<sensor_msgs::msg::JointState>(
       "/joint_states", 10, std::bind(
         &OdomNode::js_callback, this,
@@ -93,6 +94,9 @@ public:
 private:
   turtlelib::DiffDrive tbot3{0.0, 0.0};
   std::string body_id, odom_id, wheel_left, wheel_right;
+  int index{0};
+  nav_msgs::msg::Path blue_path_msg;
+  rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr blue_path_;
   rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_publisher_;
   rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr path_publisher_;
   rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr js_subscriber_;
@@ -131,7 +135,16 @@ private:
     t.transform.rotation = quat;
     tf_broadcaster_->sendTransform(t);
 
-    publish_path(quat);
+    if(index == 100)
+    {
+      blue_path_msg.header.stamp = get_clock()->now();
+      blue_path_->publish(blue_path_msg);
+      index = 0;
+    }
+    else{
+      blue_path_msg.poses.push_back(publish_path(quat));
+      index++;
+    }
 
   }
 
@@ -146,19 +159,16 @@ private:
 
   }
 
-  void publish_path(geometry_msgs::msg::Quaternion quat)
+  geometry_msgs::msg::PoseStamped publish_path(geometry_msgs::msg::Quaternion quat)
   {
-    auto path_msg = nav_msgs::msg::Path();
+    
     auto pose_msg = geometry_msgs::msg::PoseStamped();
     pose_msg.header.stamp = get_clock()->now();
-    pose_msg.header.frame_id = "nusim/world";
+    pose_msg.header.frame_id = body_id;
     pose_msg.pose.position.x = tbot3.q.x;
     pose_msg.pose.position.y = tbot3.q.y;
     pose_msg.pose.orientation = quat;
-    path_msg.poses.push_back(pose_msg);
-    path_msg.header.stamp = pose_msg.header.stamp;
-    path_msg.header.frame_id = pose_msg.header.frame_id;
-    path_publisher_->publish(path_msg);
+    return pose_msg;
   }
 
 };

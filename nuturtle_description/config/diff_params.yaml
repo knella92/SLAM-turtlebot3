@@ -7,7 +7,7 @@
     encoder_ticks_per_rad: 651.899
     collision_radius: 0.11
     input_noise: 0.001
-    basic_sensor_variance: 0.0001
+    basic_sensor_variance: 0.001
     slip_fraction: 0.001
     max_range: 0.7
     body_id: "blue/base_footprint"

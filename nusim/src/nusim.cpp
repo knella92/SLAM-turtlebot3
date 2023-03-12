@@ -384,8 +384,8 @@ private:
         turtlelib::Transform2D T_wr{{tbot3.q.x, tbot3.q.y}, tbot3.q.theta};
         turtlelib::Transform2D T_wo{{obstacles_x.at(i), obstacles_y.at(i)}, 0.0};
         turtlelib::Transform2D T_ro = T_wr.inv() * T_wo;
-        obst.pose.position.x = T_ro.translation().x;// + sens_var(get_random());
-        obst.pose.position.y = T_ro.translation().y;// + sens_var(get_random());
+        obst.pose.position.x = T_ro.translation().x + sens_var(get_random());
+        obst.pose.position.y = T_ro.translation().y + sens_var(get_random());
 
         if(sqrt(std::pow(obst.pose.position.x,2) + std::pow(obst.pose.position.y, 2)) > max_range)
         {
