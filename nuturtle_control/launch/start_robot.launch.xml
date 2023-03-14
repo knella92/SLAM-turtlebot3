@@ -10,9 +10,7 @@
     <let name="none" value="true" if="$(eval '\'$(var robot)\' == \'none\'')"/>
     <let name="none" value="false" if="$(eval '\'$(var robot)\' == \'nusim\'')"/>
     <let name="none" value="false" if="$(eval '\'$(var robot)\' == \'localhost\'')"/>
-    <!-- <let name="js" value="blue" if="$(eval '\'$(var robot)\' == \'nusim\'')"/> 
-    <let name="js" value="" if="$(eval '\'$(var robot)\' == \'localhost\'')"/> 
-    <let name="js" value="" if="$(eval '\'$(var robot)\' == \'none\'')"/>  -->
+
 
     <group if="$(eval '\'$(var none)\' == \'false\'')">
         <node pkg='nuturtle_control' exec='turtle_control' name='turtle_control' output='screen'>
