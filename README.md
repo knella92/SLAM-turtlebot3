@@ -16,3 +16,5 @@ dtheta = 41 degrees
 
 
 <video src=https://user-images.githubusercontent.com/58793794/217950496-93bcb4ad-9c3e-4133-9091-a5ba8538c6b9.mp4/>
+
+![Screenshot from 2023-03-11 23-12-10](https://user-images.githubusercontent.com/58793794/224528158-d2b79b79-33a8-4eda-8389-fc2c0f91fb32.png)
