@@ -173,7 +173,7 @@ private:
     geometry_msgs::msg::Quaternion quat_green = tf2::toMsg(q_green);
     geometry_msgs::msg::TransformStamped t_green;
     t_green.header.stamp = get_clock()->now();
-    t_green.header.frame_id = "green/odom";
+    t_green.header.frame_id = "odom";
     t_green.child_frame_id = "green/base_footprint";
     t_green.transform.translation.x = extended_kalman.zeta_est(1);
     t_green.transform.translation.y = extended_kalman.zeta_est(2);

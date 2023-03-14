@@ -22,6 +22,6 @@
         <arg name='use_jsp' value='true'/>
     </include>
 
-    <node pkg="tf2_ros" exec="static_transform_publisher" name="nusim_to_greenodom" args='0 0 0 0 0 0 1 nusim/world green/odom'/>
+    <node pkg="tf2_ros" exec="static_transform_publisher" name="nusim_to_odom" args='0 0 0 0 0 0 1 nusim/world odom'/>
 
 </launch>

@@ -5,6 +5,7 @@
 
 #include "turtlelib/rigid2d.hpp"
 #include <vector>
+#include <random>
 
 
 namespace turtlelib
@@ -153,6 +154,8 @@ namespace turtlelib
     /// \return - lidar range
     double range_walls(Config q, double range_max, double arena_x, double arena_y, double angle);
 
+
+    std::mt19937 & get_random();
 }
 
 

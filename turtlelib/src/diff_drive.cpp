@@ -231,7 +231,6 @@ namespace turtlelib
             const auto range = sqrt(std::pow(ix-q.x, 2.0) + std::pow(iy-q.y, 2.0));
             if(range < max_range && check_direction(q, ix, iy, max_x, max_y) == true)
             {
-                // std::cout << "hit check_direction\n";
                 if(exists == false)
                 {
                     ranges = range;
@@ -254,15 +253,6 @@ namespace turtlelib
                     {
                         ranges = s_range;
                     }
-                }
-            }
-            // if not within range, set to zero
-            else
-            {
-                if(exists == true){;}
-                else
-                {
-                    continue;
                 }
             }
         }
@@ -330,7 +320,7 @@ namespace turtlelib
                         
                     }
                 }
-                else // walls along y axis
+                else // walls along x axis
                 {
                     if(abs(max_y) > abs(y_pos.at(i)))
                     {
@@ -358,6 +348,13 @@ namespace turtlelib
             }
         }
         return ranges;
+    }
+
+    std::mt19937 & get_random()
+    {
+        static std::random_device rd{};
+        static std::mt19937 mt{rd()};
+        return mt;
     }
 
 

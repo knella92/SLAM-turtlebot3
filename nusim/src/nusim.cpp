@@ -309,8 +309,8 @@ private:
       v_l = u_l;
       v_r = u_r;
     } else {
-      v_l = u_l + w_i(get_random());
-      v_r = u_r + w_i(get_random());
+      v_l = u_l + w_i(turtlelib::get_random());
+      v_r = u_r + w_i(turtlelib::get_random());
     }
 
     i = 0;
@@ -352,8 +352,8 @@ private:
   }
 
 
-  /// \brief Adds obstacles to MarkerArray for publishing in timer_callback()
-  /// \return MarkerArray
+  /// \brief Adds obstacles to MarkerArray
+  /// \return MarkerArray of obstacles
   visualization_msgs::msg::MarkerArray add_obstacles(int sensor_ind, std::string frame_id)
   {
     visualization_msgs::msg::MarkerArray all_obst{};
@@ -378,8 +378,8 @@ private:
         turtlelib::Transform2D T_wr{{tbot3.q.x, tbot3.q.y}, tbot3.q.theta};
         turtlelib::Transform2D T_wo{{obstacles_x.at(i), obstacles_y.at(i)}, 0.0};
         turtlelib::Transform2D T_ro = T_wr.inv() * T_wo;
-        obst.pose.position.x = T_ro.translation().x + sens_var(get_random());
-        obst.pose.position.y = T_ro.translation().y + sens_var(get_random());
+        obst.pose.position.x = T_ro.translation().x + sens_var(turtlelib::get_random());
+        obst.pose.position.y = T_ro.translation().y + sens_var(turtlelib::get_random());
 
         if (sqrt(
             std::pow(
@@ -403,7 +403,8 @@ private:
     return all_obst;
   }
 
-
+  /// \brief - Add walls to MarkerArray for publishing in timer_callback() 
+  /// \return MarkerArray of walls
   visualization_msgs::msg::MarkerArray add_walls()
   {
     visualization_msgs::msg::MarkerArray all_walls{};
@@ -429,12 +430,13 @@ private:
     return all_walls;
   }
 
+  /// \brief - function that calculates next robot configuration based on last recorded wheel command 
   void latching()
   {
     if (i < 15) {
       tbot3.forward_kin(v_l / rate, v_r / rate);
-      const auto dphi_l = (v_l * (1 + n_i(get_random())) / rate);
-      const auto dphi_r = (v_r * (1 + n_i(get_random())) / rate);
+      const auto dphi_l = (v_l * (1 + n_i(turtlelib::get_random())) / rate);
+      const auto dphi_r = (v_r * (1 + n_i(turtlelib::get_random())) / rate);
       tbot3.update_wheel_pose(dphi_l, dphi_r);
       tbot3.q =
         collision_detection(tbot3.q, collision_radius, obstacles_x, obstacles_y, obstacles_r);
@@ -446,6 +448,9 @@ private:
     }
   }
 
+  /// \brief - Publishes path of red robot
+  /// \param quat - quaternion representing orientation of robot
+  /// \return PoseStamped of robot for path publishing
   geometry_msgs::msg::PoseStamped publish_path(geometry_msgs::msg::Quaternion quat)
   {
     auto pose_msg = geometry_msgs::msg::PoseStamped();
@@ -456,15 +461,6 @@ private:
     pose_msg.pose.orientation = quat;
 
     return pose_msg;
-  }
-
-  /// \brief random number generator
-  /// \return reference to pseudo-random number generator object
-  std::mt19937 & get_random()
-  {
-    static std::random_device rd{};
-    static std::mt19937 mt{rd()};
-    return mt;
   }
 
   void lidar()
@@ -488,7 +484,7 @@ private:
       if (range == 0.0) {
         range = turtlelib::range_walls(tbot3.q, range_max, arena_x, arena_y, i * angle_increment);
       }
-      range += sens_var(get_random());
+      range += sens_var(turtlelib::get_random());
       ranges.push_back(range);
     }
     msg.ranges = ranges;
