@@ -24,8 +24,24 @@ find_package(nuturtle_control REQUIRED)
 
 add_executable(nuslam src/slam.cpp)
 target_link_libraries(nuslam turtlelib::turtlelib)
+add_executable(landmarks src/landmarks.cpp)
+target_link_libraries(landmarks turtlelib::turtlelib)
 ament_target_dependencies(
   nuslam
+  rclcpp
+  std_msgs
+  geometry_msgs
+  visualization_msgs
+  tf2
+  tf2_ros
+  tf2_geometry_msgs
+  nuturtlebot_msgs
+  sensor_msgs
+  nav_msgs
+  nuturtle_control)
+  
+ament_target_dependencies(
+  landmarks
   rclcpp
   std_msgs
   geometry_msgs
@@ -42,7 +58,7 @@ ament_target_dependencies(
     DIRECTORY launch config
     DESTINATION share/${PROJECT_NAME})
   install(
-    TARGETS nuslam
+    TARGETS nuslam landmarks
     DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)

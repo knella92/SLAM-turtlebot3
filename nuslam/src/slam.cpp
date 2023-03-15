@@ -180,7 +180,7 @@ private:
     t_green.transform.rotation = quat_green;
     tf_green_broadcaster_->sendTransform(t_green);
 
-    if (index == 100) {
+    if (index == 200) {
       green_path_msg.header.stamp = get_clock()->now();
       blue_path_msg.header.stamp = get_clock()->now();
       blue_path_->publish(blue_path_msg);

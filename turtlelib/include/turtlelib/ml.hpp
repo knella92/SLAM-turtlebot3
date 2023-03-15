@@ -9,24 +9,42 @@
 namespace turtlelib
 {
 
-    struct Point
+    struct RangeID
     {
 
-        double x, y;
+        double range, angle;
 
         int cluster;
 
-        double minDist;
+        RangeID();
 
-        Point();
-
-        Point(double x, double y);
-
-        double sq_distance(Point p);
+        RangeID(double range, double angle);
 
     };
 
-    void kMeansClustering(std::vector<Point> * points, int epochs, int k);
+    struct Clusters
+    {
+        std::vector<RangeID> ranges;
+
+        int max_cluster;
+
+    };
+
+    struct Centroids
+    {
+        arma::vec x_i;
+        arma::vec y_i;
+    };
+
+    Clusters clustering(std::vector<double> range_data, double angle_increment, double dist_threshold);
+    
+    void drop_clusters(Clusters & cluster);
+
+    Centroids centroid_finder(Clusters cluster);
+
+    arma::mat Hinv_finder(Clusters cluster);
+
+    
 
 
 }

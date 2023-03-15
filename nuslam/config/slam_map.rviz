@@ -14,6 +14,7 @@ Panels:
         - /GreenRobot1
         - /Path3
         - /Path3/Offset1
+        - /MarkerArray1
       Splitter Ratio: 0.5
     Tree Height: 1239
   - Class: rviz_common/Selection
@@ -326,6 +327,18 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /green/path
+      Value: true
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: MarkerArray
+      Namespaces:
+        {}
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /SLAM/points
       Value: true
   Enabled: true
   Global Options:

@@ -4,6 +4,7 @@
 #include "turtlelib/rigid2d.hpp"
 #include "turtlelib/diff_drive.hpp"
 #include "turtlelib/ekf.hpp"
+#include "turtlelib/ml.hpp"
 #include <sstream>
 #include <string>
 #include <cmath>
@@ -918,11 +919,39 @@ TEMPLATE_TEST_CASE("ekf prediction step", "[ekf prediction]", double)
 
 TEST_CASE("fake_sensor position test")
 {
-    Transform2D T_wr{{0.0, 0.0}, PI/2};;
+    Transform2D T_wr{{0.0, 0.0}, PI/2};
     Transform2D T_wo{{1.0, 0.0}, 0.0};
     Transform2D T_ro = T_wr.inv() * T_wo;
     Transform2D T_revert{{0.0,0.0}, -T_ro.rotation()};
     T_revert *=T_ro;
 
     CHECK_THAT(T_revert.translation().x, WithinAbs(1.0, .01));
+}
+
+TEST_CASE("clusterint test")
+{
+    double range{};
+    std::vector<double> ranges{};
+    int j{0};
+    double k{0.0};
+    for(int i{0}; i < 360; i++)
+    {
+        if(i>350)
+        {
+            range = 0.2;
+            ranges.push_back(range);
+            continue;
+        }
+        range = k;
+        j++;
+        if(j>36)
+        {
+            j = 0;
+            k+= 0.6;
+        }
+        ranges.push_back(range);
+    }
+    turtlelib::clustering(ranges, .01, 0.5);
+
+    CHECK_THAT(1.0, WithinAbs(1.0, .01));
 }

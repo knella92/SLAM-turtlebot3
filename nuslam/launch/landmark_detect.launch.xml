@@ -1,0 +1,14 @@
+<launch>
+
+    <arg name="robot" description="Valid choices are: ['nusim', 'localhost', 'none']" default="nusim"/>
+    
+    <include file="$(find-pkg-share nuslam)/launch/slam.launch.xml">
+        <arg name='cmd_src' value='teleop'/>
+        <arg name='robot' value='$(var robot)'/>
+        <arg name='use_rviz' value='true'/>
+    </include>
+
+    <node pkg="nuslam" exec="landmarks" name="landmarks"/>
+
+
+</launch>

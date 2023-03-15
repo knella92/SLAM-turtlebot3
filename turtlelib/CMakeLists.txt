@@ -5,7 +5,7 @@ include(CTest)
 find_package(Armadillo REQUIRED)
 
 # create the turtlelib library
-add_library(turtlelib src/rigid2d.cpp src/diff_drive.cpp src/ekf.cpp)
+add_library(turtlelib src/rigid2d.cpp src/diff_drive.cpp src/ekf.cpp src/ml.cpp)
 # The add_library function just added turtlelib as a "target"
 # A "target" is a name that CMake uses to refer to some type of output
 # In this case it is a library but it could also be an executable or some other items
