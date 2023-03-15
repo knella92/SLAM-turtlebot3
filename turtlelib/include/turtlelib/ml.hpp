@@ -42,9 +42,9 @@ namespace turtlelib
 
     Centroids centroid_finder(Clusters cluster);
 
-    arma::mat Hinv_finder(Clusters cluster);
+    arma::mat HAF_finder(Clusters cluster);
 
-    
+
 
 
 }

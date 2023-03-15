@@ -123,61 +123,65 @@ private:
         range_data.push_back(range_datum);
     }
     turtlelib::Clusters lidar = turtlelib::clustering(range_data, msg.angle_increment, distance_threshold);
-    turtlelib::drop_clusters(lidar);
-    
-    publish_clusters(lidar);
+    // RCLCPP_INFO_STREAM(get_logger(), "" << lidar.max_cluster);
+
+    turtlelib::Centroids centroid_vec = turtlelib::centroid_finder(lidar);
+    publish_clusters(centroid_vec);
 
   }
 
-  void publish_clusters(turtlelib::Clusters cluster)
+  void publish_clusters(turtlelib::Centroids centroid_vec)
   {
     visualization_msgs::msg::MarkerArray lidar_data{};
     rclcpp::Time stamp = get_clock()->now();
-    for (int i = 0; i < (int) cluster.ranges.size(); ++i) {
-        if(cluster.ranges.at(i).cluster !=-1)
+    for (int i = 0; i < (int) centroid_vec.x_i.n_elem; ++i) {;
+        if(centroid_vec.x_i(i)!= 0.0 && centroid_vec.y_i(i)!= 0.0)
         {
-            visualization_msgs::msg::Marker point;
-            point.header.frame_id = "green/base_footprint";
-            point.header.stamp = stamp;
-            point.type = visualization_msgs::msg::Marker::SPHERE;
-            point.scale.x = .01;
-            point.scale.y = .01;
-            point.scale.z = 0.01;
-            if(cluster.ranges.at(i).cluster == 0)
-            {
-                point.color.r = 1.0;
-            }
-            else if(cluster.ranges.at(i).cluster == 1)
-            {
-                point.color.g = 1.0;
-            }
-            else if(cluster.ranges.at(i).cluster == 2)
-            {
-                point.color.b = 1.0;
-            }
-            else if(cluster.ranges.at(i).cluster == 3)
-            {
-                point.color.r = 1.0;
-                point.color.g = 128.0/255.0;
-            }
-            else if(cluster.ranges.at(i).cluster == 4)
-            {
-                point.color.r = 1.0;
-                point.color.g = 1.0;
-            }
-            else if(cluster.ranges.at(i).cluster == 5)
-            {
-                point.color.r = 1.0;
-                point.color.g = 51.0/255.0;
-                point.color.b = 1.0;
-            }
-            point.color.a = 1.0;
-            point.id = i;
-            point.action = visualization_msgs::msg::Marker::ADD;
-            point.pose.position.x = cluster.ranges.at(i).range*cos(cluster.ranges.at(i).angle);
-            point.pose.position.y = cluster.ranges.at(i).range*sin(cluster.ranges.at(i).angle);
-            lidar_data.markers.push_back(point);
+        visualization_msgs::msg::Marker obst;
+        obst.header.frame_id = "green/base_footprint";
+        obst.header.stamp = stamp;
+        obst.type = visualization_msgs::msg::Marker::SPHERE;
+        obst.scale.x = .05;
+        obst.scale.y = .05;
+        obst.scale.z = 0.05;
+        if(i == 0)
+        {
+            obst.color.r = 1.0;
         }
+        else if(i == 1)
+        {
+            obst.color.g = 1.0;
+        }
+        else if(i == 2)
+        {
+            obst.color.b = 1.0;
+        }
+        else if(i == 3)
+        {
+            obst.color.r = 1.0;
+            obst.color.g = 128.0/255.0;
+        }
+        else if(i == 4)
+        {
+            obst.color.r = 1.0;
+            obst.color.g = 1.0;
+        }
+        else if(i == 5)
+        {
+            obst.color.r = 1.0;
+            obst.color.g = 51.0/255.0;
+            obst.color.b = 1.0;
+        }
+        obst.color.a = 1.0;
+        obst.id = i;
+        obst.action = visualization_msgs::msg::Marker::ADD;
+        obst.pose.position.x = centroid_vec.x_i(i);
+        obst.pose.position.y = centroid_vec.y_i(i);
+        // obst.pose.position.x = lidar.ranges.at(j).range * cos(lidar.ranges.at(j).angle);
+        // obst.pose.position.y = lidar.ranges.at(j).range * sin(lidar.ranges.at(j).angle);
+        lidar_data.markers.push_back(obst);
+        }
+
     }
 
     point_publisher_->publish(lidar_data);
