@@ -380,6 +380,7 @@ private:
         turtlelib::Transform2D T_ro = T_wr.inv() * T_wo;
         obst.pose.position.x = T_ro.translation().x + sens_var(turtlelib::get_random());
         obst.pose.position.y = T_ro.translation().y + sens_var(turtlelib::get_random());
+        // obst.lifetime = rclcpp::Duration(400ms);
 
         if (sqrt(
             std::pow(

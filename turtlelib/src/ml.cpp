@@ -99,7 +99,7 @@ namespace turtlelib
                     elements +=1.0;
                 }
             }
-            if (elements > 2.0)
+            if (elements > 3.0)
             {    
                 center.x /= elements;
                 center.y /= elements; 
@@ -129,8 +129,8 @@ namespace turtlelib
         for (int i{0}; i < cluster.n_clusters; i++)
         {
             // 2 vectors (x and y) representing x and y coordinates of points in a cluster
-            arma::vec x(100);
-            arma::vec y(100);
+            arma::vec x(300);
+            arma::vec y(300);
             cluster_pts.at(i).push_back(x);
             cluster_pts.at(i).push_back(y);
         }
@@ -151,6 +151,7 @@ namespace turtlelib
                     continue;
                 }
                 int p_i = point_index.at(cluster_index);
+                
                 cluster_pts.at(cluster_index).at(0)(p_i) = cluster.ranges.at(i).range * cos(cluster.ranges.at(i).angle) - centroids.at(cluster_index).x;
 
                 cluster_pts.at(cluster_index).at(1)(p_i) = cluster.ranges.at(i).range * sin(cluster.ranges.at(i).angle) - centroids.at(cluster_index).y;
@@ -159,7 +160,7 @@ namespace turtlelib
             }
         }
 
-        // resize arma vectors
+        //resize arma vectors
         for(int i{0}; i < (int) point_index.size(); i++)
         {
             cluster_pts.at(i).at(0).resize(point_index.at(i));
@@ -184,111 +185,106 @@ namespace turtlelib
         return cluster_pts_dropped;
     }
 
-    void circle_detection(std::vector<std::vector<arma::vec>> cluster_pts)
+    std::vector<Circle> circle_detection(std::vector<std::vector<arma::vec>> cluster_pts)
     {
-        // comput z_i
-        std::vector<arma::vec> z((int) cluster_pts.size());
+        // comput z_i and mean of z_i
+        // std::vector<arma::vec> z_all{};
+        int eig_index{-1};
+        // std::vector<double> z_bar_all{};
+        // std::vector<arma::mat> bigZ_all{};
+        // std::vector<arma::mat> M_all{};
+        // std::vector<arma::mat> Hinv_all{};
+        std::vector<Circle> circles{};
+
         for(int i{0}; i < (int) cluster_pts.size(); i++)
         {
-            arma::vec x_i = cluster_pts.at(i).at(0);
-            arma::vec y_i = cluster_pts.at(i).at(1);
-            arma::vec z_i = x_i%x_i + y_i%y_i;
-            z.push_back(z_i);
+            arma::vec x = cluster_pts.at(i).at(0);
+            arma::vec y = cluster_pts.at(i).at(1);
+            arma::vec z = x%x + y%y;
+            double z_bar = mean(z);
+
+            arma::mat bigZ(z.n_elem, 4);
+            for (int j{0}; j < (int) z.n_elem; j++)
+            {
+                bigZ(j,0) = z(j);
+                bigZ(j,1) = x(j);
+                bigZ(j,2) = y(j);
+                bigZ(j,3) = 1.0;
+            }
+
+            arma::mat M = (1.0/((double) z.n_elem)) * bigZ.t() * bigZ;
+            
+            arma::mat Hinv = {{0.0, 0.0, 0.0, 0.5},
+                              {0.0, 1.0, 0.0, 0.0},
+                              {0.0, 0.0, 1.0, 0.0},
+                              {0.5, 0.0, 0.0, -2.0*z_bar}};
+
+            arma::mat U, V, A, Y, Sigma, Q, eigvec;
+            arma::vec s, A_star, eigval;
+            // arma::cx_vec eigval;
+            // arma::cx_mat eigvec;
+
+            svd(U, s, V, bigZ);
+            
+            if(s(3) < 1e-12)
+            {
+                A = V.col(3);
+            }
+            else if(s(3) > 1e-12)
+            {
+                Sigma = {{s(0), 0.0, 0.0, 0.0},
+                         {0.0, s(1), 0.0, 0.0},
+                         {0.0, 0.0, s(2), 0.0},
+                         {0.0, 0.0, 0.0, s(3)}};
+
+                Y = V*Sigma*V.t();
+                Q = Y*Hinv*Y;
+                arma::eig_sym(eigval, eigvec, Q);
+                // int eig_index{0};
+                for(int i{0}; i < (int) eigval.n_elem; i++)
+                {
+                    if(eigval(i) > 0.0)
+                    {
+                        if(eig_index == -1)
+                        {
+                            eig_index = i;
+                        }
+                        else
+                        {
+                            if(eigval(i) < eigval(eig_index))
+                            {
+                                eig_index = i;
+                            }
+                        }
+                    }
+                }
+                A_star = eigvec.col(eig_index);
+                A = arma::solve(Y, A_star);
+            }
+
+            Circle c{};
+            c.a = -A(1)/(2*A(0));
+            c.b = -A(2)/(2*A(0));
+            c.R = sqrt((A(1)*A(1) + A(2)*A(2) - 4*A(0)*A(3))/(4*A(0)*A(0)));
+
+            circles.push_back(c);
+            // z_bar_all.push_back(z_bar);
+            // z_all.push_back(z);
+            // bigZ_all.push_back(bigZ);
+            // M_all.push_back(M);
+            // Hinv_all.push_back(Hinv);
         }
 
+        //compute SVD Z
+        
+        
+        return circles;
     }
 
 
+    void SVD(arma::mat bigZ)
+    {
 
-
-        // x_i.resize(vector_index);
-        // y_i.resize(vector_index);
-
-        // arma::vec z_i(arma::size(x_i));
-        // z_i = x_i % x_i + y_i % y_i;
-        // double z_bar = mean(z_i);
-        // arma::mat Z(z.n_elem, 4);
-        // for (int i{0}; i < (int) z.n_elem; i++)
-        // {
-        //     Z(i,0) = z(i);
-        //     Z(i,1) = centroid_vec.x(i);
-        //     Z(i,2) = centroid_vec.y(i);
-        //     Z(i,3) = 1.0;
-        // }
-        // arma::mat M = 1.0/((double) z.n_elem) * Z.t()*Z;
-        // arma::mat Hinv = {{0.0, 0.0, 0.0, 0.5},
-        //                   {0.0, 1.0, 0.0, 0.0},
-        //                   {0.0, 0.0, 1.0, 0.0},
-        //                   {0.5, 0.0, 0.0, -2*z_bar}};
-
-
-
-
-// void drop_clusters(Clusters & cluster)
-//     {
-//         int k{};
-//         int n = cluster.ranges.size();
-//         bool check_end{false};
-//         for (int i{0}; i < (cluster.max_cluster + 1); i++)
-//         {
-//             k = 0;
-//             check_end = false;
-//             for(int range_index{0}; range_index < n; range_index++)
-//             {
-//                 if(cluster.ranges.at(range_index).cluster == i)
-//                 {
-//                     k++;
-//                 }
-//                 else if(k>0)
-//                 {
-//                     if(i < 3)
-//                     {
-//                         check_end = true;
-//                         continue;
-//                     }
-//                     else if(check_end == true && i == n-1)
-//                     {
-//                         if(k<3)
-//                         {
-//                             if(cluster.ranges.at(n-2).cluster == 0)
-//                             {
-//                                 cluster.ranges.at(n-2).cluster = -1;
-//                             }
-//                             if(cluster.ranges.at(n-1).cluster == 0)
-//                             {
-//                                 cluster.ranges.at(n-1).cluster = -1;
-//                             }
-//                             if(cluster.ranges.at(0).cluster == 0)
-//                             {
-//                                 cluster.ranges.at(0).cluster = -1;
-//                             }
-//                             if(cluster.ranges.at(1).cluster == 0)
-//                             {
-//                                 cluster.ranges.at(1).cluster = -1;
-//                             }
-//                             cluster.max_cluster--;
-//                             break;
-//                         }
-
-//                     }
-//                     else if(check_end == true)
-//                     {
-//                         continue;
-//                     }
-//                     if(k<3)
-//                     {
-//                         while(k>0)
-//                         {
-//                             cluster.ranges.at(range_index - k).cluster = -1;
-//                             k--;
-//                         }
-//                         cluster.max_cluster--;
-//                         break;
-//                     }
-//                 }
-//             }
-//         }
-//     }
-
+    }
 
 }

@@ -30,6 +30,13 @@ namespace turtlelib
 
     };
 
+    struct Circle
+    {
+        double a;
+        double b;
+        double R;
+    };
+
     Clusters clustering(std::vector<double> range_data, double angle_increment, double dist_threshold);
     
     // void drop_clusters(Clusters & cluster);
@@ -40,7 +47,7 @@ namespace turtlelib
 
     // arma::mat data_matrix
 
-    void circle_detection(std::vector<std::vector<arma::vec>> cluster_pts);
+    std::vector<Circle> circle_detection(std::vector<std::vector<arma::vec>> cluster_pts);
 
 
 }

@@ -124,8 +124,8 @@ private:
     // double n_clusters = turtlelib::HAF_finder(lidar);
     
     std::vector<std::vector<arma::vec>> cluster_pts = turtlelib::shift_points(lidar);
-    turtlelib::circle_detection(cluster_pts);
-    // RCLCPP_INFO_STREAM(get_logger(), "" << cluster_pts.at(0).at(1));
+    std::vector<turtlelib::Circle> detected_circles = turtlelib::circle_detection(cluster_pts);
+    // RCLCPP_INFO_STREAM(get_logger(), "" << lkj);
     // publish_clusters(centroids);
     // publish_clusters(lidar);
 
