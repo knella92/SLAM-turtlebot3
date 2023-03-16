@@ -26,25 +26,21 @@ namespace turtlelib
     {
         std::vector<RangeID> ranges;
 
-        int max_cluster;
+        int n_clusters;
 
-    };
-
-    struct Centroids
-    {
-        arma::vec x_i;
-        arma::vec y_i;
     };
 
     Clusters clustering(std::vector<double> range_data, double angle_increment, double dist_threshold);
     
-    void drop_clusters(Clusters & cluster);
+    // void drop_clusters(Clusters & cluster);
 
-    Centroids centroid_finder(Clusters cluster);
+    std::vector<Vector2D> centroid_finder(Clusters cluster);
 
-    arma::mat HAF_finder(Clusters cluster);
+    std::vector<std::vector<arma::vec>> shift_points(Clusters cluster);
 
+    // arma::mat data_matrix
 
+    void circle_detection(std::vector<std::vector<arma::vec>> cluster_pts);
 
 
 }

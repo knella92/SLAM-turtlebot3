@@ -52,7 +52,7 @@ public:
     // declare_parameter("track_width", 0.0);
     // declare_parameter("input_noise", 0.0);
     // declare_parameter("slip_fraction", 0.0);
-    declare_parameter("distance_threshold", 0.1);
+    declare_parameter("distance_threshold", 0.05);
 
     // if these are not specified, shutdown the node
     // if (get_parameter("body_id").as_string() == "none") {
@@ -107,10 +107,6 @@ private:
 //   rclcpp::Service<nuturtle_control::srv::InitialPose>::SharedPtr initialp_service_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr point_publisher_;
 
-  void on_timer()
-  {
-
-  }
 
   void lidar_callback(const sensor_msgs::msg::LaserScan & msg)
   {
@@ -123,27 +119,39 @@ private:
         range_data.push_back(range_datum);
     }
     turtlelib::Clusters lidar = turtlelib::clustering(range_data, msg.angle_increment, distance_threshold);
-    // RCLCPP_INFO_STREAM(get_logger(), "" << lidar.max_cluster);
-
-    turtlelib::Centroids centroid_vec = turtlelib::centroid_finder(lidar);
-    publish_clusters(centroid_vec);
+    RCLCPP_INFO_STREAM(get_logger(), "" << lidar.n_clusters);
+    //std::vector<turtlelib::Vector2D> centroids = turtlelib::centroid_finder(lidar, lidar.n_clusters);
+    // double n_clusters = turtlelib::HAF_finder(lidar);
+    
+    std::vector<std::vector<arma::vec>> cluster_pts = turtlelib::shift_points(lidar);
+    turtlelib::circle_detection(cluster_pts);
+    // RCLCPP_INFO_STREAM(get_logger(), "" << cluster_pts.at(0).at(1));
+    // publish_clusters(centroids);
+    // publish_clusters(lidar);
 
   }
 
-  void publish_clusters(turtlelib::Centroids centroid_vec)
+  void publish_clusters(std::vector<turtlelib::Vector2D> centroid_vec)
   {
     visualization_msgs::msg::MarkerArray lidar_data{};
     rclcpp::Time stamp = get_clock()->now();
-    for (int i = 0; i < (int) centroid_vec.x_i.n_elem; ++i) {;
-        if(centroid_vec.x_i(i)!= 0.0 && centroid_vec.y_i(i)!= 0.0)
+    int k{0};
+    for (int i = 0; i < (int) centroid_vec.size(); ++i) 
+    {
+        if(centroid_vec.at(i).x == 0.0 && centroid_vec.at(i).y == 0.0)
         {
+            continue;
+        }
+        // if(lidar.ranges.at(j).cluster !=-1)
+        
+        // int i = lidar.ranges.at(j).cluster;
         visualization_msgs::msg::Marker obst;
         obst.header.frame_id = "green/base_footprint";
         obst.header.stamp = stamp;
         obst.type = visualization_msgs::msg::Marker::SPHERE;
         obst.scale.x = .05;
         obst.scale.y = .05;
-        obst.scale.z = 0.05;
+        obst.scale.z = .05;
         if(i == 0)
         {
             obst.color.r = 1.0;
@@ -175,15 +183,15 @@ private:
         obst.color.a = 1.0;
         obst.id = i;
         obst.action = visualization_msgs::msg::Marker::ADD;
-        obst.pose.position.x = centroid_vec.x_i(i);
-        obst.pose.position.y = centroid_vec.y_i(i);
+        obst.pose.position.x = centroid_vec.at(i).x;
+        obst.pose.position.y = centroid_vec.at(i).y;
         // obst.pose.position.x = lidar.ranges.at(j).range * cos(lidar.ranges.at(j).angle);
         // obst.pose.position.y = lidar.ranges.at(j).range * sin(lidar.ranges.at(j).angle);
         lidar_data.markers.push_back(obst);
-        }
-
+        // k++;
+        // RCLCPP_INFO_STREAM(get_logger(), "" << i);
     }
-
+    // RCLCPP_INFO_STREAM(get_logger(), "" << k);
     point_publisher_->publish(lidar_data);
   }
 

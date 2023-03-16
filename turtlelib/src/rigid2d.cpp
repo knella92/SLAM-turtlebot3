@@ -263,7 +263,7 @@ namespace turtlelib
         x = is.peek();
         is.get(x);
         auto radians = deg2rad(deg);
-        Transform2D newtf{vec, radians};
+        Transform2D newtf(vec, radians);
         tf = newtf;
         return is;
     }
@@ -361,12 +361,12 @@ namespace turtlelib
         if (almost_equal(Vb.w,0))
         {
             // No t in the expression because we're dealing with one unit time-step
-            const Transform2D Tb_bp{{Vb.v.x, Vb.v.y}, 0.0};
+            const Transform2D Tb_bp({Vb.v.x, Vb.v.y}, 0.0);
             return Tb_bp;
         }
         else{
-            const Transform2D Ts_b{{Vb.v.y/Vb.w, -Vb.v.x/Vb.w}, Vb.w}; // Also equal to Tsp_bp
-            const Transform2D Ts_sp{Vb.w};
+            const Transform2D Ts_b({Vb.v.y/Vb.w, -Vb.v.x/Vb.w}, Vb.w); // Also equal to Tsp_bp
+            const Transform2D Ts_sp(Vb.w);
             const Transform2D Tb_bp = Ts_b.inv() * Ts_sp * Ts_b;
             return Tb_bp;
         }
