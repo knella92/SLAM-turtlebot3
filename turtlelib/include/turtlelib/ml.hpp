@@ -37,17 +37,25 @@ namespace turtlelib
         double R;
     };
 
+    struct ClustersCentroids
+    {
+        std::vector<std::vector<arma::vec>> points;
+        std::vector<Vector2D> centroids;
+    };
+
     Clusters clustering(std::vector<double> range_data, double angle_increment, double dist_threshold);
     
     // void drop_clusters(Clusters & cluster);
 
     std::vector<Vector2D> centroid_finder(Clusters cluster);
 
-    std::vector<std::vector<arma::vec>> shift_points(Clusters cluster);
+    ClustersCentroids shift_points(Clusters cluster, std::vector<Vector2D> centroids);
 
     // arma::mat data_matrix
 
-    std::vector<Circle> circle_detection(std::vector<std::vector<arma::vec>> cluster_pts);
+    std::vector<Circle> circle_detection(ClustersCentroids clusters);
+
+    void classification(std::vector<Circle> detected_circles, ClustersCentroids clusters);
 
 
 }

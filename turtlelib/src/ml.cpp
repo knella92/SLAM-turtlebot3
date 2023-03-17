@@ -121,10 +121,11 @@ namespace turtlelib
 
 
 
-    std::vector<std::vector<arma::vec>> shift_points(Clusters cluster)
+    ClustersCentroids shift_points(Clusters cluster, std::vector<Vector2D> centroids)
     {
-        std::vector<Vector2D> centroids = centroid_finder(cluster);
+        // std::vector<Vector2D> centroids = centroid_finder(cluster);
         std::vector<std::vector<arma::vec>> cluster_pts(cluster.n_clusters);
+        ClustersCentroids clusters_dropped{};
 
         for (int i{0}; i < cluster.n_clusters; i++)
         {
@@ -168,7 +169,8 @@ namespace turtlelib
         }
 
         // drop clusters with < 2 points
-        std::vector<std::vector<arma::vec>> cluster_pts_dropped;
+        // std::vector<std::vector<arma::vec>> cluster_pts_dropped;
+        Vector2D centroid_i{};
         int index {0};
         for(int i{0}; i < cluster.n_clusters; i++)
         {
@@ -177,15 +179,21 @@ namespace turtlelib
             }
             else
             {
-                cluster_pts_dropped.push_back(cluster_pts.at(i));
+                centroid_i.x = centroids.at(i).x;
+                centroid_i.y = centroids.at(i).y;
+                clusters_dropped.centroids.push_back(centroid_i);
+                clusters_dropped.points.push_back(cluster_pts.at(i));
                 index++;
             }
         }
 
-        return cluster_pts_dropped;
+        return clusters_dropped;
     }
 
-    std::vector<Circle> circle_detection(std::vector<std::vector<arma::vec>> cluster_pts)
+
+
+
+    std::vector<Circle> circle_detection(ClustersCentroids clusters)
     {
         // comput z_i and mean of z_i
         // std::vector<arma::vec> z_all{};
@@ -196,10 +204,10 @@ namespace turtlelib
         // std::vector<arma::mat> Hinv_all{};
         std::vector<Circle> circles{};
 
-        for(int i{0}; i < (int) cluster_pts.size(); i++)
+        for(int i{0}; i < (int) clusters.points.size(); i++)
         {
-            arma::vec x = cluster_pts.at(i).at(0);
-            arma::vec y = cluster_pts.at(i).at(1);
+            arma::vec x = clusters.points.at(i).at(0);
+            arma::vec y = clusters.points.at(i).at(1);
             arma::vec z = x%x + y%y;
             double z_bar = mean(z);
 
@@ -263,8 +271,8 @@ namespace turtlelib
             }
 
             Circle c{};
-            c.a = -A(1)/(2*A(0));
-            c.b = -A(2)/(2*A(0));
+            c.a = -A(1)/(2*A(0)) + clusters.centroids.at(i).x;
+            c.b = -A(2)/(2*A(0)) + clusters.centroids.at(i).y;
             c.R = sqrt((A(1)*A(1) + A(2)*A(2) - 4*A(0)*A(3))/(4*A(0)*A(0)));
 
             circles.push_back(c);
@@ -274,17 +282,47 @@ namespace turtlelib
             // M_all.push_back(M);
             // Hinv_all.push_back(Hinv);
         }
-
-        //compute SVD Z
-        
         
         return circles;
     }
 
 
-    void SVD(arma::mat bigZ)
+    void classification(std::vector<Circle> detected_circles, ClustersCentroids clusters)
     {
+        std::vector<std::vector<arma::vec>> shifted_points{};
+        std::vector<bool> is_circle{};
+        std::uniform_real_distribution<double> distr(0, 500);
+        for(int i{0}; i < (int) clusters.centroids.size(); i++)
+        {
+            arma::vec x(size(clusters.points.at(i).at(0)));
+            arma::vec y(size(x));
+            for(int j{0}; j < (int) clusters.points.at(i).at(0).n_elem; j++)
+            {
+                x(j) = clusters.points.at(i).at(0)(j) + clusters.centroids.at(i).x;
+                y(j) = clusters.points.at(i).at(1)(j) + clusters.centroids.at(i).y;
+            }
+            std::vector<arma::vec> points{};
+            points.push_back(x);
+            points.push_back(y);
+            shifted_points.push_back(points);
+        }
 
+        for (int i{0}; i < (int) clusters.centroids.size(); i++)
+        {
+            Vector2D P1{clusters.points.at(i).at(0)(0), clusters.points.at(i).at(1)(0)};
+            Vector2D P2{*clusters.points.at(i).at(0).end(), *clusters.points.at(i).at(1).end()};
+            int index{-1};
+            while(index == 0 || index == (int) clusters.points.at(i).at(0).n_elem)
+            {
+                index = (int) distr(get_random())%((int) clusters.points.at(i).at(0).n_elem);
+                
+            }
+            
+
+            
+
+        }
+        
     }
 
 }
