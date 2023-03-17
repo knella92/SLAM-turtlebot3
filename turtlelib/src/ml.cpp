@@ -287,42 +287,66 @@ namespace turtlelib
     }
 
 
-    void classification(std::vector<Circle> detected_circles, ClustersCentroids clusters)
+    std::vector<bool> classification(std::vector<Circle> detected_circles)
     {
-        std::vector<std::vector<arma::vec>> shifted_points{};
+        // std::vector<std::vector<arma::vec>> shifted_points{};
         std::vector<bool> is_circle{};
-        std::uniform_real_distribution<double> distr(0, 500);
-        for(int i{0}; i < (int) clusters.centroids.size(); i++)
+        // arma::vec std_dev_vec((int) detected_circles.size());
+        // arma::vec means(size(std_dev_vec));
+        // for(int i{0}; i < (int) clusters.centroids.size(); i++)
+        // {
+        //     arma::vec x(size(clusters.points.at(i).at(0)));
+        //     arma::vec y(size(x));
+        //     for(int j{0}; j < (int) clusters.points.at(i).at(0).n_elem; j++)
+        //     {
+        //         x(j) = clusters.points.at(i).at(0)(j) + clusters.centroids.at(i).x;
+        //         y(j) = clusters.points.at(i).at(1)(j) + clusters.centroids.at(i).y;
+        //     }
+        //     std::vector<arma::vec> points{};
+        //     points.push_back(x);
+        //     points.push_back(y);
+        //     shifted_points.push_back(points);
+        // }
+
+        // for (int i{0}; i < (int) clusters.centroids.size(); i++)
+        // {
+        //     Vector2D P1{clusters.points.at(i).at(0)(0), clusters.points.at(i).at(1)(0)};
+        //     Vector2D P2{*clusters.points.at(i).at(0).end(), *clusters.points.at(i).at(1).end()};
+        //     double total{0.0};
+        //     double elements{0.0};
+        //     arma::vec angles(clusters.points.at(i).at(0).n_elem - 2);
+
+        //     for(int j{1}; j < (int) clusters.points.at(i).at(0).n_elem - 1; j++)
+        //     {
+        //         Vector2D P{clusters.points.at(i).at(0)(j), clusters.points.at(i).at(1)(j)};
+        //         Vector2D vector1{P1.x - P.x, P1.y - P.y};
+        //         Vector2D vector2{P2.x - P.x, P2.y - P.y};
+        //         double angle = turtlelib::angle(vector1, vector2);
+        //         total += angle;
+        //         elements += 1.0;
+        //         angles(j-1) = angle;
+        //     }
+        //     const auto mean = total/elements;
+        //     means(i) = mean;
+        //     double sum_dev{0.0};
+        //     for (int j{0}; j < (int) angles.n_elem; j++ )
+        //     {
+        //         sum_dev += std::pow(angles(j) - mean, 2.0);
+        //     }
+        //     const auto stddev = sqrt(sum_dev/(elements - 1.0));
+        //     std_dev_vec(i) = stddev;
+        for (int i{0}; i < (int) detected_circles.size(); i++)
         {
-            arma::vec x(size(clusters.points.at(i).at(0)));
-            arma::vec y(size(x));
-            for(int j{0}; j < (int) clusters.points.at(i).at(0).n_elem; j++)
+            if(detected_circles.at(i).R >  .01 && detected_circles.at(i). R < 0.1)
             {
-                x(j) = clusters.points.at(i).at(0)(j) + clusters.centroids.at(i).x;
-                y(j) = clusters.points.at(i).at(1)(j) + clusters.centroids.at(i).y;
+                is_circle.push_back(true);
             }
-            std::vector<arma::vec> points{};
-            points.push_back(x);
-            points.push_back(y);
-            shifted_points.push_back(points);
-        }
-
-        for (int i{0}; i < (int) clusters.centroids.size(); i++)
-        {
-            Vector2D P1{clusters.points.at(i).at(0)(0), clusters.points.at(i).at(1)(0)};
-            Vector2D P2{*clusters.points.at(i).at(0).end(), *clusters.points.at(i).at(1).end()};
-            int index{-1};
-            while(index == 0 || index == (int) clusters.points.at(i).at(0).n_elem)
+            else
             {
-                index = (int) distr(get_random())%((int) clusters.points.at(i).at(0).n_elem);
-                
+                is_circle.push_back(false);
             }
-            
-
-            
-
         }
-        
+        return is_circle;
     }
 
 }

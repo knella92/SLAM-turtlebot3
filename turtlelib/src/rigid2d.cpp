@@ -97,6 +97,7 @@ namespace turtlelib
         const double num{dot(vec1,vec2)};
         const double den{magnitude(vec1) * magnitude(vec2)};
         rad = acos(num/den);
+        rad = std::abs(rad);
         return rad;
     }
 

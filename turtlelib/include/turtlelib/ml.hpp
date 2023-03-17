@@ -55,7 +55,7 @@ namespace turtlelib
 
     std::vector<Circle> circle_detection(ClustersCentroids clusters);
 
-    void classification(std::vector<Circle> detected_circles, ClustersCentroids clusters);
+    std::vector<bool> classification(std::vector<Circle> detected_circles);
 
 
 }
