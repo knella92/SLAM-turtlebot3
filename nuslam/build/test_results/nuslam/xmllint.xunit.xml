@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite
+  name="nuslam.xmllint"
+  tests="7"
+  errors="0"
+  failures="0"
+  time="0.095"
+>
+  <testcase
+    name="package.xml"
+    classname="nuslam.xmllint"/>
+  <testcase
+    name="build/test_results/nuslam/cppcheck.xunit.xml"
+    classname="nuslam.xmllint"/>
+  <testcase
+    name="build/test_results/nuslam/lint_cmake.xunit.xml"
+    classname="nuslam.xmllint"/>
+  <testcase
+    name="build/test_results/nuslam/uncrustify.xunit.xml"
+    classname="nuslam.xmllint"/>
+  <testcase
+    name="build/test_results/nuslam/xmllint.xunit.xml"
+    classname="nuslam.xmllint"/>
+  <testcase
+    name="launch/landmark_detect.launch.xml"
+    classname="nuslam.xmllint"/>
+  <testcase
+    name="launch/slam.launch.xml"
+    classname="nuslam.xmllint"/>
+  <system-out>Checked files:
+* package.xml
+* build/test_results/nuslam/cppcheck.xunit.xml
+* build/test_results/nuslam/lint_cmake.xunit.xml
+* build/test_results/nuslam/uncrustify.xunit.xml
+* build/test_results/nuslam/xmllint.xunit.xml
+* launch/landmark_detect.launch.xml
+* launch/slam.launch.xml</system-out>
+</testsuite>

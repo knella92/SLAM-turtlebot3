@@ -15,6 +15,7 @@ Panels:
         - /Path3
         - /Path3/Offset1
         - /MarkerArray1
+        - /MarkerArray1/Topic1
       Splitter Ratio: 0.5
     Tree Height: 1239
   - Class: rviz_common/Selection
@@ -34,7 +35,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: LaserScan
 Visualization Manager:
   Class: ""
   Displays:
@@ -61,19 +62,51 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        purple/base_footprint:
+        blue/base_footprint:
           Value: true
-        purple/base_link:
+        blue/base_link:
           Value: true
-        purple/base_scan:
+        blue/base_scan:
           Value: true
-        purple/caster_back_link:
+        blue/caster_back_link:
           Value: true
-        purple/imu_link:
+        blue/imu_link:
           Value: true
-        purple/wheel_left_link:
+        blue/wheel_left_link:
           Value: true
-        purple/wheel_right_link:
+        blue/wheel_right_link:
+          Value: true
+        green/base_footprint:
+          Value: true
+        green/base_link:
+          Value: true
+        green/base_scan:
+          Value: true
+        green/caster_back_link:
+          Value: true
+        green/imu_link:
+          Value: true
+        green/wheel_left_link:
+          Value: true
+        green/wheel_right_link:
+          Value: true
+        nusim/world:
+          Value: true
+        odom:
+          Value: true
+        red/base_footprint:
+          Value: true
+        red/base_link:
+          Value: true
+        red/base_scan:
+          Value: true
+        red/caster_back_link:
+          Value: true
+        red/imu_link:
+          Value: true
+        red/wheel_left_link:
+          Value: true
+        red/wheel_right_link:
           Value: true
       Marker Scale: 1
       Name: TF
@@ -81,14 +114,51 @@ Visualization Manager:
       Show Axes: false
       Show Names: false
       Tree:
-        {}
+        nusim/world:
+          odom:
+            blue/base_footprint:
+              blue/base_link:
+                blue/base_scan:
+                  {}
+                blue/caster_back_link:
+                  {}
+                blue/imu_link:
+                  {}
+                blue/wheel_left_link:
+                  {}
+                blue/wheel_right_link:
+                  {}
+            green/base_footprint:
+              green/base_link:
+                green/base_scan:
+                  {}
+                green/caster_back_link:
+                  {}
+                green/imu_link:
+                  {}
+                green/wheel_left_link:
+                  {}
+                green/wheel_right_link:
+                  {}
+          red/base_footprint:
+            red/base_link:
+              red/base_scan:
+                {}
+              red/caster_back_link:
+                {}
+              red/imu_link:
+                {}
+              red/wheel_left_link:
+                {}
+              red/wheel_right_link:
+                {}
       Update Interval: 0
       Value: true
     - Class: rviz_default_plugins/MarkerArray
       Enabled: true
       Name: Walls
       Namespaces:
-        {}
+        "": true
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -100,7 +170,7 @@ Visualization Manager:
       Enabled: true
       Name: Obstacles
       Namespaces:
-        {}
+        "": true
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -126,6 +196,39 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        base_footprint:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        base_scan:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        caster_back_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        wheel_left_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        wheel_right_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
       Mass Properties:
         Inertia: false
         Mass: false
@@ -180,6 +283,39 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        base_footprint:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        base_scan:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        caster_back_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        wheel_left_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        wheel_right_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
       Mass Properties:
         Inertia: false
         Mass: false
@@ -220,7 +356,7 @@ Visualization Manager:
       Enabled: true
       Name: FakeSensor
       Namespaces:
-        {}
+        "": true
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -266,7 +402,7 @@ Visualization Manager:
       Enabled: true
       Name: SLAMMap
       Namespaces:
-        {}
+        "": true
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -292,6 +428,39 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        base_footprint:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        base_scan:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        caster_back_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        wheel_left_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        wheel_right_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
       Mass Properties:
         Inertia: false
         Mass: false
@@ -332,11 +501,11 @@ Visualization Manager:
       Enabled: true
       Name: MarkerArray
       Namespaces:
-        {}
+        "": true
       Topic:
-        Depth: 5
+        Depth: 1
         Durability Policy: Volatile
-        History Policy: Keep Last
+        History Policy: System Default
         Reliability Policy: Reliable
         Value: /SLAM/points
       Value: true

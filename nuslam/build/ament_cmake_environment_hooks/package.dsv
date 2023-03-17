@@ -1,0 +1,4 @@
+source;share/nuslam/local_setup.bash
+source;share/nuslam/local_setup.dsv
+source;share/nuslam/local_setup.sh
+source;share/nuslam/local_setup.zsh

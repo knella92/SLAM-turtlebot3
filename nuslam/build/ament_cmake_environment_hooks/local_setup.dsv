@@ -1,0 +1,2 @@
+source;share/nuslam/environment/ament_prefix_path.sh
+source;share/nuslam/environment/path.sh

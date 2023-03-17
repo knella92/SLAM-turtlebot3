@@ -154,7 +154,8 @@ namespace turtlelib
     /// \return - lidar range
     double range_walls(Config q, double range_max, double arena_x, double arena_y, double angle);
 
-
+    /// \brief - pseudorandom seed generator 
+    /// \return - pseudo random seed
     std::mt19937 & get_random();
 }
 

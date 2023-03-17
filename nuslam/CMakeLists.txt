@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.8)
 project(nuslam)
+include(CTest)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -38,7 +39,8 @@ ament_target_dependencies(
   nuturtlebot_msgs
   sensor_msgs
   nav_msgs
-  nuturtle_control)
+  nuturtle_control
+  turtlelib)
   
 ament_target_dependencies(
   landmarks
@@ -52,7 +54,8 @@ ament_target_dependencies(
   nuturtlebot_msgs
   sensor_msgs
   nav_msgs
-  nuturtle_control)
+  nuturtle_control
+  turtlelib)
 
   install(
     DIRECTORY launch config
@@ -60,6 +63,13 @@ ament_target_dependencies(
   install(
     TARGETS nuslam landmarks
     DESTINATION lib/${PROJECT_NAME})
+
+  find_package(Catch2 3 REQUIRED)
+  enable_testing()
+  add_executable(circle_tests tests/circle_tests.cpp)
+  target_link_libraries(circle_tests Catch2::Catch2WithMain turtlelib::turtlelib)
+  # target_link_libraries(circle_tests turtlelib::turtlelib)
+  add_test(NAME Test_of_Circle_Detection COMMAND circle_tests)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

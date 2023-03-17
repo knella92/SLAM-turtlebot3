@@ -1,0 +1,288 @@
+-- run_test.py: invoking following command in '/home/kevin/workspaces/SLAM/hw1/src/nuturtle-knella92/nuslam':
+ - /opt/ros/humble/bin/ament_lint_cmake --xunit-file /home/kevin/workspaces/SLAM/hw1/src/nuturtle-knella92/nuslam/build/test_results/nuslam/lint_cmake.xunit.xml
+
+CMakeLists.txt:44: Line ends in whitespace [whitespace/eol]
+
+build/CTestTestfile.cmake:1: Line ends in whitespace [whitespace/eol]
+build/CTestTestfile.cmake:4: Line ends in whitespace [whitespace/eol]
+build/CTestTestfile.cmake:5: Line ends in whitespace [whitespace/eol]
+build/CTestTestfile.cmake:8: Lines should be <= 140 characters long [linelength]
+build/CTestTestfile.cmake:9: Lines should be <= 140 characters long [linelength]
+build/CTestTestfile.cmake:10: Lines should be <= 140 characters long [linelength]
+build/CTestTestfile.cmake:11: Lines should be <= 140 characters long [linelength]
+build/CTestTestfile.cmake:12: Lines should be <= 140 characters long [linelength]
+build/CTestTestfile.cmake:13: Lines should be <= 140 characters long [linelength]
+build/CTestTestfile.cmake:14: Lines should be <= 140 characters long [linelength]
+build/CTestTestfile.cmake:15: Lines should be <= 140 characters long [linelength]
+build/CTestTestfile.cmake:16: Lines should be <= 140 characters long [linelength]
+
+build/cmake_install.cmake:13: Weird indentation; use 2 spaces [whitespace/indent]
+build/cmake_install.cmake:46: Mismatching spaces inside () after command [whitespace/mismatch]
+build/cmake_install.cmake:54: Weird indentation; use 2 spaces [whitespace/indent]
+build/cmake_install.cmake:56: Weird indentation; use 2 spaces [whitespace/indent]
+build/cmake_install.cmake:57: Weird indentation; use 2 spaces [whitespace/indent]
+build/cmake_install.cmake:59: Lines should be <= 140 characters long [linelength]
+build/cmake_install.cmake:61: Weird indentation; use 2 spaces [whitespace/indent]
+build/cmake_install.cmake:63: Weird indentation; use 2 spaces [whitespace/indent]
+build/cmake_install.cmake:64: Lines should be <= 140 characters long [linelength]
+build/cmake_install.cmake:64: Weird indentation; use 2 spaces [whitespace/indent]
+build/cmake_install.cmake:65: Weird indentation; use 2 spaces [whitespace/indent]
+build/cmake_install.cmake:74: Weird indentation; use 2 spaces [whitespace/indent]
+build/cmake_install.cmake:76: Weird indentation; use 2 spaces [whitespace/indent]
+build/cmake_install.cmake:77: Weird indentation; use 2 spaces [whitespace/indent]
+build/cmake_install.cmake:79: Lines should be <= 140 characters long [linelength]
+build/cmake_install.cmake:81: Weird indentation; use 2 spaces [whitespace/indent]
+build/cmake_install.cmake:83: Weird indentation; use 2 spaces [whitespace/indent]
+build/cmake_install.cmake:84: Lines should be <= 140 characters long [linelength]
+build/cmake_install.cmake:84: Weird indentation; use 2 spaces [whitespace/indent]
+build/cmake_install.cmake:85: Weird indentation; use 2 spaces [whitespace/indent]
+build/cmake_install.cmake:93: Lines should be <= 140 characters long [linelength]
+build/cmake_install.cmake:97: Lines should be <= 140 characters long [linelength]
+build/cmake_install.cmake:101: Lines should be <= 140 characters long [linelength]
+build/cmake_install.cmake:105: Lines should be <= 140 characters long [linelength]
+build/cmake_install.cmake:109: Lines should be <= 140 characters long [linelength]
+build/cmake_install.cmake:113: Lines should be <= 140 characters long [linelength]
+build/cmake_install.cmake:117: Lines should be <= 140 characters long [linelength]
+build/cmake_install.cmake:121: Lines should be <= 140 characters long [linelength]
+build/cmake_install.cmake:125: Lines should be <= 140 characters long [linelength]
+build/cmake_install.cmake:129: Lines should be <= 140 characters long [linelength]
+build/cmake_install.cmake:133: Lines should be <= 140 characters long [linelength]
+build/cmake_install.cmake:137: Lines should be <= 140 characters long [linelength]
+build/cmake_install.cmake:141: Mismatching spaces inside () after command [whitespace/mismatch]
+build/cmake_install.cmake:148: Lines should be <= 140 characters long [linelength]
+build/cmake_install.cmake:158: Weird indentation; use 2 spaces [whitespace/indent]
+build/cmake_install.cmake:160: Weird indentation; use 2 spaces [whitespace/indent]
+
+build/CMakeFiles/Makefile.cmake:8: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/Makefile.cmake:967: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/Makefile.cmake:973: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/Makefile.cmake:996: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/3.22.1/CMakeCCompiler.cmake:9: Lines should be <= 140 characters long [linelength]
+build/CMakeFiles/3.22.1/CMakeCCompiler.cmake:69: Lines should be <= 140 characters long [linelength]
+
+build/CMakeFiles/3.22.1/CMakeCXXCompiler.cmake:9: Lines should be <= 140 characters long [linelength]
+build/CMakeFiles/3.22.1/CMakeCXXCompiler.cmake:11: Lines should be <= 140 characters long [linelength]
+build/CMakeFiles/3.22.1/CMakeCXXCompiler.cmake:12: Lines should be <= 140 characters long [linelength]
+build/CMakeFiles/3.22.1/CMakeCXXCompiler.cmake:42: Extra spaces between 'foreach' and its () [whitespace/extra]
+build/CMakeFiles/3.22.1/CMakeCXXCompiler.cmake:43: Extra spaces between 'if' and its () [whitespace/extra]
+build/CMakeFiles/3.22.1/CMakeCXXCompiler.cmake:80: Lines should be <= 140 characters long [linelength]
+
+build/CMakeFiles/Continuous.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/Continuous.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/Continuous.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/Continuous.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ContinuousBuild.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ContinuousBuild.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ContinuousBuild.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ContinuousBuild.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ContinuousConfigure.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ContinuousConfigure.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ContinuousConfigure.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ContinuousConfigure.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ContinuousCoverage.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ContinuousCoverage.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ContinuousCoverage.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ContinuousCoverage.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ContinuousMemCheck.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ContinuousMemCheck.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ContinuousMemCheck.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ContinuousMemCheck.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ContinuousStart.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ContinuousStart.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ContinuousStart.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ContinuousStart.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ContinuousSubmit.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ContinuousSubmit.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ContinuousSubmit.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ContinuousSubmit.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ContinuousTest.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ContinuousTest.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ContinuousTest.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ContinuousTest.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ContinuousUpdate.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ContinuousUpdate.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ContinuousUpdate.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ContinuousUpdate.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/Experimental.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/Experimental.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/Experimental.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/Experimental.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ExperimentalBuild.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ExperimentalBuild.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ExperimentalBuild.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ExperimentalBuild.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ExperimentalConfigure.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ExperimentalConfigure.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ExperimentalConfigure.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ExperimentalConfigure.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ExperimentalCoverage.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ExperimentalCoverage.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ExperimentalCoverage.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ExperimentalCoverage.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ExperimentalMemCheck.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ExperimentalMemCheck.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ExperimentalMemCheck.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ExperimentalMemCheck.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ExperimentalStart.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ExperimentalStart.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ExperimentalStart.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ExperimentalStart.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ExperimentalSubmit.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ExperimentalSubmit.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ExperimentalSubmit.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ExperimentalSubmit.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ExperimentalTest.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ExperimentalTest.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ExperimentalTest.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ExperimentalTest.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ExperimentalUpdate.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ExperimentalUpdate.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/ExperimentalUpdate.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/ExperimentalUpdate.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/Nightly.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/Nightly.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/Nightly.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/Nightly.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/NightlyBuild.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/NightlyBuild.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/NightlyBuild.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/NightlyBuild.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/NightlyConfigure.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/NightlyConfigure.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/NightlyConfigure.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/NightlyConfigure.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/NightlyCoverage.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/NightlyCoverage.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/NightlyCoverage.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/NightlyCoverage.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/NightlyMemCheck.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/NightlyMemCheck.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/NightlyMemCheck.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/NightlyMemCheck.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/NightlyMemoryCheck.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/NightlyMemoryCheck.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/NightlyMemoryCheck.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/NightlyMemoryCheck.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/NightlyStart.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/NightlyStart.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/NightlyStart.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/NightlyStart.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/NightlySubmit.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/NightlySubmit.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/NightlySubmit.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/NightlySubmit.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/NightlyTest.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/NightlyTest.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/NightlyTest.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/NightlyTest.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/NightlyUpdate.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/NightlyUpdate.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/NightlyUpdate.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/NightlyUpdate.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/circle_tests.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/circle_tests.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/circle_tests.dir/DependInfo.cmake:15: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/landmarks.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/landmarks.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/landmarks.dir/DependInfo.cmake:15: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/nuslam.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/nuslam.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/nuslam.dir/DependInfo.cmake:15: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/nuslam_uninstall.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/nuslam_uninstall.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/nuslam_uninstall.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/nuslam_uninstall.dir/cmake_clean.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/uninstall.dir/DependInfo.cmake:6: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/uninstall.dir/DependInfo.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/CMakeFiles/uninstall.dir/DependInfo.cmake:14: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/CMakeFiles/uninstall.dir/cmake_clean.cmake:3: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/ament_cmake_core/package.cmake:4: Lines should be <= 140 characters long [linelength]
+build/ament_cmake_core/package.cmake:6: Lines should be <= 140 characters long [linelength]
+build/ament_cmake_core/package.cmake:7: Mismatching spaces inside () after command [whitespace/mismatch]
+build/ament_cmake_core/package.cmake:8: Lines should be <= 140 characters long [linelength]
+build/ament_cmake_core/package.cmake:10: Mismatching spaces inside () after command [whitespace/mismatch]
+build/ament_cmake_core/package.cmake:11: Mismatching spaces inside () after command [whitespace/mismatch]
+
+build/ament_cmake_package_templates/templates.cmake:1: Lines should be <= 140 characters long [linelength]
+build/ament_cmake_package_templates/templates.cmake:2: Lines should be <= 140 characters long [linelength]
+build/ament_cmake_package_templates/templates.cmake:4: Lines should be <= 140 characters long [linelength]
+build/ament_cmake_package_templates/templates.cmake:5: Lines should be <= 140 characters long [linelength]
+build/ament_cmake_package_templates/templates.cmake:6: Lines should be <= 140 characters long [linelength]
+build/ament_cmake_package_templates/templates.cmake:8: Lines should be <= 140 characters long [linelength]
+build/ament_cmake_package_templates/templates.cmake:9: Lines should be <= 140 characters long [linelength]
+build/ament_cmake_package_templates/templates.cmake:10: Lines should be <= 140 characters long [linelength]
+build/ament_cmake_package_templates/templates.cmake:11: Lines should be <= 140 characters long [linelength]
+build/ament_cmake_package_templates/templates.cmake:12: Lines should be <= 140 characters long [linelength]
+build/ament_cmake_package_templates/templates.cmake:13: Lines should be <= 140 characters long [linelength]
+build/ament_cmake_package_templates/templates.cmake:14: Lines should be <= 140 characters long [linelength]
+
+
+208 errors
+
+
+-- run_test.py: return code 1
+-- run_test.py: verify result file '/home/kevin/workspaces/SLAM/hw1/src/nuturtle-knella92/nuslam/build/test_results/nuslam/lint_cmake.xunit.xml'

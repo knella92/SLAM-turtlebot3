@@ -119,7 +119,7 @@ private:
         range_data.push_back(range_datum);
     }
     turtlelib::Clusters lidar = turtlelib::clustering(range_data, msg.angle_increment, distance_threshold);
-    RCLCPP_INFO_STREAM(get_logger(), "" << lidar.n_clusters);
+    // RCLCPP_INFO_STREAM(get_logger(), "" << lid0ar.n_clusters);
     std::vector<turtlelib::Vector2D> centroids = turtlelib::centroid_finder(lidar);
     // double n_clusters = turtlelib::HAF_finder(lidar);
     
@@ -139,7 +139,6 @@ private:
   {
     visualization_msgs::msg::MarkerArray lidar_data{};
     rclcpp::Time stamp = get_clock()->now();
-    int k{0};
     for (int i = 0; i < (int) detected_circles.size(); ++i) 
     {
         if(is_circle.at(i) == false)
@@ -151,10 +150,10 @@ private:
         visualization_msgs::msg::Marker obst;
         obst.header.frame_id = "green/base_footprint";
         obst.header.stamp = stamp;
-        obst.type = visualization_msgs::msg::Marker::SPHERE;
-        obst.scale.x = .05;
-        obst.scale.y = .05;
-        obst.scale.z = .05;
+        obst.type = visualization_msgs::msg::Marker::CYLINDER;
+        obst.scale.x = detected_circles.at(i).R;
+        obst.scale.y = detected_circles.at(i).R;
+        obst.scale.z = .25;
         if(i == 0)
         {
             obst.color.r = 1.0;
@@ -191,11 +190,11 @@ private:
         // obst.pose.position.x = lidar.ranges.at(j).range * cos(lidar.ranges.at(j).angle);
         // obst.pose.position.y = lidar.ranges.at(j).range * sin(lidar.ranges.at(j).angle);
         lidar_data.markers.push_back(obst);
-        RCLCPP_INFO_STREAM(get_logger(), "" << detected_circles.at(i).a);
+        // RCLCPP_INFO_STREAM(get_logger(), "" << detected_circles.at(i).a);
         // k++;
         // RCLCPP_INFO_STREAM(get_logger(), "" << i);
     }
-    ;
+    
     point_publisher_->publish(lidar_data);
   }
 
