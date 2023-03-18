@@ -131,7 +131,7 @@ public:
     // Laser scan parameters
     declare_parameter("angle_increment", 0.01745329238474369);
     declare_parameter("range_min", 0.11999999731779099);
-    declare_parameter("range_max", 0.8);
+    declare_parameter("range_max", 2.0);
     //declare_parameter("sample_N", )
     //declare_parameter("resolution", )
     angle_increment = get_parameter("angle_increment").as_double();

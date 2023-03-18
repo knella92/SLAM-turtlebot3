@@ -69,6 +69,9 @@ namespace turtlelib
             /// \brief - vector of bool values stating if specific obstacle is initialized
             std::vector<bool> izd;
 
+            
+            std::vector<double> obst_radii;
+
 
             /// \brief initializes state vector (zeta_0) and system covariance
             /// \param q_0 - initial robot configuration

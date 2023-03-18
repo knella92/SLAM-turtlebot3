@@ -13,6 +13,7 @@ namespace turtlelib
         for(int i{0}; i < n; i++)
         {
             izd.push_back(false);
+            obst_radii.push_back(0.0);
         }
         
 
@@ -106,8 +107,8 @@ namespace turtlelib
         int m_index = 3 + 2*k;
         double r = sqrt(std::pow(lmark.a, 2) + std::pow(lmark.b, 2));
         double phi = atan2(lmark.b,lmark.a);
-        double delta_x{0.0};
-        double delta_y{0.0};
+        double delta_x{};
+        double delta_y{};
 
         arma::vec z_real = {r, phi};
 
@@ -130,7 +131,7 @@ namespace turtlelib
 
         arma::mat Psi = H * sigma_est * H.t() + R;
 
-        arma::vec z_theor = {sqrt(d), normalize_angle(atan2(delta_y, delta_x))};
+        arma::vec z_theor = {sqrt(d), normalize_angle(atan2(delta_y, delta_x) - zeta_est(0))};
 
         arma::vec d_m = (z_real - z_theor).t() * Psi.i() * (z_real - z_theor);
 

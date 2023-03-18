@@ -28,7 +28,7 @@ namespace turtlelib
         }
         lidar.ranges.push_back(range_i);
 
-        for(int i{1}; i < n-5; i++)
+        for(int i{1}; i < n; i++)
         {
             range_i = RangeID{};
             if (!almost_equal(range_data.at(i), 0.0, 0.1))
@@ -45,32 +45,47 @@ namespace turtlelib
         }
     
         //last batch
-        for(int i{n-5}; i < n; i++)
+        if(std::abs(lidar.ranges.at(n-1).range - lidar.ranges.at(0).range) < dist_threshold && lidar.ranges.at(n-1).cluster != -1)
         {
-            range_i = RangeID{};
-            if (!almost_equal(range_data.at(i), 0.0, 0.1))
+            for(int i{1}; i < n; i++)
             {
-                range_i.range = range_data.at(i);
-                range_i.angle = i*angle_increment;
-                if(std::abs(range_i.range - lidar.ranges.at(i-1).range) > dist_threshold)
+                if(lidar.ranges.at(i).cluster == lidar.ranges.at(n-1).cluster)
                 {
-                    if(std::abs(range_i.range - lidar.ranges.at(0).range) < dist_threshold)
-                    {
-                        range_i.cluster = 0;
-                    }
-                    else
-                    {
-                        cluster_id++;
-                        range_i.cluster = cluster_id; 
-                    }
+                    lidar.ranges.at(i).cluster = 0;
                 }
-                else
-                {
-                    range_i.cluster = cluster_id;
-                }
-            } 
-            lidar.ranges.push_back(range_i);
+                
+            }
+            if(cluster_id > 0)
+            {
+                cluster_id--;
+            }
         }
+        // for(int i{n-1}; i > (n-6) ; i--)
+        // {
+        //     range_i = RangeID{};
+        //     // if (!almost_equal(range_data.at(i), 0.0, 0.1))
+        //     // {
+        //     //     range_i.range = range_data.at(i);
+        //     //     range_i.angle = i*angle_increment;
+        //     //     if(std::abs(range_i.range - lidar.ranges.at(i-1).range) > dist_threshold)
+        //     //     {
+        //     //         if(std::abs(range_i.range - lidar.ranges.at(0).range) < dist_threshold)
+        //     //         {
+        //     //             range_i.cluster = 0;
+        //     //         }
+        //     //         else
+        //     //         {
+        //     //             cluster_id++;
+        //     //             range_i.cluster = cluster_id; 
+        //     //         }
+        //     //     }
+        //     //     else
+        //     //     {
+        //     //         range_i.cluster = cluster_id;
+        //     //     }
+        //     // } 
+        //     // lidar.ranges.push_back(range_i);
+        // }
 
         lidar.n_clusters = cluster_id+1;
         return lidar;
@@ -84,7 +99,7 @@ namespace turtlelib
         std::vector<Vector2D> centroids{};
         double elements{0.0};
 
-        for(int j{0}; j < (cluster.n_clusters); j++)
+        for(int j{0}; j < (int) cluster.n_clusters; j++)
         {
             Vector2D center{};
             elements = 0.0;
@@ -119,15 +134,14 @@ namespace turtlelib
 
     ClustersCentroids shift_points(Clusters cluster, std::vector<Vector2D> centroids)
     {
-        // std::vector<Vector2D> centroids = centroid_finder(cluster);
         std::vector<std::vector<arma::vec>> cluster_pts(cluster.n_clusters);
         ClustersCentroids clusters_dropped{};
 
         for (int i{0}; i < cluster.n_clusters; i++)
         {
             // 2 vectors (x and y) representing x and y coordinates of points in a cluster
-            arma::vec x(300);
-            arma::vec y(300);
+            arma::vec x(360);
+            arma::vec y(360);
             cluster_pts.at(i).push_back(x);
             cluster_pts.at(i).push_back(y);
         }
@@ -157,14 +171,14 @@ namespace turtlelib
             }
         }
 
-        //resize arma vectors
-        for(int i{0}; i < (int) point_index.size(); i++)
+        // resize arma vectors
+        for(int i{0}; i < (int) cluster_pts.size(); i++)
         {
             cluster_pts.at(i).at(0).resize(point_index.at(i));
             cluster_pts.at(i).at(1).resize(point_index.at(i));
         }
 
-        // drop clusters with < 2 points
+        // drop clusters with < 3 points
         Vector2D centroid_i{};
         int index {0};
         for(int i{0}; i < cluster.n_clusters; i++)

@@ -57,7 +57,7 @@ public:
     declare_parameter("track_width", 0.0);
     declare_parameter("input_noise", 0.0);
     declare_parameter("slip_fraction", 0.0);
-    declare_parameter("process_covariance", 0.001);
+    declare_parameter("process_covariance", 0.01);
     declare_parameter("data_assoc", "known");
     declare_parameter("dk_threshold", 1.0);
 
@@ -248,7 +248,7 @@ private:
 
     for (int i{0}; i < max_obstacles - 1; i++) {
       if (msg.markers[i].action == visualization_msgs::msg::Marker::ADD && msg.markers[i].color.a == 1.0) {
-
+        RCLCPP_INFO_STREAM(get_logger(), "" << i);
         if (extended_kalman.izd.at(i) == false) {
           extended_kalman.initialization(
             msg.markers[i].id, msg.markers[i].pose.position.x,
@@ -275,15 +275,16 @@ private:
   {
     extended_kalman.prediction(tbot3.q);
     // RCLCPP_INFO_STREAM(get_logger(), "circle_callback");
-    for(int i{0}; i < 1; i++)
+    for(int i{0}; i < msg.markers.size(); i++)
     {
       if(msg.markers[i].action == visualization_msgs::msg::Marker::ADD && msg.markers[i].color.a == 1.0)
       {
         turtlelib::Circle lmark = {msg.markers[i].pose.position.x, msg.markers[i].pose.position.y, msg.markers[i].scale.x};
+        RCLCPP_INFO_STREAM(get_logger(), "lmark.x and y  " << lmark.a <<" " << lmark.b);
         std::vector<double> d_ks{};
         double d_k{};
         int l{0};
-        double d_star{};
+        double d_star{100.0};
 
         if(N == 0)
         {
@@ -292,43 +293,51 @@ private:
             msg.markers[i].pose.position.y);
 
           extended_kalman.izd.at(0) = true;
+          extended_kalman.obst_radii.at(0) = msg.markers[i].scale.x;
           obstacles_initialized = true;
           N++;
         }
-        // else
-        // {
-        //   for(int k{0}; k < N+1; k++)
-        //   {
-        //     if(k == N)
-        //     {
-        //       ;
-        //     }
-        //     else
-        //     {
-        //       d_k = extended_kalman.mah_distance(lmark, k)(0);
-        //       if(d_k < dk_threshold)
-        //       {
-        //         l = k;
-        //         d_star = d_k;
-        //       }
-        //     }
-        //   }
-          //   // d_ks.push_back(d_k);
-          // }
-          // if(l == N)
-          // {
-          //   extended_kalman.initialization(
-          //     l, msg.markers[i].pose.position.x,
-          //     msg.markers[i].pose.position.y);
-          //   extended_kalman.izd.at(i) = true;
-          //   obstacles_initialized = true;
-          //   N++;
-          // }
-        // }
+        else
+        {
+          for(int k{0}; k < N+1; k++)
+          {
+            if(k == N)
+            {
+              ;
+            }
+            else
+            {
+              d_k = extended_kalman.mah_distance(lmark, k)(0);
+              RCLCPP_INFO_STREAM(get_logger(), "d_k =  " << d_k);
+              if(d_k < d_star)
+              {
+                l = k;
+                d_star = d_k;
+              }
+            }
+          }
+          if(d_star > dk_threshold)
+          {
+            l = N;
+          }
+            // d_ks.push_back(d_k);
+          if(l == N)
+          {
+            extended_kalman.initialization(
+              l, msg.markers[i].pose.position.x,
+              msg.markers[i].pose.position.y);
+            extended_kalman.izd.at(l) = true;
+            obstacles_initialized = true;
+            extended_kalman.obst_radii.at(l) = msg.markers[i].scale.x;
+            N++;
+            RCLCPP_INFO_STREAM(get_logger(), "initialized =  " << l);
+          }
+        }
         if (extended_kalman.izd.at(l) == true) {
           extended_kalman.correction(
               l, msg.markers[i].pose.position.x,
               msg.markers[i].pose.position.y);
+          // RCLCPP_INFO_STREAM(get_logger(), "marker x =  " << extended_kalman.zeta_est(3 + 2*l) - extended_kalman.zeta_est(1));
         }
       }
     }
@@ -349,16 +358,16 @@ private:
         obst.header.frame_id = "nusim/world";
         obst.header.stamp = stamp;
         obst.type = visualization_msgs::msg::Marker::CYLINDER;
-        obst.scale.x = msg.markers[i].scale.x;
-        obst.scale.y = msg.markers[i].scale.y;
-        obst.scale.z = msg.markers[i].scale.z;
+        obst.scale.x = extended_kalman.obst_radii.at(i);
+        obst.scale.y = extended_kalman.obst_radii.at(i);
+        obst.scale.z = 0.25;
         obst.color.a = 1.0;
         obst.color.g = 1.0;
         obst.id = i;
         obst.pose.position.x = extended_kalman.zeta_est(3 + (2 * i));
         obst.pose.position.y = extended_kalman.zeta_est(4 + (2 * i));
         obst.action = visualization_msgs::msg::Marker::ADD;
-        RCLCPP_INFO_STREAM(get_logger(), "i =  " << i);
+        // RCLCPP_INFO_STREAM(get_logger(), "i =  " << i);
 
         all_obst.markers.push_back(obst);
       }

@@ -6,10 +6,11 @@
     motor_cmd_per_rad_sec: 41.667
     encoder_ticks_per_rad: 651.899
     collision_radius: 0.11
-    input_noise: 0.001
-    basic_sensor_variance: 0.001
-    slip_fraction: 0.001
+    input_noise: 0.01
+    basic_sensor_variance: .001
+    slip_fraction: 0.5
     max_range: 0.7
+    range_max: 3.5
     body_id: "blue/base_footprint"
     odom_id: "odom"
     wheel_left: "blue/wheel_left_joint"

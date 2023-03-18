@@ -119,18 +119,24 @@ private:
         range_data.push_back(range_datum);
     }
     turtlelib::Clusters lidar = turtlelib::clustering(range_data, msg.angle_increment, distance_threshold);
-    // RCLCPP_INFO_STREAM(get_logger(), "" << lidar.n_clusters);
-    std::vector<turtlelib::Vector2D> centroids = turtlelib::centroid_finder(lidar);
-    
-    turtlelib::ClustersCentroids cluster_points = turtlelib::shift_points(lidar, centroids);
-    std::vector<turtlelib::Circle> detected_circles = turtlelib::circle_detection(cluster_points);
-    std::vector<bool> is_circle = turtlelib::classification(detected_circles);
-    // for(int i{0}; i< (int) is_circle.size(); i++)
+    // for(int i{0}; i < (int) lidar.ranges.size(); i++)
     // {
-    //     RCLCPP_INFO_STREAM(get_logger(), "" << is_circle);
+    //     RCLCPP_INFO_STREAM(get_logger(), "" << lidar.ranges.at(i).cluster);
     // }
-    publish_clusters(detected_circles, is_circle);
-    // publish_clusters(lidar);
+    // if(lidar.n_clusters > 0)
+    // {
+        std::vector<turtlelib::Vector2D> centroids = turtlelib::centroid_finder(lidar);
+        
+        turtlelib::ClustersCentroids cluster_points = turtlelib::shift_points(lidar, centroids);
+        std::vector<turtlelib::Circle> detected_circles = turtlelib::circle_detection(cluster_points);
+        std::vector<bool> is_circle = turtlelib::classification(detected_circles);
+        // for(int i{0}; i< (int) is_circle.size(); i++)
+        // {
+        //     RCLCPP_INFO_STREAM(get_logger(), "" << is_circle);
+        // }
+        publish_clusters(detected_circles, is_circle);
+        // publish_clusters(lidar);
+    // }
 
   }
 
@@ -138,7 +144,7 @@ private:
   {
     visualization_msgs::msg::MarkerArray lidar_data{};
     rclcpp::Time stamp = get_clock()->now();
-    if(detected_circles.size() == 0)
+    if((int) detected_circles.size() == 0)
     {
         visualization_msgs::msg::Marker obst{};
         obst.header.frame_id = "red/base_footprint";
@@ -147,10 +153,14 @@ private:
     }
     else
     {
-        for (int i = 0; i < (int) detected_circles.size(); ++i) 
+        for (int i = 0; i < (int) is_circle.size(); ++i) 
         {
             if(is_circle.at(i) == false)
             {
+                visualization_msgs::msg::Marker obst{};
+                obst.header.frame_id = "red/base_footprint";
+                obst.header.stamp = stamp;
+                lidar_data.markers.push_back(obst);
                 continue;
             }
             
