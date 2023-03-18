@@ -58,6 +58,8 @@ public:
     declare_parameter("input_noise", 0.0);
     declare_parameter("slip_fraction", 0.0);
     declare_parameter("process_covariance", 0.001);
+    declare_parameter("data_assoc", "known");
+    declare_parameter("dk_threshold", 1.0);
 
     // if these are not specified, shutdown the node
     if (get_parameter("body_id").as_string() == "none") {
@@ -78,6 +80,8 @@ public:
     const auto radius = get_parameter("wheel_radius").as_double();
     const auto depth = get_parameter("track_width").as_double();
     process_covariance = get_parameter("process_covariance").as_double();
+    const auto data_assoc = get_parameter("data_assoc").as_string();
+    dk_threshold = get_parameter("dk_threshold").as_double();
 
     turtlelib::DiffDrive tbot{depth, radius};
     tbot3 = tbot;
@@ -97,10 +101,19 @@ public:
       "/joint_states", 10, std::bind(
         &SlamNode::js_callback, this,
         std::placeholders::_1));
-    fake_sensor_subscriber_ = create_subscription<visualization_msgs::msg::MarkerArray>(
-      "nusim/fake_sensor", 10, std::bind(
-        &SlamNode::sensor_callback, this,
-        std::placeholders::_1));
+    if(data_assoc == "known")
+    {
+      fake_sensor_subscriber_ = create_subscription<visualization_msgs::msg::MarkerArray>(
+        "nusim/fake_sensor", 10, std::bind(
+          &SlamNode::sensor_callback, this,
+          std::placeholders::_1));
+    }
+    else{
+      true_circle_subscriber_ = create_subscription<visualization_msgs::msg::MarkerArray>(
+        "SLAM/points", 10, std::bind(
+          &SlamNode::circle_callback, this,
+          std::placeholders::_1));
+    }
     initialp_service_ =
       create_service<nuturtle_control::srv::InitialPose>(
       "/initial_pose",
@@ -116,9 +129,11 @@ private:
   turtlelib::DiffDrive tbot3{0.0, 0.0};
   int index{0};
   double process_covariance{};
-  int max_obstacles{6};
-  turtlelib::EKF extended_kalman{tbot3.q, 1, 0.0, 0.0};
+  int max_obstacles{7};
+  turtlelib::EKF extended_kalman{tbot3.q, max_obstacles, 0.0, 0.0};
   bool obstacles_initialized{false};
+  int N{0};
+  double dk_threshold{0.0};
   nav_msgs::msg::Path green_path_msg;
   nav_msgs::msg::Path blue_path_msg;
   std::string body_id, odom_id, wheel_left, wheel_right;
@@ -128,6 +143,7 @@ private:
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr slam_publisher_;
   rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr js_subscriber_;
   rclcpp::Subscription<visualization_msgs::msg::MarkerArray>::SharedPtr fake_sensor_subscriber_;
+  rclcpp::Subscription<visualization_msgs::msg::MarkerArray>::SharedPtr true_circle_subscriber_;
   std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
   std::unique_ptr<tf2_ros::TransformBroadcaster> tf_green_broadcaster_;
   rclcpp::Service<nuturtle_control::srv::InitialPose>::SharedPtr initialp_service_;
@@ -230,8 +246,8 @@ private:
   {
     extended_kalman.prediction(tbot3.q);
 
-    for (int i{0}; i < 3; i++) {
-      if (msg.markers[i].action == visualization_msgs::msg::Marker::ADD) {
+    for (int i{0}; i < max_obstacles - 1; i++) {
+      if (msg.markers[i].action == visualization_msgs::msg::Marker::ADD && msg.markers[i].color.a == 1.0) {
 
         if (extended_kalman.izd.at(i) == false) {
           extended_kalman.initialization(
@@ -255,11 +271,79 @@ private:
 
   }
 
+  void circle_callback(const visualization_msgs::msg::MarkerArray & msg)
+  {
+    extended_kalman.prediction(tbot3.q);
+    // RCLCPP_INFO_STREAM(get_logger(), "circle_callback");
+    for(int i{0}; i < 1; i++)
+    {
+      if(msg.markers[i].action == visualization_msgs::msg::Marker::ADD && msg.markers[i].color.a == 1.0)
+      {
+        turtlelib::Circle lmark = {msg.markers[i].pose.position.x, msg.markers[i].pose.position.y, msg.markers[i].scale.x};
+        std::vector<double> d_ks{};
+        double d_k{};
+        int l{0};
+        double d_star{};
+
+        if(N == 0)
+        {
+          extended_kalman.initialization(
+            0, msg.markers[i].pose.position.x,
+            msg.markers[i].pose.position.y);
+
+          extended_kalman.izd.at(0) = true;
+          obstacles_initialized = true;
+          N++;
+        }
+        // else
+        // {
+        //   for(int k{0}; k < N+1; k++)
+        //   {
+        //     if(k == N)
+        //     {
+        //       ;
+        //     }
+        //     else
+        //     {
+        //       d_k = extended_kalman.mah_distance(lmark, k)(0);
+        //       if(d_k < dk_threshold)
+        //       {
+        //         l = k;
+        //         d_star = d_k;
+        //       }
+        //     }
+        //   }
+          //   // d_ks.push_back(d_k);
+          // }
+          // if(l == N)
+          // {
+          //   extended_kalman.initialization(
+          //     l, msg.markers[i].pose.position.x,
+          //     msg.markers[i].pose.position.y);
+          //   extended_kalman.izd.at(i) = true;
+          //   obstacles_initialized = true;
+          //   N++;
+          // }
+        // }
+        if (extended_kalman.izd.at(l) == true) {
+          extended_kalman.correction(
+              l, msg.markers[i].pose.position.x,
+              msg.markers[i].pose.position.y);
+        }
+      }
+    }
+
+    if (obstacles_initialized) {
+      slam_publisher_->publish(add_obstacles(msg));
+    }
+
+  }
+
   visualization_msgs::msg::MarkerArray add_obstacles(visualization_msgs::msg::MarkerArray msg)
   {
     visualization_msgs::msg::MarkerArray all_obst{};
     rclcpp::Time stamp = get_clock()->now();
-    for (int i = 0; i < max_obstacles; ++i) {
+    for (int i = 0; i < max_obstacles - 1; ++i) {
       if (extended_kalman.izd.at(i) == true) {
         visualization_msgs::msg::Marker obst;
         obst.header.frame_id = "nusim/world";
@@ -274,7 +358,7 @@ private:
         obst.pose.position.x = extended_kalman.zeta_est(3 + (2 * i));
         obst.pose.position.y = extended_kalman.zeta_est(4 + (2 * i));
         obst.action = visualization_msgs::msg::Marker::ADD;
-        // RCLCPP_INFO_STREAM(get_logger(), "green bot y position: " << extended_kalman.zeta_est(2));
+        RCLCPP_INFO_STREAM(get_logger(), "i =  " << i);
 
         all_obst.markers.push_back(obst);
       }

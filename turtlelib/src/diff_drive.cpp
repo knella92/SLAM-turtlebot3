@@ -147,7 +147,7 @@ namespace turtlelib
         }
     }
 
-    double range_obstacles(Config q, double range_max, std::vector<double> obstacles_x, std::vector<double> obstacles_y, double obstacles_r, double angle)
+    double range_obstacles(Config q, double range_max, double range_min, std::vector<double> obstacles_x, std::vector<double> obstacles_y, double obstacles_r, double angle)
     {
         double ranges{0.0};
         bool exists{false};
@@ -155,6 +155,7 @@ namespace turtlelib
         const auto max_x = q.x + range_max*cos(angle + q.theta);
         const auto max_y = q.y + range_max*sin(angle + q.theta);
         const auto max_range = sqrt(std::pow(range_max*cos(angle + q.theta), 2.0) + std::pow(range_max*sin(angle + q.theta), 2.0));
+        const auto min_range = sqrt(std::pow(range_min*cos(angle + q.theta), 2.0) + std::pow(range_min*sin(angle + q.theta), 2.0));
         const auto m = (max_y - q.y) / (max_x - q.x);
 
         for(int j = 0; j < (int) obstacles_x.size(); j++)
@@ -229,7 +230,7 @@ namespace turtlelib
 
             //check if range is within the max_range ray (magnitude and direction)
             const auto range = sqrt(std::pow(ix-q.x, 2.0) + std::pow(iy-q.y, 2.0));
-            if(range < max_range && check_direction(q, ix, iy, max_x, max_y) == true)
+            if(range < max_range && range > min_range &&check_direction(q, ix, iy, max_x, max_y) == true)
             {
                 if(exists == false)
                 {

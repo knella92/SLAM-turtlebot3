@@ -5,6 +5,7 @@
 
 #include "ekf.hpp"
 #include <vector>
+#include <armadillo>
 
 namespace turtlelib
 {
@@ -39,19 +40,6 @@ namespace turtlelib
         /// \brief number of clusters
         int n_clusters;
 
-    };
-
-    /// \brief Circle parameters
-    struct Circle
-    {
-        /// \brief x coordinate of circle
-        double a;
-
-        /// \brief y coordinate of circle
-        double b;
-
-        /// \brief radius of circle
-        double R;
     };
 
     /// \brief Struct of cluster point coordinates and centroid coordinates
@@ -91,6 +79,8 @@ namespace turtlelib
     /// \param detected_circles - detected circle coordinates and radii
     /// \return - vector with true/false values in order of cluster ID
     std::vector<bool> classification(std::vector<Circle> detected_circles);
+
+
 
 
 }

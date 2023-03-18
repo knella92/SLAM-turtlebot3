@@ -1,16 +1,12 @@
 <launch>
 
     <arg name="robot" description="Valid choices are: ['nusim', 'localhost', 'none']" default="nusim"/>
-    <arg name="data_assoc" default="known"/>
-    
-    <include file="$(find-pkg-share nuslam)/launch/slam.launch.xml">
+
+    <include file="$(find-pkg-share nuslam)/launch/landmark_detect.launch.xml">
         <arg name='cmd_src' value='teleop'/>
         <arg name='robot' value='$(var robot)'/>
         <arg name='use_rviz' value='true'/>
-        <arg name='data_assoc' value='$(var data_assoc)'/>
+        <arg name='data_assoc' value = "known"/>
     </include>
-
-    <node pkg="nuslam" exec="landmarks" name="landmarks"/>
-
 
 </launch>

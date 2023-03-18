@@ -554,6 +554,7 @@ TEMPLATE_TEST_CASE("obstacle_range", "[range of obstacles]", double){
     double obstacles_r = 0.038;
     double range{}; double angle{};
     double range_max = 3.5;
+    double range_min = 0.11999999731779099;
     //double angle_increment = 0.01745329238474369;
     Config q{0.0,0.0,0.0};
 
@@ -562,7 +563,7 @@ TEMPLATE_TEST_CASE("obstacle_range", "[range of obstacles]", double){
         q.y = 0.9;
         q.theta = 0.0;
         angle = 0.0;
-        range = range_obstacles(q, range_max, obstacles_x, obstacles_y, obstacles_r, angle);
+        range = range_obstacles(q, range_max, range_min, obstacles_x, obstacles_y, obstacles_r, angle);
         CHECK_THAT(range, WithinAbs(0.462,.01));
     }
 
@@ -571,7 +572,7 @@ TEMPLATE_TEST_CASE("obstacle_range", "[range of obstacles]", double){
         q.y = 0.9;
         q.theta = 0.0;
         angle = 5.124799;
-        range = range_obstacles(q, range_max, obstacles_x, obstacles_y, obstacles_r, angle);
+        range = range_obstacles(q, range_max, range_min, obstacles_x, obstacles_y, obstacles_r, angle);
         CHECK_THAT(range, WithinAbs(1.7084, .01));
     }
 
@@ -580,7 +581,7 @@ TEMPLATE_TEST_CASE("obstacle_range", "[range of obstacles]", double){
         q.y = 0.9;
         q.theta = -PI/4;
         angle = PI/4;
-        range = range_obstacles(q, range_max, obstacles_x, obstacles_y, obstacles_r, angle);
+        range = range_obstacles(q, range_max, range_min, obstacles_x, obstacles_y, obstacles_r, angle);
         CHECK_THAT(range, WithinAbs(0.462,.01));
     }
 
@@ -589,7 +590,7 @@ TEMPLATE_TEST_CASE("obstacle_range", "[range of obstacles]", double){
         q.y = 0.9;
         q.theta = 0.0;
         angle = PI;
-        range = range_obstacles(q, range_max, obstacles_x, obstacles_y, obstacles_r, angle);
+        range = range_obstacles(q, range_max,range_min, obstacles_x, obstacles_y, obstacles_r, angle);
         CHECK_THAT(range, WithinAbs(0.0,.01));
     }
 
@@ -598,7 +599,7 @@ TEMPLATE_TEST_CASE("obstacle_range", "[range of obstacles]", double){
         q.y = 0.7;
         q.theta = 0.0;
         angle = PI/2;
-        range = range_obstacles(q, range_max, obstacles_x, obstacles_y, obstacles_r, angle);
+        range = range_obstacles(q, range_max, range_min, obstacles_x, obstacles_y, obstacles_r, angle);
         CHECK_THAT(range, WithinAbs(0.9-.038 - 0.7,.01));
     }
 
@@ -607,7 +608,7 @@ TEMPLATE_TEST_CASE("obstacle_range", "[range of obstacles]", double){
         q.y = 1.1;
         q.theta = 0.0;
         angle = -PI/2;
-        range = range_obstacles(q, range_max, obstacles_x, obstacles_y, obstacles_r, angle);
+        range = range_obstacles(q, range_max, range_min, obstacles_x, obstacles_y, obstacles_r, angle);
         CHECK_THAT(range, WithinAbs(q.y - (0.9+obstacles_r),.01));
     }
 
@@ -616,7 +617,7 @@ TEMPLATE_TEST_CASE("obstacle_range", "[range of obstacles]", double){
         q.y = 0.6;
         q.theta = 0.0;
         angle = PI/4;
-        range = range_obstacles(q, range_max, obstacles_x, obstacles_y, obstacles_r, angle);
+        range = range_obstacles(q, range_max, range_min, obstacles_x, obstacles_y, obstacles_r, angle);
         CHECK_THAT(range, WithinAbs(0.424264,.01));
     }
 }

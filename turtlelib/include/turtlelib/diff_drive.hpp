@@ -143,7 +143,7 @@ namespace turtlelib
     /// \param obstacles_r - obstacle radius
     /// \param angle - lidar angle
     /// \return - lidar range
-    double range_obstacles(Config q, double range_max, std::vector<double> obstacles_x, std::vector<double> obstacles_y, double obstacles_r, double angle);
+    double range_obstacles(Config q, double range_max, double range_min, std::vector<double> obstacles_x, std::vector<double> obstacles_y, double obstacles_r, double angle);
 
     /// \brief returns lidar range (distances) of walls
     /// \param q - body configuration of robot

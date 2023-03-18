@@ -119,9 +119,8 @@ private:
         range_data.push_back(range_datum);
     }
     turtlelib::Clusters lidar = turtlelib::clustering(range_data, msg.angle_increment, distance_threshold);
-    // RCLCPP_INFO_STREAM(get_logger(), "" << lid0ar.n_clusters);
+    // RCLCPP_INFO_STREAM(get_logger(), "" << lidar.n_clusters);
     std::vector<turtlelib::Vector2D> centroids = turtlelib::centroid_finder(lidar);
-    // double n_clusters = turtlelib::HAF_finder(lidar);
     
     turtlelib::ClustersCentroids cluster_points = turtlelib::shift_points(lidar, centroids);
     std::vector<turtlelib::Circle> detected_circles = turtlelib::circle_detection(cluster_points);
@@ -139,60 +138,46 @@ private:
   {
     visualization_msgs::msg::MarkerArray lidar_data{};
     rclcpp::Time stamp = get_clock()->now();
-    for (int i = 0; i < (int) detected_circles.size(); ++i) 
+    if(detected_circles.size() == 0)
     {
-        if(is_circle.at(i) == false)
-        {
-            continue;
-        }
-        
-        // int i = lidar.ranges.at(j).cluster;
-        visualization_msgs::msg::Marker obst;
-        obst.header.frame_id = "green/base_footprint";
+        visualization_msgs::msg::Marker obst{};
+        obst.header.frame_id = "red/base_footprint";
         obst.header.stamp = stamp;
-        obst.type = visualization_msgs::msg::Marker::CYLINDER;
-        obst.scale.x = detected_circles.at(i).R;
-        obst.scale.y = detected_circles.at(i).R;
-        obst.scale.z = .25;
-        if(i == 0)
-        {
-            obst.color.r = 1.0;
-        }
-        else if(i == 1)
-        {
-            obst.color.g = 1.0;
-        }
-        else if(i == 2)
-        {
-            obst.color.b = 1.0;
-        }
-        else if(i == 3)
-        {
-            obst.color.r = 1.0;
-            obst.color.g = 128.0/255.0;
-        }
-        else if(i == 4)
-        {
-            obst.color.r = 1.0;
-            obst.color.g = 1.0;
-        }
-        else if(i == 5)
-        {
-            obst.color.r = 1.0;
-            obst.color.g = 51.0/255.0;
-            obst.color.b = 1.0;
-        }
-        obst.color.a = 1.0;
-        obst.id = i;
-        obst.action = visualization_msgs::msg::Marker::ADD;
-        obst.pose.position.x = detected_circles.at(i).a;
-        obst.pose.position.y = detected_circles.at(i).b;
-        // obst.pose.position.x = lidar.ranges.at(j).range * cos(lidar.ranges.at(j).angle);
-        // obst.pose.position.y = lidar.ranges.at(j).range * sin(lidar.ranges.at(j).angle);
         lidar_data.markers.push_back(obst);
-        // RCLCPP_INFO_STREAM(get_logger(), "" << detected_circles.at(i).a);
-        // k++;
-        // RCLCPP_INFO_STREAM(get_logger(), "" << i);
+    }
+    else
+    {
+        for (int i = 0; i < (int) detected_circles.size(); ++i) 
+        {
+            if(is_circle.at(i) == false)
+            {
+                continue;
+            }
+            
+            // int i = lidar.ranges.at(j).cluster;
+            visualization_msgs::msg::Marker obst{};
+            obst.header.frame_id = "red/base_footprint";
+            obst.header.stamp = stamp;
+            obst.type = visualization_msgs::msg::Marker::CYLINDER;
+            obst.scale.x = detected_circles.at(i).R;
+            obst.scale.y = detected_circles.at(i).R;
+            obst.scale.z = .25;
+            obst.color.r = .627;
+            obst.color.g = 0.125;
+            obst.color.b = 0.941;
+            obst.color.a = 1.0;
+            obst.id = i;
+            obst.lifetime = rclcpp::Duration(100ms);
+            obst.action = visualization_msgs::msg::Marker::ADD;
+            obst.pose.position.x = detected_circles.at(i).a;
+            obst.pose.position.y = detected_circles.at(i).b;
+            // obst.pose.position.x = lidar.ranges.at(j).range * cos(lidar.ranges.at(j).angle);
+            // obst.pose.position.y = lidar.ranges.at(j).range * sin(lidar.ranges.at(j).angle);
+            lidar_data.markers.push_back(obst);
+            // RCLCPP_INFO_STREAM(get_logger(), "" << detected_circles.at(i).a);
+            // k++;
+            // RCLCPP_INFO_STREAM(get_logger(), "" << i);
+        }
     }
     
     point_publisher_->publish(lidar_data);

@@ -51,7 +51,7 @@ namespace turtlelib
     }
 
 
-    void EKF::initialization(double index, double dx, double dy)
+    void EKF::initialization(int index, double dx, double dy)
     {
         int m_index = 3 + 2*index;
         double r = sqrt(std::pow(dx, 2) + std::pow(dy, 2));
@@ -63,7 +63,7 @@ namespace turtlelib
 
     }
 
-    void EKF::correction(double index, double dx, double dy)
+    void EKF::correction(int index, double dx, double dy)
     {
         int m_index = 3 + 2*index;
         double r = sqrt(std::pow(dx, 2) + std::pow(dy, 2));
@@ -90,7 +90,7 @@ namespace turtlelib
 
         H.submat(0,0, 1,2) = h_1;
 
-        H.submat(0,3+2*index, 1,4+2*index) = h_2;
+        H.submat(0,m_index, 1,m_index+1) = h_2;
 
         arma::mat K = sigma_est*H.t()*(H*sigma_est*H.t() + R).i();
 
@@ -99,4 +99,43 @@ namespace turtlelib
         sigma_est = (I - K*H)*sigma_est;
         
     }
+
+    arma::vec EKF::mah_distance(Circle lmark, int k)
+    {
+        // H matrix
+        int m_index = 3 + 2*k;
+        double r = sqrt(std::pow(lmark.a, 2) + std::pow(lmark.b, 2));
+        double phi = atan2(lmark.b,lmark.a);
+        double delta_x{0.0};
+        double delta_y{0.0};
+
+        arma::vec z_real = {r, phi};
+
+        delta_x = zeta_est(m_index) - zeta_est(1);
+        delta_y = zeta_est(m_index+1) - zeta_est(2);
+        
+        double d = delta_x*delta_x + delta_y*delta_y;
+
+        arma::mat H(2, 3+2*n);
+
+        arma::mat h_1 = {{0.0, -delta_x/sqrt(d), -delta_y/sqrt(d)},
+                         {-1.0, delta_y/d, -delta_x/d}};
+
+        arma::mat h_2 = {{delta_x/sqrt(d), delta_y/sqrt(d)},
+                         {-delta_y/d, delta_x/d}};
+
+        H.submat(0,0, 1,2) = h_1;
+
+        H.submat(0,m_index, 1,m_index+1) = h_2;
+
+        arma::mat Psi = H * sigma_est * H.t() + R;
+
+        arma::vec z_theor = {sqrt(d), normalize_angle(atan2(delta_y, delta_x))};
+
+        arma::vec d_m = (z_real - z_theor).t() * Psi.i() * (z_real - z_theor);
+
+        return d_m;
+    }
+
+
 }

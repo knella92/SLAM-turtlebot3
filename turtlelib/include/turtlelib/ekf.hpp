@@ -10,7 +10,18 @@
 
 namespace turtlelib
 {
+    /// \brief Circle parameters
+    struct Circle
+    {
+        /// \brief x coordinate of circle
+        double a;
 
+        /// \brief y coordinate of circle
+        double b;
+
+        /// \brief radius of circle
+        double R;
+    };
 
     /// \brief extended kalman filter
     class EKF
@@ -74,13 +85,16 @@ namespace turtlelib
             /// \param index - obstacle id
             /// \param dx - measured distance from robot to obstacle (x)
             /// \param dy - measured distance from robot to obstacle (y)
-            void initialization(double index, double dx, double dy);
+            void initialization(int index, double dx, double dy);
 
             /// \brief - corrects the predicted estimate of state vector
             /// \param index - obstacle id
             /// \param dx - measured distance from robot to obstacle (x)
             /// \param dy - measured distance from robot to obstacle (y)
-            void correction(double index, double dx, double dy);
+            void correction(int index, double dx, double dy);
+
+
+            arma::vec mah_distance(Circle lmark, int k);
 
     };
 

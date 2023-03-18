@@ -131,7 +131,7 @@ public:
     // Laser scan parameters
     declare_parameter("angle_increment", 0.01745329238474369);
     declare_parameter("range_min", 0.11999999731779099);
-    declare_parameter("range_max", 3.5);
+    declare_parameter("range_max", 0.8);
     //declare_parameter("sample_N", )
     //declare_parameter("resolution", )
     angle_increment = get_parameter("angle_increment").as_double();
@@ -385,12 +385,14 @@ private:
         if (sqrt(
             std::pow(
               obst.pose.position.x,
-              2) + std::pow(obst.pose.position.y, 2)) > max_range)
+              2.0) + std::pow(obst.pose.position.y, 2.0)) < max_range)
         {
-          obst.action = visualization_msgs::msg::Marker::DELETE;
-        } else {
           obst.color.g = 0.917;
           obst.action = visualization_msgs::msg::Marker::ADD;
+          // RCLCPP_INFO_STREAM(get_logger(), "obst.pose.position.x: " << obst.pose.position.x);
+        } else {
+          
+          obst.action = visualization_msgs::msg::Marker::DELETE;
           // RCLCPP_INFO_STREAM(get_logger(), "obst.pose.position.x: " << obst.pose.position.x);
         }
       } else {
@@ -480,11 +482,16 @@ private:
     std::vector<float> ranges{};
     for (int i = 0; i < 360; i++) {
       auto range = turtlelib::range_obstacles(
-        tbot3.q, range_max, obstacles_x, obstacles_y,
+        tbot3.q, range_max, range_min, obstacles_x, obstacles_y,
         obstacles_r, i * angle_increment);
       if (range == 0.0) {
         range = turtlelib::range_walls(tbot3.q, range_max, arena_x, arena_y, i * angle_increment);
+        if(range < range_min)
+        {
+          range = 0.0;
+        }
       }
+      
       range += sens_var(turtlelib::get_random());
       ranges.push_back(range);
     }
