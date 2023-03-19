@@ -69,7 +69,7 @@ namespace turtlelib
             /// \brief - vector of bool values stating if specific obstacle is initialized
             std::vector<bool> izd;
 
-            
+            /// \brief - vector of detected obstacle radii
             std::vector<double> obst_radii;
 
 
@@ -96,7 +96,10 @@ namespace turtlelib
             /// \param dy - measured distance from robot to obstacle (y)
             void correction(int index, double dx, double dy);
 
-
+            /// \brief Function that returns the mahalonabis distance between landmark and robot
+            /// \param lmark landmark coordinates
+            /// \param k index of landmark under comparison
+            /// \return vector with result of mahalonabis computation (range and angle)
             arma::vec mah_distance(Circle lmark, int k);
 
     };

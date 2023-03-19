@@ -7,9 +7,13 @@ Panels:
         - /Global Options1
         - /Status1
         - /TF1
+        - /TF1/Frames1
         - /TF1/Tree1
         - /Walls1
         - /Obstacles1
+        - /LaserScan1/Topic1
+        - /MarkerArray1
+        - /RobotModel1
       Splitter Ratio: 0.5
     Tree Height: 476
   - Class: rviz_common/Selection
@@ -66,6 +70,24 @@ Visualization Manager:
           Value: true
         blue/imu_link:
           Value: true
+        blue/wheel_left_link:
+          Value: true
+        blue/wheel_right_link:
+          Value: true
+        green/base_footprint:
+          Value: true
+        green/base_link:
+          Value: true
+        green/base_scan:
+          Value: true
+        green/caster_back_link:
+          Value: true
+        green/imu_link:
+          Value: true
+        green/wheel_left_link:
+          Value: true
+        green/wheel_right_link:
+          Value: true
         nusim/world:
           Value: true
         odom:
@@ -94,17 +116,17 @@ Visualization Manager:
         Value: /nuwalls/walls
       Value: true
     - Class: rviz_default_plugins/MarkerArray
-      Enabled: true
+      Enabled: false
       Name: Obstacles
       Namespaces:
-        "": true
+        {}
       Topic:
         Depth: 5
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /nuwalls/obstacles
-      Value: true
+        Value: /nuwalls/walls
+      Value: false
     - Alpha: 1
       Class: rviz_default_plugins/RobotModel
       Collision Enabled: false
@@ -168,7 +190,7 @@ Visualization Manager:
       Buffer Length: 200
       Class: rviz_default_plugins/Path
       Color: 25; 255; 0
-      Enabled: true
+      Enabled: false
       Head Diameter: 0.029999999329447746
       Head Length: 0.05000000074505806
       Length: 0.30000001192092896
@@ -190,8 +212,8 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /path
-      Value: true
+        Value: ""
+      Value: false
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -204,7 +226,7 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: ""
       Decay Time: 0
-      Enabled: true
+      Enabled: false
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Max Intensity: 4096
@@ -221,11 +243,82 @@ Visualization Manager:
         Durability Policy: Volatile
         Filter size: 10
         History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: ""
+        Reliability Policy: Best Effort
+        Value: /scan
       Use Fixed Frame: true
       Use rainbow: true
+      Value: false
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: MarkerArray
+      Namespaces:
+        {}
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /slam/slam_map
       Value: true
+    - Alpha: 1
+      Class: rviz_default_plugins/RobotModel
+      Collision Enabled: false
+      Description File: ""
+      Description Source: Topic
+      Description Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /green/robot_description
+      Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+        base_footprint:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        base_scan:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        caster_back_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        wheel_left_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        wheel_right_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+      Mass Properties:
+        Inertia: false
+        Mass: false
+      Name: RobotModel
+      TF Prefix: /green
+      Update Interval: 0
+      Value: true
+      Visual Enabled: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -308,5 +401,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1440
-  X: 584
-  Y: 185
+  X: 210
+  Y: 142

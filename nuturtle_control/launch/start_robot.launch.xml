@@ -32,7 +32,7 @@
     </node>
 
     <group if="$(eval '\'$(var use_rviz)\' == \'true\'')">
-        <node pkg='rviz2' exec='rviz2' output='screen' args='-d $(find-pkg-share nuslam)/config/slam_map.rviz'
+        <node pkg='rviz2' exec='rviz2' output='screen' args='-d $(find-pkg-share nuslam)/config/EKF_UKDA_map.rviz'
             if="$(eval '\'$(var robot)\' == \'nusim\'')">
         </node>
         <node pkg='rviz2' exec='rviz2' output='screen' args='-d $(find-pkg-share nuturtle_control)/config/no_robot.rviz'
@@ -69,9 +69,9 @@
         if="$(eval '\'$(var cmd_src)\' == \'teleop\'')"
         launch-prefix="xterm -e"/>
 
-    <node pkg="tf2_ros" exec="static_transform_publisher" name="world_to_odom" args='0 0 0 0 0 0 1 nusim/world odom'/>
+    <!-- <node pkg="tf2_ros" exec="static_transform_publisher" name="world_to_odom" args='0 0 0 0 0 0 1 nusim/world odom'/> -->
 
-    <node pkg='hls_lfcd_lds_driver' exec='hdls_laser_publisher'
+    <include file="$(find-pkg-share hls_lfcd_lds_driver)/launch/hlds_laser.launch.py"
         if="$(eval '\'$(var robot)\' == \'localhost\'')"/>
 
 

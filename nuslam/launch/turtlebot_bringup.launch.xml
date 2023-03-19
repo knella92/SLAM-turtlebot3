@@ -1,0 +1,8 @@
+<launch>
+
+    <include file="$(find-pkg-share nuslam)/launch/landmark_detect.launch.xml">
+        <arg name='robot' value='localhost'/>
+        <arg name='data_assoc' value = "unknown"/>
+    </include>
+
+</launch>

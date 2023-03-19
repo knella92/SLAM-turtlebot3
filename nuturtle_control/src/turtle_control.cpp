@@ -58,7 +58,7 @@ public:
 
     // initialize publishers and timer
     cmd_publisher_ = create_publisher<nuturtlebot_msgs::msg::WheelCommands>("/wheel_cmd", 10);
-    js_publisher_ = create_publisher<sensor_msgs::msg::JointState>("/joint_states", 40);
+    js_publisher_ = create_publisher<sensor_msgs::msg::JointState>("/joint_states", 100);
 
     // initialize subscribers
     vel_subscriber_ =
@@ -120,7 +120,6 @@ private:
   void sens_callback(const nuturtlebot_msgs::msg::SensorData & msg)
   {
     sensor_msgs::msg::JointState message{};
-    message.header.stamp = get_clock()->now();
     auto dt = message.header.stamp.nanosec - prev_time.nanoseconds();
     turtlelib::Wheel_Vel phidot{};
     phidot.l = (msg.left_encoder / encoder_ticks_per_rad - tbot3.phi_l) / (1e-9 * dt);
@@ -131,6 +130,7 @@ private:
     message.name = {"wheel_left_joint", "wheel_right_joint"};
     message.position = {tbot3.phi_l, tbot3.phi_r};
     message.velocity = {phidot.l, phidot.r};
+    message.header.stamp = get_clock()->now();
     js_publisher_->publish(message);
     prev_time = message.header.stamp;
   }
