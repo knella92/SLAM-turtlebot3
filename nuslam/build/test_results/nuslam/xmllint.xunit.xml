@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuite
   name="nuslam.xmllint"
-  tests="7"
+  tests="10"
   errors="0"
   failures="0"
-  time="0.095"
+  time="0.073"
 >
   <testcase
     name="package.xml"
@@ -25,7 +25,16 @@
     name="launch/landmark_detect.launch.xml"
     classname="nuslam.xmllint"/>
   <testcase
+    name="launch/pc_bringup.launch.xml"
+    classname="nuslam.xmllint"/>
+  <testcase
     name="launch/slam.launch.xml"
+    classname="nuslam.xmllint"/>
+  <testcase
+    name="launch/turtlebot_bringup.launch.xml"
+    classname="nuslam.xmllint"/>
+  <testcase
+    name="launch/unknown_data_assoc.launch.xml"
     classname="nuslam.xmllint"/>
   <system-out>Checked files:
 * package.xml
@@ -34,5 +43,8 @@
 * build/test_results/nuslam/uncrustify.xunit.xml
 * build/test_results/nuslam/xmllint.xunit.xml
 * launch/landmark_detect.launch.xml
-* launch/slam.launch.xml</system-out>
+* launch/pc_bringup.launch.xml
+* launch/slam.launch.xml
+* launch/turtlebot_bringup.launch.xml
+* launch/unknown_data_assoc.launch.xml</system-out>
 </testsuite>

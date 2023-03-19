@@ -138,6 +138,7 @@ namespace turtlelib
     /// \brief returns lidar range (distances) of obstacles
     /// \param q - body configuration of robot
     /// \param range_max - max range of lidar
+    /// \param range_min - minimum range of lidar
     /// \param obstacles_x - vector of obstacle x positions
     /// \param obstacles_y - vector of obstacle y positions
     /// \param obstacles_r - obstacle radius

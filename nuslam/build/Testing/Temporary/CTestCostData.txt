@@ -1,8 +1,8 @@
-Test_of_Circle_Detection 4 0.00274928
-cppcheck 7 0.0249277
+Test_of_Circle_Detection 5 0.00237219
+cppcheck 8 0.0254454
 lint_cmake 0 0
 uncrustify 0 0
-xmllint 7 0.0363656
+xmllint 8 0.0345172
 ---
 lint_cmake
 uncrustify

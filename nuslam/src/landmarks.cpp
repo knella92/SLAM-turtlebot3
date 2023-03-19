@@ -60,17 +60,18 @@ private:
 
   void lidar_callback(const sensor_msgs::msg::LaserScan & msg)
   {
-    
+
     std::vector<double> range_data{};
     double range_datum{};
-    for(int i{0}; i < (int) msg.ranges.size(); i++)
-    {
-        range_datum = msg.ranges.at(i);
-        range_data.push_back(range_datum);
+    for (int i{0}; i < (int) msg.ranges.size(); i++) {
+      range_datum = msg.ranges.at(i);
+      range_data.push_back(range_datum);
     }
-    turtlelib::Clusters lidar = turtlelib::clustering(range_data, msg.angle_increment, distance_threshold);
+    turtlelib::Clusters lidar = turtlelib::clustering(
+      range_data, msg.angle_increment,
+      distance_threshold);
     std::vector<turtlelib::Vector2D> centroids = turtlelib::centroid_finder(lidar);
-    
+
     turtlelib::ClustersCentroids cluster_points = turtlelib::shift_points(lidar, centroids);
     std::vector<turtlelib::Circle> detected_circles = turtlelib::circle_detection(cluster_points);
     std::vector<bool> is_circle = turtlelib::classification(detected_circles);
@@ -79,51 +80,48 @@ private:
 
   }
 
-  void publish_clusters(std::vector<turtlelib::Circle> detected_circles, std::vector<bool> is_circle)
+  void publish_clusters(
+    std::vector<turtlelib::Circle> detected_circles,
+    std::vector<bool> is_circle)
   {
     visualization_msgs::msg::MarkerArray lidar_data{};
     rclcpp::Time stamp = get_clock()->now();
-    if((int) detected_circles.size() == 0)
-    {
+    if ((int) detected_circles.size() == 0) {
+      visualization_msgs::msg::Marker obst{};
+      obst.header.frame_id = "red/base_footprint";
+      obst.header.stamp = stamp;
+      lidar_data.markers.push_back(obst);
+    } else {
+      for (int i = 0; i < (int) is_circle.size(); ++i) {
+        if (is_circle.at(i) == false) {
+          visualization_msgs::msg::Marker obst{};
+          obst.header.frame_id = "red/base_footprint";
+          obst.header.stamp = stamp;
+          lidar_data.markers.push_back(obst);
+          continue;
+        }
+
+        // int i = lidar.ranges.at(j).cluster;
         visualization_msgs::msg::Marker obst{};
         obst.header.frame_id = "red/base_footprint";
         obst.header.stamp = stamp;
+        obst.type = visualization_msgs::msg::Marker::CYLINDER;
+        obst.scale.x = detected_circles.at(i).R;
+        obst.scale.y = detected_circles.at(i).R;
+        obst.scale.z = .25;
+        obst.color.r = .627;
+        obst.color.g = 0.125;
+        obst.color.b = 0.941;
+        obst.color.a = 1.0;
+        obst.id = i;
+        obst.lifetime = rclcpp::Duration(100ms);
+        obst.action = visualization_msgs::msg::Marker::ADD;
+        obst.pose.position.x = detected_circles.at(i).a;
+        obst.pose.position.y = detected_circles.at(i).b;
         lidar_data.markers.push_back(obst);
+      }
     }
-    else
-    {
-        for (int i = 0; i < (int) is_circle.size(); ++i) 
-        {
-            if(is_circle.at(i) == false)
-            {
-                visualization_msgs::msg::Marker obst{};
-                obst.header.frame_id = "red/base_footprint";
-                obst.header.stamp = stamp;
-                lidar_data.markers.push_back(obst);
-                continue;
-            }
-            
-            // int i = lidar.ranges.at(j).cluster;
-            visualization_msgs::msg::Marker obst{};
-            obst.header.frame_id = "red/base_footprint";
-            obst.header.stamp = stamp;
-            obst.type = visualization_msgs::msg::Marker::CYLINDER;
-            obst.scale.x = detected_circles.at(i).R;
-            obst.scale.y = detected_circles.at(i).R;
-            obst.scale.z = .25;
-            obst.color.r = .627;
-            obst.color.g = 0.125;
-            obst.color.b = 0.941;
-            obst.color.a = 1.0;
-            obst.id = i;
-            obst.lifetime = rclcpp::Duration(100ms);
-            obst.action = visualization_msgs::msg::Marker::ADD;
-            obst.pose.position.x = detected_circles.at(i).a;
-            obst.pose.position.y = detected_circles.at(i).b;
-            lidar_data.markers.push_back(obst);
-        }
-    }
-    
+
     point_publisher_->publish(lidar_data);
   }
 

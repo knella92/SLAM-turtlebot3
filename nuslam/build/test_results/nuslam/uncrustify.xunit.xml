@@ -2,9 +2,9 @@
 <testsuite
   name="nuslam.uncrustify"
   tests="6"
-  failures="4"
+  failures="3"
   errors="0"
-  time="0.170"
+  time="0.169"
 >
   <testcase
     name="build/CMakeFiles/3.22.1/CompilerIdC/CMakeCCompilerId.c"
@@ -650,137 +650,7 @@
   </testcase>
   <testcase
     name="src/landmarks.cpp"
-    classname="nuslam.uncrustify"
-  >
-      <failure message="Diff with 128 lines"><![CDATA[--- src/landmarks.cpp
-+++ src/landmarks.cpp.uncrustify
-@@ -113 +113 @@
--    
-+
-@@ -116,4 +116,3 @@
--    for(int i{0}; i < (int) msg.ranges.size(); i++)
--    {
--        range_datum = msg.ranges.at(i);
--        range_data.push_back(range_datum);
-+    for (int i{0}; i < (int) msg.ranges.size(); i++) {
-+      range_datum = msg.ranges.at(i);
-+      range_data.push_back(range_datum);
-@@ -121 +120,3 @@
--    turtlelib::Clusters lidar = turtlelib::clustering(range_data, msg.angle_increment, distance_threshold);
-+    turtlelib::Clusters lidar = turtlelib::clustering(
-+      range_data, msg.angle_increment,
-+      distance_threshold);
-@@ -125 +126 @@
--    
-+
-@@ -138 +139,3 @@
--  void publish_clusters(std::vector<turtlelib::Circle> detected_circles, std::vector<bool> is_circle)
-+  void publish_clusters(
-+    std::vector<turtlelib::Circle> detected_circles,
-+    std::vector<bool> is_circle)
-@@ -142,54 +145,41 @@
--    for (int i = 0; i < (int) detected_circles.size(); ++i) 
--    {
--        if(is_circle.at(i) == false)
--        {
--            continue;
--        }
--        
--        // int i = lidar.ranges.at(j).cluster;
--        visualization_msgs::msg::Marker obst;
--        obst.header.frame_id = "green/base_footprint";
--        obst.header.stamp = stamp;
--        obst.type = visualization_msgs::msg::Marker::CYLINDER;
--        obst.scale.x = detected_circles.at(i).R;
--        obst.scale.y = detected_circles.at(i).R;
--        obst.scale.z = .25;
--        if(i == 0)
--        {
--            obst.color.r = 1.0;
--        }
--        else if(i == 1)
--        {
--            obst.color.g = 1.0;
--        }
--        else if(i == 2)
--        {
--            obst.color.b = 1.0;
--        }
--        else if(i == 3)
--        {
--            obst.color.r = 1.0;
--            obst.color.g = 128.0/255.0;
--        }
--        else if(i == 4)
--        {
--            obst.color.r = 1.0;
--            obst.color.g = 1.0;
--        }
--        else if(i == 5)
--        {
--            obst.color.r = 1.0;
--            obst.color.g = 51.0/255.0;
--            obst.color.b = 1.0;
--        }
--        obst.color.a = 1.0;
--        obst.id = i;
--        obst.action = visualization_msgs::msg::Marker::ADD;
--        obst.pose.position.x = detected_circles.at(i).a;
--        obst.pose.position.y = detected_circles.at(i).b;
--        // obst.pose.position.x = lidar.ranges.at(j).range * cos(lidar.ranges.at(j).angle);
--        // obst.pose.position.y = lidar.ranges.at(j).range * sin(lidar.ranges.at(j).angle);
--        lidar_data.markers.push_back(obst);
--        // RCLCPP_INFO_STREAM(get_logger(), "" << detected_circles.at(i).a);
--        // k++;
--        // RCLCPP_INFO_STREAM(get_logger(), "" << i);
-+    for (int i = 0; i < (int) detected_circles.size(); ++i) {
-+      if (is_circle.at(i) == false) {
-+        continue;
-+      }
-+
-+      // int i = lidar.ranges.at(j).cluster;
-+      visualization_msgs::msg::Marker obst;
-+      obst.header.frame_id = "green/base_footprint";
-+      obst.header.stamp = stamp;
-+      obst.type = visualization_msgs::msg::Marker::CYLINDER;
-+      obst.scale.x = detected_circles.at(i).R;
-+      obst.scale.y = detected_circles.at(i).R;
-+      obst.scale.z = .25;
-+      if (i == 0) {
-+        obst.color.r = 1.0;
-+      } else if (i == 1) {
-+        obst.color.g = 1.0;
-+      } else if (i == 2) {
-+        obst.color.b = 1.0;
-+      } else if (i == 3) {
-+        obst.color.r = 1.0;
-+        obst.color.g = 128.0 / 255.0;
-+      } else if (i == 4) {
-+        obst.color.r = 1.0;
-+        obst.color.g = 1.0;
-+      } else if (i == 5) {
-+        obst.color.r = 1.0;
-+        obst.color.g = 51.0 / 255.0;
-+        obst.color.b = 1.0;
-+      }
-+      obst.color.a = 1.0;
-+      obst.id = i;
-+      obst.action = visualization_msgs::msg::Marker::ADD;
-+      obst.pose.position.x = detected_circles.at(i).a;
-+      obst.pose.position.y = detected_circles.at(i).b;
-+      // obst.pose.position.x = lidar.ranges.at(j).range * cos(lidar.ranges.at(j).angle);
-+      // obst.pose.position.y = lidar.ranges.at(j).range * sin(lidar.ranges.at(j).angle);
-+      lidar_data.markers.push_back(obst);
-+      // RCLCPP_INFO_STREAM(get_logger(), "" << detected_circles.at(i).a);
-+      // k++;
-+      // RCLCPP_INFO_STREAM(get_logger(), "" << i);
-@@ -197 +187 @@
--    
-+
-@@ -209 +199 @@
--}+}
-]]></failure>
-  </testcase>
+    classname="nuslam.uncrustify"/>
   <testcase
     name="src/odometry.cpp"
     classname="nuslam.uncrustify"/>

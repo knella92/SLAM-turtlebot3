@@ -13,7 +13,13 @@ File 'build/test_results/nuslam/xmllint.xunit.xml' is valid
 
 File 'launch/landmark_detect.launch.xml' is valid
 
+File 'launch/pc_bringup.launch.xml' is valid
+
 File 'launch/slam.launch.xml' is valid
+
+File 'launch/turtlebot_bringup.launch.xml' is valid
+
+File 'launch/unknown_data_assoc.launch.xml' is valid
 
 No problems found
 

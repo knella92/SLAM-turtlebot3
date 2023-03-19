@@ -4,7 +4,7 @@
   tests="217"
   errors="0"
   failures="208"
-  time="0.059"
+  time="0.056"
 >
   <testcase
     name="whitespace/eol (CMakeLists.txt:44)"

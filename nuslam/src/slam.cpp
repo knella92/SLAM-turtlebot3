@@ -101,14 +101,12 @@ public:
       "/joint_states", 10, std::bind(
         &SlamNode::js_callback, this,
         std::placeholders::_1));
-    if(data_assoc == "known")
-    {
+    if (data_assoc == "known") {
       fake_sensor_subscriber_ = create_subscription<visualization_msgs::msg::MarkerArray>(
         "nusim/fake_sensor", 10, std::bind(
           &SlamNode::sensor_callback, this,
           std::placeholders::_1));
-    }
-    else{
+    } else {
       true_circle_subscriber_ = create_subscription<visualization_msgs::msg::MarkerArray>(
         "SLAM/points", 10, std::bind(
           &SlamNode::circle_callback, this,
@@ -247,7 +245,9 @@ private:
     extended_kalman.prediction(tbot3.q);
 
     for (int i{0}; i < max_obstacles - 1; i++) {
-      if (msg.markers[i].action == visualization_msgs::msg::Marker::ADD && msg.markers[i].color.a == 1.0) {
+      if (msg.markers[i].action == visualization_msgs::msg::Marker::ADD &&
+        msg.markers[i].color.a == 1.0)
+      {
         RCLCPP_INFO_STREAM(get_logger(), "" << i);
         if (extended_kalman.izd.at(i) == false) {
           extended_kalman.initialization(
@@ -255,6 +255,7 @@ private:
             msg.markers[i].pose.position.y);
           extended_kalman.izd.at(i) = true;
           obstacles_initialized = true;
+          extended_kalman.obst_radii.at(i) = msg.markers[i].scale.x;
         }
 
         if (extended_kalman.izd.at(i) == true) {
@@ -266,7 +267,7 @@ private:
 
     }
     if (obstacles_initialized) {
-      slam_publisher_->publish(add_obstacles(msg));
+      slam_publisher_->publish(add_obstacles());
     }
 
   }
@@ -274,18 +275,18 @@ private:
   void circle_callback(const visualization_msgs::msg::MarkerArray & msg)
   {
     extended_kalman.prediction(tbot3.q);
-    for(int i{0}; i < msg.markers.size(); i++)
-    {
-      if(msg.markers[i].action == visualization_msgs::msg::Marker::ADD && msg.markers[i].color.a == 1.0)
+    for (int i{0}; i < (int) msg.markers.size(); i++) {
+      if (msg.markers[i].action == visualization_msgs::msg::Marker::ADD &&
+        msg.markers[i].color.a == 1.0)
       {
-        turtlelib::Circle lmark = {msg.markers[i].pose.position.x, msg.markers[i].pose.position.y, msg.markers[i].scale.x};
+        turtlelib::Circle lmark =
+        {msg.markers[i].pose.position.x, msg.markers[i].pose.position.y, msg.markers[i].scale.x};
         std::vector<double> d_ks{};
         double d_k{};
         int l{0};
         double d_star{100.0};
 
-        if(N == 0)
-        {
+        if (N == 0) {
           extended_kalman.initialization(
             0, msg.markers[i].pose.position.x,
             msg.markers[i].pose.position.y);
@@ -294,31 +295,21 @@ private:
           extended_kalman.obst_radii.at(0) = msg.markers[i].scale.x;
           obstacles_initialized = true;
           N++;
-        }
-        else
-        {
-          for(int k{0}; k < N+1; k++)
-          {
-            if(k == N)
-            {
-              ;
-            }
-            else
-            {
+        } else {
+          for (int k{0}; k < N + 1; k++) {
+            if (k == N) {
+            } else {
               d_k = extended_kalman.mah_distance(lmark, k)(0);
-              if(d_k < d_star)
-              {
+              if (d_k < d_star) {
                 l = k;
                 d_star = d_k;
               }
             }
           }
-          if(d_star > dk_threshold)
-          {
+          if (d_star > dk_threshold) {
             l = N;
           }
-          if(l == N)
-          {
+          if (l == N) {
             extended_kalman.initialization(
               l, msg.markers[i].pose.position.x,
               msg.markers[i].pose.position.y);
@@ -330,19 +321,19 @@ private:
         }
         if (extended_kalman.izd.at(l) == true) {
           extended_kalman.correction(
-              l, msg.markers[i].pose.position.x,
-              msg.markers[i].pose.position.y);
+            l, msg.markers[i].pose.position.x,
+            msg.markers[i].pose.position.y);
         }
       }
     }
 
     if (obstacles_initialized) {
-      slam_publisher_->publish(add_obstacles(msg));
+      slam_publisher_->publish(add_obstacles());
     }
 
   }
 
-  visualization_msgs::msg::MarkerArray add_obstacles(visualization_msgs::msg::MarkerArray msg)
+  visualization_msgs::msg::MarkerArray add_obstacles()
   {
     visualization_msgs::msg::MarkerArray all_obst{};
     rclcpp::Time stamp = get_clock()->now();
