@@ -274,13 +274,11 @@ private:
   void circle_callback(const visualization_msgs::msg::MarkerArray & msg)
   {
     extended_kalman.prediction(tbot3.q);
-    // RCLCPP_INFO_STREAM(get_logger(), "circle_callback");
     for(int i{0}; i < msg.markers.size(); i++)
     {
       if(msg.markers[i].action == visualization_msgs::msg::Marker::ADD && msg.markers[i].color.a == 1.0)
       {
         turtlelib::Circle lmark = {msg.markers[i].pose.position.x, msg.markers[i].pose.position.y, msg.markers[i].scale.x};
-        RCLCPP_INFO_STREAM(get_logger(), "lmark.x and y  " << lmark.a <<" " << lmark.b);
         std::vector<double> d_ks{};
         double d_k{};
         int l{0};
@@ -308,7 +306,6 @@ private:
             else
             {
               d_k = extended_kalman.mah_distance(lmark, k)(0);
-              RCLCPP_INFO_STREAM(get_logger(), "d_k =  " << d_k);
               if(d_k < d_star)
               {
                 l = k;
@@ -320,7 +317,6 @@ private:
           {
             l = N;
           }
-            // d_ks.push_back(d_k);
           if(l == N)
           {
             extended_kalman.initialization(
@@ -330,14 +326,12 @@ private:
             obstacles_initialized = true;
             extended_kalman.obst_radii.at(l) = msg.markers[i].scale.x;
             N++;
-            RCLCPP_INFO_STREAM(get_logger(), "initialized =  " << l);
           }
         }
         if (extended_kalman.izd.at(l) == true) {
           extended_kalman.correction(
               l, msg.markers[i].pose.position.x,
               msg.markers[i].pose.position.y);
-          // RCLCPP_INFO_STREAM(get_logger(), "marker x =  " << extended_kalman.zeta_est(3 + 2*l) - extended_kalman.zeta_est(1));
         }
       }
     }
@@ -367,7 +361,6 @@ private:
         obst.pose.position.x = extended_kalman.zeta_est(3 + (2 * i));
         obst.pose.position.y = extended_kalman.zeta_est(4 + (2 * i));
         obst.action = visualization_msgs::msg::Marker::ADD;
-        // RCLCPP_INFO_STREAM(get_logger(), "i =  " << i);
 
         all_obst.markers.push_back(obst);
       }

@@ -1,19 +1,14 @@
 /// \landmarks.cpp
-/// \brief Defines and launches odometry node to update and publish/broadcast joint positions and velocities
+/// \brief Defines and launches landmarks node which interprets laser scan data for obstacle recognition
 ///
 /// PARAMETERS:
-///     wheel_radius (double): Radius of the turtlebot's wheels
-///     track_width (double): Distance between the turtlebot's wheels
-///     body_id (string): Name of odometry frame's child frame (base_footprint)
-///     odom_id (string): Name of odometry frame
-///     wheel_left (string): Name of left wheel joint
-///     wheel_right (string): Name of right wheel joint
+///     distance_threshold (double): Largest difference in range between laser scan points to be within the same cluster
 /// PUBLISHES:
-///     (/odom) (Odometry): Body configuration and twist
+///     (/SLAM/points) (MarkerArray): MarkerArray of recognized obstacle sizes and positions relative to robot
 /// SUBSCRIBES:
-///     (/joint_states) (JointState): Joint position and velocity messages
+///     (/red/base_scan) (LaserScan): Laserscan data
 /// SERVERS:
-///     (/initial_pose) (InitialPose): Input for a full reset of odometry to begin at desired position and orientation
+///     none
 /// CLIENTS:
 ///     none
 
@@ -43,68 +38,23 @@ public:
   : Node("landmarks")
   {
 
-    //declare initial parameters
-    // declare_parameter("body_id", "none");
-    // declare_parameter("odom_id", "odom");
-    // declare_parameter("wheel_left", "none");
-    // declare_parameter("wheel_right", "none");
-    // declare_parameter("wheel_radius", 0.0);
-    // declare_parameter("track_width", 0.0);
-    // declare_parameter("input_noise", 0.0);
-    // declare_parameter("slip_fraction", 0.0);
     declare_parameter("distance_threshold", 0.05);
-
-    // if these are not specified, shutdown the node
-    // if (get_parameter("body_id").as_string() == "none") {
-    //   RCLCPP_ERROR_STREAM(get_logger(), "No body frame specified.");
-    //   rclcpp::shutdown();
-    // } else if (get_parameter("wheel_left").as_string() == "none") {
-    //   RCLCPP_ERROR_STREAM(get_logger(), "No left wheel joint name specified.");
-    //   rclcpp::shutdown();
-    // } else if (get_parameter("wheel_right").as_string() == "none") {
-    //   RCLCPP_ERROR_STREAM(get_logger(), "No right wheel joint name specified.");
-    //   rclcpp::shutdown();
-    // }
-
-    // body_id = get_parameter("body_id").as_string();
-    // odom_id = get_parameter("odom_id").as_string();
-    // wheel_left = get_parameter("wheel_left").as_string();
-    // wheel_right = get_parameter("wheel_right").as_string();
-    // const auto radius = get_parameter("wheel_radius").as_double();
-    // const auto depth = get_parameter("track_width").as_double();
     distance_threshold = get_parameter("distance_threshold").as_double();
-
-    // turtlelib::DiffDrive tbot{depth, radius};
-    // tbot3 = tbot;
-    // blue_path_msg.header.frame_id = odom_id;
 
 
     // initialize publisher, subscriber, and service
-    //odom_publisher_ = create_publisher<nav_msgs::msg::Odometry>("/odom", 10);
     point_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("SLAM/points", 10);
     laser_scan_subscriber_ = create_subscription<sensor_msgs::msg::LaserScan>(
       "/red/base_scan", 10, std::bind(
         &LandmarksNode::lidar_callback, this,
         std::placeholders::_1));
-    //initialp_service_ =
-    //   create_service<nuturtle_control::srv::InitialPose>(
-    //   "/initial_pose",
-    //   std::bind(&OdomNode::initial_pose, this, std::placeholders::_1, std::placeholders::_2));
-
-    // initializes braodcaster
-    // tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
   }
 
 private:
   turtlelib::DiffDrive tbot3{0.0, 0.0};
   double distance_threshold{};
-//   rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr blue_path_;
-//   rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_publisher_;
-//   rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr path_publisher_;
   rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr laser_scan_subscriber_;
-//   std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
-//   rclcpp::Service<nuturtle_control::srv::InitialPose>::SharedPtr initialp_service_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr point_publisher_;
 
 
@@ -119,24 +69,13 @@ private:
         range_data.push_back(range_datum);
     }
     turtlelib::Clusters lidar = turtlelib::clustering(range_data, msg.angle_increment, distance_threshold);
-    // for(int i{0}; i < (int) lidar.ranges.size(); i++)
-    // {
-    //     RCLCPP_INFO_STREAM(get_logger(), "" << lidar.ranges.at(i).cluster);
-    // }
-    // if(lidar.n_clusters > 0)
-    // {
-        std::vector<turtlelib::Vector2D> centroids = turtlelib::centroid_finder(lidar);
-        
-        turtlelib::ClustersCentroids cluster_points = turtlelib::shift_points(lidar, centroids);
-        std::vector<turtlelib::Circle> detected_circles = turtlelib::circle_detection(cluster_points);
-        std::vector<bool> is_circle = turtlelib::classification(detected_circles);
-        // for(int i{0}; i< (int) is_circle.size(); i++)
-        // {
-        //     RCLCPP_INFO_STREAM(get_logger(), "" << is_circle);
-        // }
-        publish_clusters(detected_circles, is_circle);
-        // publish_clusters(lidar);
-    // }
+    std::vector<turtlelib::Vector2D> centroids = turtlelib::centroid_finder(lidar);
+    
+    turtlelib::ClustersCentroids cluster_points = turtlelib::shift_points(lidar, centroids);
+    std::vector<turtlelib::Circle> detected_circles = turtlelib::circle_detection(cluster_points);
+    std::vector<bool> is_circle = turtlelib::classification(detected_circles);
+    publish_clusters(detected_circles, is_circle);
+
 
   }
 
@@ -181,12 +120,7 @@ private:
             obst.action = visualization_msgs::msg::Marker::ADD;
             obst.pose.position.x = detected_circles.at(i).a;
             obst.pose.position.y = detected_circles.at(i).b;
-            // obst.pose.position.x = lidar.ranges.at(j).range * cos(lidar.ranges.at(j).angle);
-            // obst.pose.position.y = lidar.ranges.at(j).range * sin(lidar.ranges.at(j).angle);
             lidar_data.markers.push_back(obst);
-            // RCLCPP_INFO_STREAM(get_logger(), "" << detected_circles.at(i).a);
-            // k++;
-            // RCLCPP_INFO_STREAM(get_logger(), "" << i);
         }
     }
     
