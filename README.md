@@ -25,10 +25,5 @@ SLAM Corrected to true:
 dx = -0.0002 CM
 dy = -0.0003 CM
 
-
 <video src=https://user-images.githubusercontent.com/58793794/217950496-93bcb4ad-9c3e-4133-9091-a5ba8538c6b9.mp4>
-
-<img src=https://user-images.githubusercontent.com/58793794/224528158-d2b79b79-33a8-4eda-8389-fc2c0f91fb32.png>
-
-![Screenshot from 2023-03-11 23-12-10](https://user-images.githubusercontent.com/58793794/224997641-be58f4f3-b058-43a2-967a-ff4af58ee6c7.jpg)
-[Screencast from 03-19-2023 04:29:16 PM.webm](https://user-images.githubusercontent.com/58793794/226211996-dfe8ae07-cbb5-46e5-9ec7-b2b9325d1f82.webm)
+![Screenshot from 2023-03-11 23-12-10](https://user-images.githubusercontent.com/58793794/233505100-d10a511e-e4f5-4aca-b24e-8d5cb2ec0f6e.jpg)
