@@ -1,6 +1,6 @@
 # ME495 Sensing, Navigation and Machine Learning For Robotics
 * Kevin Nella
-* Winter 2022
+* Winter 2023
 # Brief Overview
 The purpose of this project was to develop a custom C++ library to implement SLAM with a turtlebot 3 (ROS 2). The project was executed in sequential assignments throughout the ME 495 SLAM class. By the end of the class the project was capable of calculating the state of the robot and its environment (cylindrical obstacles) using odometry, laser scanning, and an Extended Kalman Filter.
 # Package List
@@ -27,10 +27,14 @@ dy = -0.0003 CM
 
 
 
-
+# Videos
+Pure odometry
 https://github.com/knella92/SLAM-turtlebot3/assets/58793794/9b30db39-1969-454d-a9ce-8a5d715bb0eb
 
 
-
+Simulated turtlebot, odometry position, and EKF corrected position and detected obstacles
+- Red: simulated robot
+- Blue: odometry position after the addition of slippage (gaussian noise)
+- Green: EKF corrected position with detected obstacles through state estimation
 https://github.com/knella92/SLAM-turtlebot3/assets/58793794/2e041d2c-cc10-4d84-807b-04b0b348b80b
 
