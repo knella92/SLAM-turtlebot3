@@ -28,13 +28,15 @@ dy = -0.0003 CM
 
 
 # Videos
-Pure odometry
+## Pure odometry
+
 https://github.com/knella92/SLAM-turtlebot3/assets/58793794/9b30db39-1969-454d-a9ce-8a5d715bb0eb
 
 
-Simulated turtlebot, odometry position, and EKF corrected position and detected obstacles
+## Simulated turtlebot, odometry position, and EKF corrected position and detected obstacles
 - Red: simulated robot
 - Blue: odometry position after the addition of slippage (gaussian noise)
 - Green: EKF corrected position with detected obstacles through state estimation
+
 https://github.com/knella92/SLAM-turtlebot3/assets/58793794/2e041d2c-cc10-4d84-807b-04b0b348b80b
 
