@@ -25,6 +25,8 @@ SLAM Corrected to true:
 dx = -0.0002 CM
 dy = -0.0003 CM
 
-<video src=https://user-images.githubusercontent.com/58793794/217950496-93bcb4ad-9c3e-4133-9091-a5ba8538c6b9.mp4>
-<br>
-![Screenshot from 2023-03-11 23-12-10](https://user-images.githubusercontent.com/58793794/233505100-d10a511e-e4f5-4aca-b24e-8d5cb2ec0f6e.jpg)
+
+
+
+https://github.com/knella92/SLAM-turtlebot3/assets/58793794/9b30db39-1969-454d-a9ce-8a5d715bb0eb
+
